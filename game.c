@@ -14,6 +14,93 @@ const char *test_level_str =
     "#      #\n"
     "########\n";
 
+const char *levels[] = {
+    "#####\n"
+    "## t#\n"
+    "# b #\n"
+    "#   #\n"
+    "##p##\n"
+    "#####\n",
+    
+    "######\n"
+    "#t t##\n"
+    "##   #\n"
+    "##b  #\n"
+    "## b #\n"
+    "##   #\n"
+    "###p##\n"
+    "######\n",
+
+    "#########\n"
+    "######t##\n"
+    "##/////##\n"
+    "#p ///b/#\n"
+    "# #////##\n"
+    "#  ////##\n"
+    "#      ##\n"
+    "#########\n",
+
+    "########\n"
+    "#####t##\n"
+    "#pb////#\n"
+    "#  ////#\n"
+    "#  ////#\n"
+    "#     b#\n"
+    "#      #\n"
+    "########\n",
+
+    "########\n"
+    "####t###\n"
+    "#//////#\n"
+    "#pb//#/#\n"
+    "#//////#\n"
+    "#////#/#\n"
+    "#/#////#\n"
+    "#//////#\n"
+    "########\n",
+
+    "#########\n"
+    "####t##t#\n"
+    "#  #/## #\n"
+    "#  /B/t #\n"
+    "#  #/## #\n"
+    "#  #b# b#\n"
+    "#   p   #\n"
+    "#########\n",
+
+    "#########\n"
+    "####t####\n"
+    "####t####\n"
+    "####t####\n"
+    "#t  /   #\n"
+    "# #b/ b #\n"
+    "# # /   #\n"
+    "# # /b  #\n"
+    "#p# /   #\n"
+    "####/## #\n"
+    "####B   #\n"
+    "####/ ###\n"
+    "####/   #\n"
+    "####/####\n"
+    "#########\n",
+
+    "###############\n"
+    "#### bt########\n"
+    "#### ##########\n"
+    "#//#////////#/#\n"
+    "#//////#//////#\n"
+    "#/#///////////#\n"
+    "##///////////##\n"
+    "#p//////#//#//#\n"
+    "##//////##///##\n"
+    "#//////#//#///#\n"
+    "#//#//////////#\n"
+    "#///////////#/#\n"
+    "###############\n",
+
+};
+
+bool game_check_victory(game *g);
 bool game_is_tile_walkable(game *g, int x, int y, int dx, int dy);
 
 bool game_try_move_box(game *g, int x, int y, int dx, int dy) {
@@ -84,25 +171,40 @@ void game_handle_input(application_data *ad, void *scene_data, SDL_Event e) {
         bool down = sym == SDLK_DOWN || sym == SDLK_s || sym == SDLK_j;
         bool left = sym == SDLK_LEFT || sym == SDLK_a || sym == SDLK_h;
         bool right = sym == SDLK_RIGHT || sym == SDLK_d || sym == SDLK_l;
+        bool reset = sym == SDLK_r;
 
+        bool movement = up || down || left || right;
 
-        int dx = 0;
-        int dy = 0;
+        if (movement) {
+            int dx = 0;
+            int dy = 0;
 
-        if (up) {
-            dy = -1;
-        } else if (down) {
-            dy = 1;
-        } else if (left) {
-            dx = -1;
-        } else if (right) {
-            dx = 1;
-        } else {
-            return;
+            if (up) {
+                dy = -1;
+            } else if (down) {
+                dy = 1;
+            } else if (left) {
+                dx = -1;
+            } else if (right) {
+                dx = 1;
+            }
+            game_try_move_player(g, dx, dy);
+            if (game_check_victory(g)) {
+                printf("u win\n");
+                grid_delete(g->current_level);
+                game_load_level_from_str(g, levels[++g->current_level_num]);
+            }
+
+        } else if (reset) {
+            grid_delete(g->current_level);
+            game_load_level_from_str(g, levels[g->current_level_num]);
+        } else if (sym == SDLK_q) {
+            grid_delete(g->current_level);
+            game_load_level_from_str(g, levels[--g->current_level_num]);
+        } else if (sym == SDLK_e) {
+            grid_delete(g->current_level);
+            game_load_level_from_str(g, levels[++g->current_level_num]);            
         }
-
-        game_try_move_player(g, dx, dy);
-        
     }
 }
 
@@ -215,15 +317,32 @@ void game_load_level_from_str(game *g, const char *level_str) {
     }
 };
 
+bool game_check_victory(game *g) {
+    tile_type t;
+    for (int i = 0; i < g->current_level.w; i++) {
+        for (int j = 0; j < g->current_level.h; j++) {
+            grid_get(g->current_level, &t, i, j);
+            if (t & TT_TARGET) {
+                if (t& TT_BOX) {
+                    // ok
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
 
-game game_init() {
+
+game game_init(int starting_level_num) {
     game g = {0};
     g.s = (scene_interface) {
         .draw = game_draw,
         .handle_input = game_handle_input,
     };
-
-    game_load_level_from_str(&g, test_level_str);
+    g.current_level_num = starting_level_num;
+    game_load_level_from_str(&g, levels[g.current_level_num]);
 
     for (int i = 0; i < g.current_level.h; i++) {
         for (int j = 0; j < g.current_level.w; j++) {

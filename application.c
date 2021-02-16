@@ -1,16 +1,19 @@
 #include "application.h"
 
-void application_init(application *app, int xres, int yres) {
+void application_init(application *app, int xres, int yres, bool do_start_level, int start_level) {
     app->gc = gef_init("snowkoban", xres, yres, 60);
     gef_load_atlas(&app->gc, "assets/snowkoban.png");
     app->main_menu = main_menu_init(&app->gc);
-    app->game = game_init();
+    app->game = game_init(start_level);
 
     app->ad = (application_data) {
-        //.current_scene = &app->main_menu.s,
-        .current_scene = &app->game.s,
+        .current_scene = &app->main_menu.s,
         .keep_going = true,
     };
+
+    if (do_start_level) {
+        app->ad.current_scene = &app->game.s;
+    }
 }
 
 void application_update(application *app) {

@@ -15,6 +15,7 @@ typedef enum {
 typedef struct {
     scene_interface s;
     grid current_level;
+    int current_level_num;
     int player_x;
     int player_y;
 } game;
