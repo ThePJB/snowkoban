@@ -5,12 +5,14 @@ idea: snowman balls where u have to push them to grow them to a certain size
 
 TODOS:
  - level menu
- - clap for levels
- - victory check
  - are we lerping out  positions or what
  - juice it up, sounds
- - are we improving art at all lol. like a wall side at least |
+ - graphics improvement - 3d voxels with translucent ice nice. puffy snow and wall walls. as for the character idk lol. shit billboard?
  - settings menu
- - ctrl z
- - reset
- - 2 next to each other ok or no? feels bad lol
+ - wire up menu
+
+ ## Level Concepts
+ - got to have newtons cradling with one on snow in the middle of the ice!
+ - non victory blocks (snowballs)
+ - get snowballs to a certain size
+ - lol cloning machine

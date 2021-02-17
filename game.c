@@ -31,6 +31,13 @@ const char *levels[] = {
     "###p##\n"
     "######\n",
 
+    // 2 steps forward 1 step back
+    "########\n"
+    "# tb   #\n"
+    "#p #   #\n"
+    "# bt   #\n"
+    "########\n",
+
     "#########\n"
     "######t##\n"
     "##/////##\n"
@@ -59,6 +66,47 @@ const char *levels[] = {
     "#//////#\n"
     "########\n",
 
+    "###########\n"
+    "# bt#######\n"
+    "# #/////bt#\n"
+    "#  /#######\n"
+    "#  /#######\n"
+    "#  /#######\n"
+    "#p /#######\n"
+    "###/#######\n"
+    "###########\n"
+    "###########\n",
+
+    // elementary block puzzle
+    "###########\n"
+    "#  b     t#\n"
+    "#     /  t#\n"
+    "#    #b#  #\n"
+    "#p        #\n"
+    "###########\n",
+
+    
+    // easy double block puzzle
+    "###########\n"
+    "# b    t  #\n"
+    "#    /t # #\n"
+    "#   #b#b# #\n"
+    "#p     t  #\n"
+    "#         #\n"
+    "###########\n",
+
+    
+    // tricky double block puzzle
+    "###########\n"
+    "# b    t  #\n"
+    "#    /t # #\n"
+    "#   #b#b# #\n"
+    "#p     t  #\n"
+    "###########\n",
+
+    // cross
+    // tricky if you dont get blocking the block and ur just
+    // thinking which order to put them in the receptacle
     "#########\n"
     "####t##t#\n"
     "#  #/## #\n"
@@ -68,6 +116,7 @@ const char *levels[] = {
     "#   p   #\n"
     "#########\n",
 
+    // railgun
     "#########\n"
     "####t####\n"
     "####t####\n"
@@ -84,10 +133,53 @@ const char *levels[] = {
     "####/####\n"
     "#########\n",
 
+    // loom
+    "###############\n"
+    "#  ///#///###\n"
+    "#  ///////tt#\n"
+    "# b//#////###\n"
+    "# b///////tt#\n"
+    "# b/////#/###\n"
+    "#  ///////tt#\n"
+    "# #///////###\n"
+    "#  bbb      #\n"
+    "#p          #\n"
+    "#############\n",
+
+    // send block back and forth over ice lake
+    // u actually have to start by constraining a block
+    "###############\n"
+    "#           t #\n"
+    "#          #  #\n"
+    "#   p      b/ #\n"
+    "#          #  #\n"
+    "#  #//////////#\n"
+    "#  B//////////#\n"
+    "#  #//////////#\n"
+    "#             #\n"
+    "#            t#\n"
+    "###############\n",
+
+    // calculator
+    // oo this might need like one way ice so u can push it laterally still
+    "################\n"
+    "#   T/T/T//T   #\n"
+    "#   T/T/T///   #\n"
+    "#   //T/////   #\n"
+    "#   ////////   #\n"
+    "#   ////////   #\n"
+    "#   ////////   #\n"
+    "#     bbbb     #\n"
+    "#   ////////   #\n"
+    "#   ////////   #\n"
+    "#     bbbb     #\n"
+    "#              #\n"
+    "################\n",
+
     "###############\n"
     "#### bt########\n"
     "#### ##########\n"
-    "#//#////////#/#\n"
+    "#//#/#//////#/#\n"
     "#//////#//////#\n"
     "#/#///////////#\n"
     "##///////////##\n"
@@ -99,6 +191,8 @@ const char *levels[] = {
     "###############\n",
 
 };
+
+void history_erase(history *h);
 
 bool game_check_victory(game *g);
 bool game_is_tile_walkable(game *g, int x, int y, int dx, int dy);
@@ -176,6 +270,8 @@ void game_handle_input(application_data *ad, void *scene_data, SDL_Event e) {
         bool movement = up || down || left || right;
 
         if (movement) {
+            game_append_history(g);
+
             int dx = 0;
             int dy = 0;
 
@@ -191,19 +287,25 @@ void game_handle_input(application_data *ad, void *scene_data, SDL_Event e) {
             game_try_move_player(g, dx, dy);
             if (game_check_victory(g)) {
                 printf("u win\n");
+                history_erase(&g->history);
                 grid_delete(g->current_level);
                 game_load_level_from_str(g, levels[++g->current_level_num]);
             }
 
         } else if (reset) {
+            history_erase(&g->history);
             grid_delete(g->current_level);
             game_load_level_from_str(g, levels[g->current_level_num]);
         } else if (sym == SDLK_q) {
+            history_erase(&g->history);
             grid_delete(g->current_level);
             game_load_level_from_str(g, levels[--g->current_level_num]);
         } else if (sym == SDLK_e) {
+            history_erase(&g->history);
             grid_delete(g->current_level);
             game_load_level_from_str(g, levels[++g->current_level_num]);            
+        } else if (sym == SDLK_u) {
+            game_undo(g);
         }
     }
 }
@@ -301,8 +403,16 @@ void game_load_level_from_str(game *g, const char *level_str) {
                 g->player_y = j;
                 t = TT_SNOW | TT_PLAYER;
                 grid_set(g->current_level, &t, i, j);
+            } else if (*current_pos == 'P') {
+                g->player_x = i;
+                g->player_y = j;
+                t = TT_ICE | TT_PLAYER;
+                grid_set(g->current_level, &t, i, j);
             } else if (*current_pos == 't') {
                 t = TT_SNOW | TT_TARGET;
+                grid_set(g->current_level, &t, i, j);
+            } else if (*current_pos == 'T') {
+                t = TT_ICE | TT_TARGET;
                 grid_set(g->current_level, &t, i, j);
             } else if (*current_pos == 'b') {
                 t = TT_SNOW | TT_BOX;
@@ -310,11 +420,18 @@ void game_load_level_from_str(game *g, const char *level_str) {
             } else if (*current_pos == 'B') {
                 t = TT_ICE | TT_BOX;
                 grid_set(g->current_level, &t, i, j);
+            } else if (*current_pos == 'f') {
+                t = TT_SNOW | TT_BOX | TT_TARGET;
+                grid_set(g->current_level, &t, i, j);
+            } else if (*current_pos == 'F') {
+                t = TT_ICE | TT_BOX | TT_TARGET;
+                grid_set(g->current_level, &t, i, j);
             }
             i++;
         }
         current_pos++;
     }
+    game_append_history(g);
 };
 
 bool game_check_victory(game *g) {
@@ -334,6 +451,97 @@ bool game_check_victory(game *g) {
     return true;
 }
 
+#define HISTORY_STARTING_SIZE 100
+
+history history_init() {
+    history h = (history) {
+        .backing_size = HISTORY_STARTING_SIZE,
+        .length = 1,
+        .records = malloc(HISTORY_STARTING_SIZE * sizeof(history_record)),
+    };
+
+    h.records[0] = (history_record) {.t = TT_SENTINEL, 0, 0};
+
+    return h;
+}
+
+void history_erase(history *h) {
+    h->length = 1;
+}
+
+void history_append_record(history *h, history_record r) {
+    if (h->length == h->backing_size) {
+        h->backing_size *= 2;
+        h->records = realloc(h->records, sizeof(history_record) * h->backing_size);
+    }
+    h->records[h->length++] = r;
+}
+
+void game_append_history(game *g) {
+    tile_type t;
+    for (int i = 0; i < g->current_level.w; i++) {
+        for (int j = 0; j < g->current_level.h; j++) {
+            grid_get(g->current_level, &t, i, j);
+            if (t & TT_BOX) {
+                history_record r = (history_record) {
+                    .t = TT_BOX,
+                    .x = i,
+                    .y = j,
+                };
+                history_append_record(&g->history, r);
+            }
+            if (t & TT_PLAYER) {
+                history_record r = (history_record) {
+                    .t = TT_PLAYER,
+                    .x = i,
+                    .y = j,
+                };
+                history_append_record(&g->history, r);
+            }
+        }
+    }
+    history_append_record(&g->history, (history_record) {.t = TT_SENTINEL});
+    printf("history len %d\n", g->history.length);
+}
+
+void game_undo(game *g) {
+    // already at the start
+    if (g->history.length == 1) {
+        return;
+    }
+
+    // erase mobile entities
+    tile_type t;
+    for (int i = 0; i < g->current_level.w; i++) {
+        for (int j = 0; j < g->current_level.h; j++) {
+            grid_get(g->current_level, &t, i, j);
+            if (t & TT_BOX) {
+                t ^= TT_BOX;
+            }
+            if (t & TT_PLAYER) {
+                t ^= TT_PLAYER;
+            }
+            grid_set(g->current_level, &t, i, j);
+        }
+    }
+
+    int i = g->history.length - 2; // 1 for sentinel and 1 for length being index+1
+    history_record r = g->history.records[i];
+    while (r.t != TT_SENTINEL) {
+        tile_type t;
+        grid_get(g->current_level, &t, r.x, r.y);
+        t ^= r.t;
+        if (t & TT_PLAYER) {
+            g->player_x = r.x;
+            g->player_y = r.y;
+        }
+        grid_set(g->current_level, &t, r.x, r.y);
+        i--;
+        r = g->history.records[i];
+    }
+    g->history.length = i + 1;
+}
+
 
 game game_init(int starting_level_num) {
     game g = {0};
@@ -351,5 +559,9 @@ game game_init(int starting_level_num) {
         }
     }
 
+    g.history = history_init();
+
     return g;
 }
+
+
