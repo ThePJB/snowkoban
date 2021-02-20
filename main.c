@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     }
 
     application app = {0};
-    application_init(&app, 1000, 1000, do_level_start, level_num);
+    application_init(&app, 1600, 900, do_level_start, level_num);
     
     while (app.ad.keep_going) {
         gef_start_frame(&app.gc);

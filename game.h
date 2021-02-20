@@ -2,6 +2,7 @@
 
 #include "grid.h"
 #include "scene.h"
+#include "audio.h"
 
 typedef enum {
     TT_WALL = 1,
@@ -10,7 +11,8 @@ typedef enum {
     TT_TARGET = 8,
     TT_ICE = 16,
     TT_PLAYER = 32,
-    TT_SENTINEL = 64,
+    TT_CRATE = 64,
+    TT_SENTINEL = 128,
 } tile_type;
 
 typedef struct {
@@ -32,6 +34,7 @@ typedef struct {
     int player_x;
     int player_y;
     history history;
+    audio *audio;
 } game;
 
 history history_init();
@@ -43,4 +46,4 @@ void game_undo(game *g);
 
 void game_load_level_from_str(game *g, const char *level_str);
 
-game game_init();
+game game_init(int starting_level_num, audio *audio);

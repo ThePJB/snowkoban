@@ -5,9 +5,11 @@
 #include "menus.h"
 #include "game.h"
 #include <stdbool.h>
+#include <SDL_mixer.h>
+#include "audio.h"
+
 
 #define MAX_SCENES 16;
-
 
 
 typedef struct {
@@ -15,13 +17,9 @@ typedef struct {
 
     main_menu main_menu;
     game game;
-    //all scenes
-    // game
-    // menus
+    audio audio;
 
     application_data ad;
-
-    
     
 } application;
 
