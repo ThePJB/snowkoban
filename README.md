@@ -25,6 +25,9 @@ TODOS:
  - lol cloning machine
  - maybe a hole would be good too, so u can have ice without necessarily having a wall u can go on. 1 way ice of a sort
  - crumbly block no going back
+ - Torch pickup item which melts ice blocks as you move them, allowing you to create your own slippery ice blocks
+ - Ice pick splits ice block in two
+ - Ice pick or torch to free frozen prehistoric animal from ice that has a set movement pattern/action once it is freed (e.g. sabertooth lashes out which can be used to break through a destructible block
 
  - crate knocks a block
  - crate gets in the way e.g. makes a corner so u cant push something
@@ -67,3 +70,4 @@ Christmas is pretty fucking trash. What else is snow and icy?
  - eskimos
  - yetis
  - you could be tibet santa
+ - Siberia? escaped from russian prison.
