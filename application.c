@@ -1,4 +1,6 @@
 #include "application.h"
+#include "levels.h"
+#include "util.h"
 
 void application_init(application *app, int xres, int yres, bool do_start_level, int start_level) {
     app->gc = gef_init("snowkoban", xres, yres, 60);
@@ -9,29 +11,45 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
     }
 
     app->audio = audio_load_sounds();
-
-
-    app->main_menu = main_menu_init(&app->gc);
-    app->game = game_init(start_level, &app->audio);
-
-    app->ad = (application_data) {
-        .current_scene = &app->main_menu.s,
+    app->previous_scene = -1;
+    app->shared_data = (shared_data) {
+        .current_scene = SCENE_MAIN_MENU,
         .keep_going = true,
+        .levels = levels,
+        .num_levels = len(levels),
+        .selected_level = 0,
+        .completed = {false},
     };
 
+    app->scenes[SCENE_MAIN_MENU] = malloc(sizeof(main_menu));
+    *(main_menu*)app->scenes[SCENE_MAIN_MENU] = main_menu_init(&app->gc);
+    app->scenes[SCENE_LEVEL_MENU] = malloc(sizeof(level_menu));
+    *(level_menu*)app->scenes[SCENE_LEVEL_MENU] = level_menu_init(&app->gc, &app->shared_data);
+    app->scenes[SCENE_GAME] = malloc(sizeof(game));
+    *(game*)app->scenes[SCENE_GAME] = game_init(&app->audio, &app->shared_data);
+
     if (do_start_level) {
-        app->ad.current_scene = &app->game.s;
+        app->shared_data.current_scene = SCENE_GAME;
+        app->shared_data.selected_level = start_level;
     }
 }
 
 void application_update(application *app) {
+    if (app->previous_scene != app->shared_data.current_scene) {
+        app->previous_scene = app->shared_data.current_scene;
+        scene_interface *cs = app->scenes[app->shared_data.current_scene];
+        cs->on_focus(&app->shared_data, cs);
+    }
     return; // probably dont do much here since its mostly input driven
 }
 
 void application_draw(application *app) {
     gef_clear(&app->gc);
 
-    app->ad.current_scene->draw(&app->ad, app->ad.current_scene, &app->gc);
+    app->scenes[app->shared_data.current_scene]->draw(
+        &app->shared_data, 
+        app->scenes[app->shared_data.current_scene], 
+        &app->gc);
 
     gef_present(&app->gc);
 }
@@ -40,10 +58,11 @@ void application_handle_input(application *app) {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0) {
         if (e.type == SDL_QUIT) {
-            app->ad.keep_going = false;
+            app->shared_data.keep_going = false;
             return;
         } else {
-            app->ad.current_scene->handle_input(&app->ad, app->ad.current_scene, e);
+            app->scenes[app->shared_data.current_scene]->handle_input(
+                &app->shared_data, app->scenes[app->shared_data.current_scene], e);
         }
     }
 }

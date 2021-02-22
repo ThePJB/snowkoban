@@ -1,6 +1,7 @@
 #include "strings.h"
 
 #include <stdio.h>
+#include <math.h>
 
 bool strings_equal(char *a, char *b) {
     if (!a) {
@@ -45,4 +46,28 @@ int strings_atoi(char *a) {
     } while (*a++ != '\0');
 
     return acc;
+}
+
+void strings_itoa(char *a, int i) {
+    if (i == 0) {
+        a[0] = '0';
+        a[1] = '\0';
+        return;
+    }
+
+    if (i < 0) {
+        a[0] = '-';
+        strings_itoa(a+1, -1*i);
+        return;
+    }
+
+    int len = log10(i) + 1;
+    int column = 1;
+    for (int j = 0; j < len; j++) {
+        int d = (i / column) % 10;
+        char c = d + '0';
+        a[len-j-1] = c;
+        column *= 10;
+    }
+    a[len] = '\0';
 }

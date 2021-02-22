@@ -22,9 +22,10 @@ int main(int argc, char** argv) {
     application app = {0};
     application_init(&app, 1600, 900, do_level_start, level_num);
     
-    while (app.ad.keep_going) {
+    while (app.shared_data.keep_going) {
         gef_start_frame(&app.gc);
         application_handle_input(&app);
+        application_update(&app);
         application_draw(&app);
         gef_end_frame(&app.gc);
     }

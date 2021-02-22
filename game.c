@@ -1,497 +1,88 @@
 #include "scene.h"
 #include "game.h"
+#include "util.h"
 
 
-const char *levels[] = {
-    "#####\n"
-    "## t#\n"
-    "# b #\n"
-    "#   #\n"
-    "##p##\n"
-    "#####\n",
-    
-    "######\n"
-    "#t t##\n"
-    "##   #\n"
-    "##b  #\n"
-    "## b #\n"
-    "##   #\n"
-    "###p##\n"
-    "######\n",
-
-    // 2 steps forward 1 step back
-    "########\n"
-    "# tb   #\n"
-    "#p #   #\n"
-    "# bt   #\n"
-    "########\n",
-
-    "###########\n"
-    "#         #\n"
-    "#  p     b#\n"
-    "#    b    #\n"
-    "#        t#\n"
-    "#        t#\n"
-    "#    b   t#\n"
-    "###########\n",
-
-    "#########\n"
-    "######t##\n"
-    "###////##\n"
-    "#p ///B/#\n"
-    "# #////##\n"
-    "# #////##\n"
-    "#      ##\n"
-    "#########\n",
-
-
-    "########\n"
-    "####t###\n"
-    "#//////#\n"
-    "#pb//#/#\n"
-    "#//////#\n"
-    "#////#/#\n"
-    "#/#////#\n"
-    "#//////#\n"
-    "########\n",
-    
-    "##############\n"
-    "#########/####\n"
-    "#########/T###\n"
-    "##/////////###\n"
-    "#//PB//////###\n"
-    "###//////////#\n"
-    "###//////////#\n"
-    "###//#//#/#//#\n"
-    "##############\n",
-
-    "#############\n"
-    "#########//##\n"
-    "#########/B##\n"
-    "# t//////// #\n"
-    "#/B///B///Bt#\n"
-    "#///////////#\n"
-    "#///////////#\n"
-    "#t///////// #\n"
-    "# ///////Pt #\n"
-    "#############\n",
-
-    // use ice to move fast lol
-    "##########\n"
-    "######  /#\n"
-    "#  b p #/#\n"
-    "#/####t#/#\n"
-    "#/######/#\n"
-    "#/######/#\n"
-    "#////////#\n"
-    "##########\n",
-
-    // but make it able to lose
-    "##########\n"
-    "######  /#\n"
-    "#p b   #/#\n"
-    "#/####t#/#\n"
-    "#/######/#\n"
-    "#/######/#\n"
-    "#////////#\n"
-    "##########\n",
-
-    "###########\n"
-    "# bt#######\n"
-    "# #/////bt#\n"
-    "#  /#######\n"
-    "#  /#######\n"
-    "#  P#######\n"
-    "#  /#######\n"
-    "###/#######\n"
-    "###########\n"
-    "###########\n",
-
-    "########\n"
-    "##T#####\n"
-    "#T/////#\n"
-    "##/ bb/#\n"
-    "##/ b T#\n"
-    "##/ b /#\n"
-    "##/ p /#\n"
-    "##T////#\n"
-    "########\n",
-
-    "###############\n"
-    "#            t#\n"
-    "#             #\n"
-    "#######/#######\n"
-    "#   ###/###   #\n"
-    "# b ###/###   #\n"
-    "#   ///P///   #\n"
-    "# # ###/###   #\n"
-    "# / ###/###  t#\n"
-    "##/####/#######\n"
-    "# b           #\n"
-    "#             #\n"
-    "###############\n",
-
-    "##############\n"
-    "#            #\n"
-    "#       ##   #\n"
-    "## #####    t#\n"
-    "## #     ## ##\n"
-    "## #  b  #   #\n"
-    "## # bpb #  t#\n"
-    "## ## b ##  t#\n"
-    "##           #\n"
-    "#    #########\n"
-    "#           t#\n"
-    "##############\n",
-
-
-
-
-    // welcome to crate town
-    "#########\n"
-    "####t####\n"
-    "#   c   #\n"
-    "#    b  #\n"
-    "#  p    #\n"
-    "#########\n",
-
-
-    // elementary block puzzle
-    "###########\n"
-    "#  b     t#\n"
-    "#     /  t#\n"
-    "#    #b#  #\n"
-    "#p        #\n"
-    "###########\n",
-
-    
-    // easy double block puzzle
-    "###########\n"
-    "# b    t  #\n"
-    "#    /t # #\n"
-    "#   #b#b# #\n"
-    "#p     t  #\n"
-    "#         #\n"
-    "###########\n",
-
-    
-    // tricky double block puzzle
-    "###########\n"
-    "# b    t  #\n"
-    "#    /t # #\n"
-    "#   #b#b# #\n"
-    "#p     t  #\n"
-    "###########\n",
-
-    // cross
-    // tricky if you dont get blocking the block and ur just
-    // thinking which order to put them in the receptacle
-    "#########\n"
-    "####t##t#\n"
-    "#  #/## #\n"
-    "#  /B/t #\n"
-    "#  #/## #\n"
-    "#  #b# b#\n"
-    "#   p   #\n"
-    "#########\n",
-
-    // railgun
-    "#########\n"
-    "####t####\n"
-    "####t####\n"
-    "####t####\n"
-    "#t  /   #\n"
-    "# #b/ b #\n"
-    "# # /   #\n"
-    "# # /b  #\n"
-    "#p# /   #\n"
-    "####/## #\n"
-    "####B   #\n"
-    "####/ ###\n"
-    "####/   #\n"
-    "####/####\n"
-    "#########\n",
-
-    // loom
-    "#############\n"
-    "#  ///#///###\n"
-    "#  ///////tt#\n"
-    "# b//#////###\n"
-    "# b///////tt#\n"
-    "# b/////#/###\n"
-    "#  ///////tt#\n"
-    "# #///////###\n"
-    "#  bbb      #\n"
-    "#p          #\n"
-    "#############\n",
-
-    // send block back and forth over ice lake
-    // u actually have to start by constraining a block
-    "###############\n"
-    "#          #t #\n"
-    "#          #  #\n"
-    "#   p      b/ #\n"
-    "#  #########  #\n"
-    "#  #//////////#\n"
-    "#  B//////////#\n"
-    "#  #//////////#\n"
-    "#  ########## #\n"
-    "#           #t#\n"
-    "###############\n",
-
-
-
-    // crossroads: ur in the middle and u just go in 4 directions
-    // well they cant interact can they?
-    // would need like corner pieces for stuff to bounce off
-
-
-    "########\n"
-    "#####t##\n"
-    "#pb////#\n"
-    "#  ////#\n"
-    "#  ////#\n"
-    "#     c#\n"
-    "#      #\n"
-    "########\n",
-
-    "#########\n"
-    "#######/#\n"
-    "#######T#\n"
-    "#######/#\n"
-    "#######T#\n"
-    "#######T#\n"
-    "# p    /#\n"
-    "#  cc  /#\n"
-    "# bbb  /#\n"
-    "#      /#\n"
-    "#      /#\n"
-    "#      /#\n"
-    "#     #/#\n"
-    "#########\n",
-
-    // scaffolding
-    "###########\n"
-    "#        t#\n"
-    "#  p      #\n"
-    "# bb /   t#\n"
-    "# ### #####\n"
-    "#   c c   #\n"
-    "#  c c    #\n"
-    "#         #\n"
-    "###########\n",
-
-    "###############\n"
-    "#      t      #\n"
-    "#             #\n"
-    "#######/#######\n"
-    "#   ###/###   #\n"
-    "# b ###/###   #\n"
-    "#   ///P///   #\n"
-    "#   ###/###   #\n"
-    "#   ###/###  t#\n"
-    "#######/#######\n"
-    "# b      cccc #\n"
-    "#             #\n"
-    "###############\n",
-
-    // loader
-    // load up the train replace crates with prezzies
-    "###################\n"
-    "#            ######\n"
-    "#   #b#   #b#######\n"
-    "# ////////////////#\n"
-    "# cbccb      ttttt#\n"
-    "# ////////////////#\n"
-    "#        #b# ######\n"
-    "#p           ######\n"
-    "###################\n",
-
-    // newtons cradle
-    // look out cause u can always push the last one too
-    // broken atm
-    "################\n"
-    "########t#######\n"
-    "######## #######\n"
-    "########t#######\n"
-    "########t#######\n"
-    "########t#######\n"
-    "########/#######\n"
-    "# bcbcb/ //////#\n"
-    "#       /#######\n"
-    "#       /#######\n"
-    "#  c    c#######\n"
-    "#       b#######\n"
-    "#p       #######\n"
-    "################\n",
-
-    // bit shifter
-    // doesnt work because sliding stuff pushes snow stuff, which doesnt make sense really
-    "#####################\n"
-    "######T////T/T#######\n"
-    "######T/TT///T#######\n"
-    "######////////#######\n"
-    "#p cccbbccbbbcccc   #\n"
-    "#  ccccbbccbbcccc   #\n"
-    "#/####////////#####/#\n"
-    "#/####////////#####/#\n"
-    "#/####cccccccc#####/#\n"
-    "#/####cccccccc#####/#\n"
-    "#                   #\n"
-    "# ///////////////// #\n"
-    "#####################\n",
-
-    
-    // squeeze
-    // hard lol, but ur pretty constrained, kinda have to calculate
-    // more constraints = feel more clever
-    "#t######\n"
-    "#      #\n"
-    "# #b # #\n"
-    "# //c/t#\n"
-    "## bp b#\n"
-    "####t  #\n"
-    "#### c #\n"
-    "####   #\n"
-    "########\n",
-
-
-    
-    // cool
-    "############\n"
-    "#   #      #\n"
-    "#tb #      #\n"
-    "#//////////#\n"
-    "#//////////#\n"
-    "#//////////#\n"
-    "#//////////#\n"
-    "##c###c###c#\n"
-    "#p         #\n"
-    "############\n",
-
-    "####################\n"
-    "#//T/T/////P/////P/#\n"
-    "######/////////////#\n"
-    "######/////////////#\n"
-    "######/////////////#\n"
-    "######/////////////#\n"
-    "######/////////////#\n"
-    "######c##c##c##c##/#\n" // this mechanism might not work lol. maybe a double crate can
-    "##p   /# /# /# /# /#\n"
-    "##    /  /  /  /  /#\n"
-    "######/##/##/##/####\n"
-    "####################\n",
-
-    // one way street
-    // + good ice maze
-    "#################\n"
-    "#    # /////////#\n"
-    "#      /////////#\n"
-    "#    / /////////#\n"
-    "#ttt#/##/#//////#\n"
-    "#####/#////////##\n"
-    "#    /b////////##\n"
-    "# bb /#///////###\n"
-    "# p  /#///#/////#\n"
-    "#    /#/////////#\n"
-    "#####/###########\n"
-    "#################\n",
-    
-
-    "###############\n"
-    "#### bt########\n"
-    "#### ##########\n"
-    "#//#/#//////#/#\n"
-    "#//////#//////#\n"
-    "#/#///////////#\n"
-    "##///////////##\n"
-    "#p//////#//#//#\n"
-    "##//////##///##\n"
-    "#//////#//#///#\n"
-    "#//#//////////#\n"
-    "#///////////#/#\n"
-    "###############\n",
-
-};
+//#include "levels.h"
+// const char* levels = ...
 
 void history_erase(history *h);
 
 bool game_check_victory(game *g);
 bool game_is_tile_walkable(game *g, int x, int y, int dx, int dy);
 
-bool game_try_move_box(game *g, int x, int y, int dx, int dy, tile_type box_type) {
-    tile_type t;
-
-    grid_get(g->current_level, &t, x, y);
-
-    if (game_is_tile_walkable(g, x + dx, y + dy, dx, dy)) {
-        t ^= box_type;
-        grid_set(g->current_level, &t, x, y);
-        x += dx;
-        y += dy;
-        grid_get(g->current_level, &t, x, y);
-        t ^= box_type;
-        grid_set(g->current_level, &t, x, y);
-
-        // try and slide
-        if (t & TT_ICE) {
-            game_try_move_box(g, x, y, dx, dy, box_type);
-        } else {
-            if (t & TT_TARGET) {
-                Mix_PlayChannel(CS_MOVEFINAL, g->audio->movefinal, 0);
-            }
-        }
-        return true;
-    }
-    return false;
+bool tile_moves(tile_type t) {
+    return (t & TT_BOX) || (t & TT_CRATE) || (t & TT_PLAYER);
 }
 
 bool game_is_tile_walkable(game *g, int x, int y, int dx, int dy) {
     tile_type t;
     grid_get(g->current_level, &t, x, y);
     if (t & TT_WALL) return false;
-    if (t & TT_BOX) return game_try_move_box(g, x, y, dx, dy, TT_BOX);
-    if (t & TT_CRATE) return game_try_move_box(g, x, y, dx, dy, TT_CRATE);
+    if (t & TT_BOX) return game_is_tile_walkable(g, x+dx, y+dy, dx, dy);
+    if (t & TT_CRATE) return game_is_tile_walkable(g, x+dx, y+dy, dx, dy);
 
     return true;
 }
 
-
-
-void game_try_move_player(game *g, int dx, int dy) {
+void game_move_entity(game *g, int x, int y, int dx, int dy, tile_type entity_type) {
     tile_type t;
 
-    grid_get(g->current_level, &t, g->player_x, g->player_y);
+    grid_get(g->current_level, &t, x, y);
 
-    if (game_is_tile_walkable(g, g->player_x + dx, g->player_y + dy, dx, dy)) {
-        t ^= TT_PLAYER;
-        grid_set(g->current_level, &t, g->player_x, g->player_y);
-        g->player_x += dx;
-        g->player_y += dy;
-        grid_get(g->current_level, &t, g->player_x, g->player_y);
-        t ^= TT_PLAYER;
-        grid_set(g->current_level, &t, g->player_x, g->player_y);
+    if (game_is_tile_walkable(g, x + dx, y + dy, dx, dy)) {
+        tile_type t;
+        grid_get(g->current_level, &t, x + dx, y + dy);
+
+
+        // its a box or something we can move
+        // its annoying that we cant move it without knowing the type
+        if (t & TT_BOX) game_move_entity(g, x + dx, y + dy, dx, dy, TT_BOX);
+        if (t & TT_CRATE) game_move_entity(g, x + dx, y + dy, dx, dy, TT_CRATE);
+        if (t & TT_PLAYER) game_move_entity(g, x + dx, y + dy, dx, dy, TT_PLAYER);
+    }
+
+    if (game_is_tile_walkable(g, x + dx, y + dy, dx, dy)) {
+        t ^= entity_type;
+        grid_set(g->current_level, &t, x, y);
+        x += dx;
+        y += dy;
+        grid_get(g->current_level, &t, x, y);
+        if (t & TT_HOLE) {
+            // return before re placing
+            return;
+        }
+        t ^= entity_type;
+        grid_set(g->current_level, &t, x, y);
 
         // try and slide
         if (t & TT_ICE) {
-            Mix_PlayChannel(CS_SLIP, g->audio->slip, 0);
-            game_try_move_player(g, dx, dy);
+            game_move_entity(g, x, y, dx, dy, entity_type);
+            if (entity_type == TT_PLAYER) {
+                Mix_PlayChannel(CS_SLIP, g->audio->slip, 0);
+            }
+        } else {
+            if (t & TT_TARGET) {
+                Mix_PlayChannel(CS_MOVEFINAL, g->audio->movefinal, 0);
+            }
         }
-        if (t & TT_SNOW) {
-            Mix_PlayChannel(CS_SNOW_FOOTSTEP, g->audio->snow_footstep, 0);
-        }
-
+        return;
     }
+    return;
 }
 
 
 
-
-void game_handle_input(application_data *ad, void *scene_data, SDL_Event e) {
+void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) {
     game *g = (game *)scene_data;
 
     if (e.type  == SDL_KEYDOWN) {
         SDL_Keycode sym = e.key.keysym.sym;
+
+        if (sym == SDLK_ESCAPE) {
+            shared_data->current_scene = SCENE_LEVEL_MENU;
+            return;
+        }
 
         bool up = sym == SDLK_UP || sym == SDLK_w || sym == SDLK_k;
         bool down = sym == SDLK_DOWN || sym == SDLK_s || sym == SDLK_j;
@@ -502,7 +93,6 @@ void game_handle_input(application_data *ad, void *scene_data, SDL_Event e) {
         bool movement = up || down || left || right;
 
         if (movement) {
-            game_append_history(g);
 
             int dx = 0;
             int dy = 0;
@@ -516,29 +106,80 @@ void game_handle_input(application_data *ad, void *scene_data, SDL_Event e) {
             } else if (right) {
                 dx = 1;
             }
-            game_try_move_player(g, dx, dy);
+            tile_type t;
+
+            for (int i = 0; i < g->current_level.w; i++) {
+                for (int j = 0; j < g->current_level.h; j++) {
+                    grid_get(g->current_level, &t, i, j);
+                    if (t & TT_PLAYER) {
+                        if (game_is_tile_walkable(g, i+dx, j+dy, dx, dy)) {
+                            
+                            // play current tile sound
+                            if (t & TT_SNOW) {
+                                Mix_PlayChannel(CS_LOSE, g->audio->snow_footstep, 0);
+                            }
+                            if (t & TT_ICE) {
+                                Mix_PlayChannel(CS_SLIP, g->audio->slip, 0);
+                            }
+                            if (t & TT_HOLE) {
+                                Mix_PlayChannel(CS_LOSE, g->audio->lose, 0);
+                            }
+
+                            // save undo
+                            game_append_history(g);
+
+                            game_move_entity(g, i, j, dx, dy, TT_PLAYER);
+
+                            grid_get(g->current_level, &t, i+dx, j+dy);
+                            
+                            // play dest tile sound, i guess this still doesn't handle ice slip if its ' ///// '
+                            // this is dumb because its only the next tile, so again doesnt account for slipping, needs to be in move entity.
+                            // mm polyphony or do we just not care lol
+                            // how many channels is it possible to have
+                            if (t & TT_SNOW) {
+                                Mix_PlayChannel(CS_LOSE, g->audio->snow_footstep, 0);
+                            }
+                            if (t & TT_ICE) {
+                                Mix_PlayChannel(CS_SLIP, g->audio->slip, 0);
+                            }
+                            if (t & TT_HOLE) {
+                                Mix_PlayChannel(CS_LOSE, g->audio->lose, 0);
+                            }
+                            
+                        } else {
+                            // could play a negatory noise to say that u cant move
+                        }
+                        goto break_player_moving_loop; // still not supporting multiple players
+                    }
+                }
+            }
+            break_player_moving_loop:
+
             if (game_check_victory(g)) {
                 printf("u win\n");
-                history_erase(&g->history);
-                grid_delete(g->current_level);
-                game_load_level_from_str(g, levels[++g->current_level_num]);
+                shared_data->completed[shared_data->selected_level] = true;
+                shared_data->selected_level++;
+                g->s.on_focus(shared_data, g);
             }
 
         } else if (reset) {
-            history_erase(&g->history);
-            grid_delete(g->current_level);
-            game_load_level_from_str(g, levels[g->current_level_num]);
+            g->s.on_focus(shared_data, g);
             Mix_PlayChannel(CS_LOSE, g->audio->lose, 0);
         } else if (sym == SDLK_q) {
-            history_erase(&g->history);
-            grid_delete(g->current_level);
-            game_load_level_from_str(g, levels[--g->current_level_num]);
+            if (g->current_level_num == 0) {
+                return;
+            }
+            shared_data->selected_level--;
+            g->s.on_focus(shared_data, g);
         } else if (sym == SDLK_e) {
-            history_erase(&g->history);
-            grid_delete(g->current_level);
-            game_load_level_from_str(g, levels[++g->current_level_num]);            
+            if (g->current_level_num == shared_data->num_levels - 1) {
+                return;
+            }
+            shared_data->selected_level++;
+            g->s.on_focus(shared_data, g);
         } else if (sym == SDLK_u) {
             game_undo(g);
+            Mix_PlayChannel(CS_UNDO, g->audio->undo, 0);
         }
     }
 }
@@ -550,8 +191,9 @@ const SDL_Rect clip_box = {48, 0, 16, 16};
 const SDL_Rect clip_player = {64, 0, 16, 16};
 const SDL_Rect clip_target = {80, 0, 16, 16};
 const SDL_Rect clip_crate = {96, 0, 16, 16};
+const SDL_Rect clip_hole = {112, 0, 16, 16};
 
-void game_draw(application_data *ad, void *scene_data, gef_context *gc) {
+void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc) {
     game *g = (game *)scene_data;
     for (int i = 0; i < g->current_level.w; i++) {
         for (int j = 0; j < g->current_level.h; j++) {
@@ -568,6 +210,9 @@ void game_draw(application_data *ad, void *scene_data, gef_context *gc) {
             }
             if (t & TT_ICE) {
                 gef_draw_sprite(gc, clip_ice, to_rect);
+            }
+            if (t & TT_HOLE) {
+                gef_draw_sprite(gc, clip_hole, to_rect);
             }
             if (t & TT_TARGET) {
                 gef_draw_sprite(gc, clip_target, to_rect);
@@ -586,15 +231,35 @@ void game_draw(application_data *ad, void *scene_data, gef_context *gc) {
 }
 
 void game_load_level_from_str(game *g, const char *level_str) {
+    bool title = true;
     int width;
     int height;
     int i = 0;
     int j = 0;
 
     const char *current_pos = level_str;
+    const char *grid_start = 0;
 
     // check and get dimensions
     while(*current_pos) {
+        // load the title first
+        if (title) {
+            i++;
+            if (*current_pos == '\n') {
+                g->current_level_name = malloc(sizeof(char) * i);
+                memcpy(g->current_level_name, level_str, sizeof(char) * i);
+                g->current_level_name[i-1] = '\0';
+                i = 0;
+                title = false;
+            }
+            current_pos++;
+            continue;
+        }
+
+        if (!grid_start) {
+            grid_start = current_pos;
+        }
+
         if (*current_pos == '\n') {
             if (j == 0) {
                 width = i;
@@ -614,8 +279,10 @@ void game_load_level_from_str(game *g, const char *level_str) {
         current_pos++;
     }
 
+    printf("loading %s\n", g->current_level_name);
+
     g->current_level = grid_init(sizeof(tile_type), width, j);
-    current_pos = level_str;
+    current_pos = grid_start;
     tile_type t;
     i = 0;
     j = 0;
@@ -636,13 +303,9 @@ void game_load_level_from_str(game *g, const char *level_str) {
                 t = TT_ICE;
                 grid_set(g->current_level, &t, i, j);
             } else if (*current_pos == 'p') {
-                g->player_x = i;
-                g->player_y = j;
                 t = TT_SNOW | TT_PLAYER;
                 grid_set(g->current_level, &t, i, j);
             } else if (*current_pos == 'P') {
-                g->player_x = i;
-                g->player_y = j;
                 t = TT_ICE | TT_PLAYER;
                 grid_set(g->current_level, &t, i, j);
             } else if (*current_pos == 't') {
@@ -668,6 +331,9 @@ void game_load_level_from_str(game *g, const char *level_str) {
                 grid_set(g->current_level, &t, i, j);
             } else if (*current_pos == 'C') {
                 t = TT_ICE | TT_CRATE;
+                grid_set(g->current_level, &t, i, j);
+            } else if (*current_pos == 'h') {
+                t = TT_HOLE;
                 grid_set(g->current_level, &t, i, j);
             }
             i++;
@@ -773,37 +439,32 @@ void game_undo(game *g) {
         tile_type t;
         grid_get(g->current_level, &t, r.x, r.y);
         t ^= r.t;
-        if (t & TT_PLAYER) {
-            g->player_x = r.x;
-            g->player_y = r.y;
-        }
         grid_set(g->current_level, &t, r.x, r.y);
         i--;
         r = g->history.records[i];
     }
     g->history.length = i + 1;
 
-    Mix_PlayChannel(CS_UNDO, g->audio->undo, 0);
 }
 
+void game_on_focus(shared_data *shared_data, void *scene_data) {
+    game *g = (game *)scene_data;
+    
+    g->current_level_num = shared_data->selected_level;
+    history_erase(&g->history);
+    grid_delete(g->current_level);
+    game_load_level_from_str(g, shared_data->levels[g->current_level_num]);
+}
 
-game game_init(int starting_level_num, audio *audio) {
+game game_init(audio *audio, shared_data *shared_data) {
     game g = {0};
     g.history = history_init();
 
     g.s = (scene_interface) {
         .draw = game_draw,
         .handle_input = game_handle_input,
+        .on_focus = game_on_focus,
     };
-    g.current_level_num = starting_level_num;
-    game_load_level_from_str(&g, levels[g.current_level_num]);
-
-    for (int i = 0; i < g.current_level.h; i++) {
-        for (int j = 0; j < g.current_level.w; j++) {
-            tile_type t;
-            grid_get(g.current_level, &t, j, i);
-        }
-    }
 
     g.audio = audio;
 
@@ -811,3 +472,4 @@ game game_init(int starting_level_num, audio *audio) {
 }
 
 
+ 

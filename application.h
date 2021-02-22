@@ -15,11 +15,13 @@
 typedef struct {
     gef_context gc;
 
-    main_menu main_menu;
-    game game;
+    scene_interface* scenes[NUM_SCENES];
+    
+    scene_index previous_scene;
+
     audio audio;
 
-    application_data ad;
+    shared_data shared_data;
     
 } application;
 

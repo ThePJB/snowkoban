@@ -13,6 +13,7 @@ typedef enum {
     TT_PLAYER = 32,
     TT_CRATE = 64,
     TT_SENTINEL = 128,
+    TT_HOLE = 256,
 } tile_type;
 
 typedef struct {
@@ -31,8 +32,7 @@ typedef struct {
     scene_interface s;
     grid current_level;
     int current_level_num;
-    int player_x;
-    int player_y;
+    char *current_level_name;
     history history;
     audio *audio;
 } game;
@@ -46,4 +46,4 @@ void game_undo(game *g);
 
 void game_load_level_from_str(game *g, const char *level_str);
 
-game game_init(int starting_level_num, audio *audio);
+game game_init(audio *audio, shared_data *shared_data);
