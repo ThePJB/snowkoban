@@ -26,6 +26,6 @@ typedef struct {
 } application;
 
 void application_init(application *app, int xres, int yres, bool do_start_level, int start_level);
-void application_update(application *app);
-void application_draw(application *app);
+void application_update(application *app, double dt);
+void application_draw(application *app, double dt);
 void application_handle_input(application *app);

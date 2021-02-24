@@ -9,13 +9,12 @@
 
 
 
-gef_context gef_init(char *name, int xres, int yres, int frame_cap) {
+gef_context gef_init(char *name, int xres, int yres) {
     printf("initializing graphics...\n");
     gef_context gc;
 
     gc.xres = xres;
     gc.yres = yres;
-    gc.frame_cap = frame_cap;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) gef_die(&gc, "couldn't init sdl");
 
@@ -123,17 +122,3 @@ void gef_teardown(gef_context *gc) {
     IMG_Quit();
     SDL_Quit();
 }
-
-void gef_start_frame(gef_context *gc) {
-    gc->tstart = get_us();
-}
-void gef_end_frame(gef_context *gc) {
-    int64_t tnow = get_us();
-    int64_t frame_us = 1000000 / gc->frame_cap;
-    int64_t dt = tnow - gc->tstart;
-    if (dt < frame_us) {
-        int64_t remaining_us = frame_us - dt;
-        usleep(remaining_us);
-    }
-};
-

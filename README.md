@@ -5,12 +5,10 @@
  - multiple players (cloning machine?)
 
 ## Game Features
- - level editor
-  - I think im happy just hardcoding in the levels rn, but could make custom levels that you load from text files
-  - or make it so you load text files
  - custom levels in main menu
  - you win screen
  - reset, undo buttons that also hint 
+ - write save to disk
 
 ## Bugs
  - no hole sound if u slide into it

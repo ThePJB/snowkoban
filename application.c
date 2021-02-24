@@ -3,7 +3,7 @@
 #include "util.h"
 
 void application_init(application *app, int xres, int yres, bool do_start_level, int start_level) {
-    app->gc = gef_init("snowkoban", xres, yres, 60);
+    app->gc = gef_init("snowkoban", xres, yres);
     gef_load_atlas(&app->gc, "assets/snowkoban.png");
 
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
@@ -19,6 +19,7 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
         .num_levels = len(levels),
         .selected_level = 0,
         .completed = {false},
+        .time = 0,
     };
 
     app->scenes[SCENE_MAIN_MENU] = malloc(sizeof(main_menu));
@@ -34,22 +35,25 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
     }
 }
 
-void application_update(application *app) {
+void application_update(application *app, double dt) {
     if (app->previous_scene != app->shared_data.current_scene) {
         app->previous_scene = app->shared_data.current_scene;
         scene_interface *cs = app->scenes[app->shared_data.current_scene];
         cs->on_focus(&app->shared_data, cs);
     }
+
+    app->shared_data.time += dt;
+
     return; // probably dont do much here since its mostly input driven
 }
 
-void application_draw(application *app) {
+void application_draw(application *app, double dt) {
     gef_clear(&app->gc);
 
     app->scenes[app->shared_data.current_scene]->draw(
         &app->shared_data, 
         app->scenes[app->shared_data.current_scene], 
-        &app->gc);
+        &app->gc, dt);
 
     gef_present(&app->gc);
 }

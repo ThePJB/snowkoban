@@ -42,7 +42,7 @@ void main_menu_handle_input(shared_data *shared_data, void *scene_data, SDL_Even
     }
 }
 
-void main_menu_draw(shared_data *shared_data, void *scene_data, gef_context *gc) {
+void main_menu_draw(shared_data *shared_data, void *scene_data, gef_context *gc, double dt) {
     main_menu *main_menu_data = (main_menu*)scene_data;
 
     const int button_w = 400;
@@ -149,7 +149,7 @@ void level_menu_handle_input(shared_data *shared_data, void *scene_data, SDL_Eve
     }
 }
 
-void level_menu_draw(shared_data *shared_data, void *scene_data, gef_context *gc) {
+void level_menu_draw(shared_data *shared_data, void *scene_data, gef_context *gc, double dt) {
     level_menu *level_menu_data = (level_menu*)scene_data;
 
     const int w = 10;

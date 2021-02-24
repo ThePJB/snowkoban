@@ -19,7 +19,7 @@ struct shared_data;
 // the intention is that the void* points to this and that the rest of the structure
 // e.g. game, menu, etc follows in memory
 typedef struct {
-    void (*draw)(struct shared_data *shared_data, void *, gef_context *gc);
+    void (*draw)(struct shared_data *shared_data, void *, gef_context *gc, double dt);
     void (*handle_input)(struct shared_data *shared_data, void *, SDL_Event);
     void (*on_focus)(struct shared_data *shared_data, void *);
 } scene_interface;
@@ -31,4 +31,5 @@ typedef struct shared_data {
     int num_levels;
     int selected_level;
     bool completed[NUM_LEVELS];
+    float time;
 } shared_data;

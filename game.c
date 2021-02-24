@@ -1,10 +1,8 @@
 #include "scene.h"
 #include "game.h"
 #include "util.h"
-
-
-//#include "levels.h"
-// const char* levels = ...
+#include "coolmath.h"
+#include "snowflakes.h"
 
 void history_erase(history *h);
 
@@ -62,7 +60,7 @@ void game_move_entity(game *g, int x, int y, int dx, int dy, tile_type entity_ty
                 Mix_PlayChannel(CS_SLIP, g->audio->slip, 0);
             }
         } else {
-            if (t & TT_TARGET) {
+            if ((t & TT_TARGET) && (t & TT_BOX)) {
                 Mix_PlayChannel(CS_MOVEFINAL, g->audio->movefinal, 0);
             }
         }
@@ -188,13 +186,24 @@ const SDL_Rect clip_wall = {0, 0, 16, 16};
 const SDL_Rect clip_snow = {16, 0, 16, 16};
 const SDL_Rect clip_ice = {32, 0, 16, 16};
 const SDL_Rect clip_box = {48, 0, 16, 16};
-const SDL_Rect clip_player = {64, 0, 16, 16};
+const SDL_Rect clip_player[4] = {
+    (SDL_Rect) {64, 0, 16, 16},
+    (SDL_Rect) {64, 16, 16, 16},
+    (SDL_Rect) {64, 0, 16, 16},
+    (SDL_Rect) {64, 32, 16, 16},
+    
+};
+
 const SDL_Rect clip_target = {80, 0, 16, 16};
 const SDL_Rect clip_crate = {96, 0, 16, 16};
 const SDL_Rect clip_hole = {112, 0, 16, 16};
 
-void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc) {
+const SDL_Rect clip_background_snow = {0, 96, 64, 64};
+
+
+void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, double dt) {
     game *g = (game *)scene_data;
+
     for (int i = 0; i < g->current_level.w; i++) {
         for (int j = 0; j < g->current_level.h; j++) {
             const int tsize = 64;
@@ -221,13 +230,25 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc) {
                 gef_draw_sprite(gc, clip_box, to_rect);
             }
             if (t & TT_PLAYER) {
-                gef_draw_sprite(gc, clip_player, to_rect);
+                float x = cm_frac(shared_data->time / 2);
+                if (x < 0.25) {
+                    gef_draw_sprite(gc, clip_player[0], to_rect);
+                } else if (x < 0.5) {
+                    gef_draw_sprite(gc, clip_player[1], to_rect);
+                } else if (x < 0.75) {
+                    gef_draw_sprite(gc, clip_player[0], to_rect);
+                } else {
+                    gef_draw_sprite(gc, clip_player[1], to_rect);
+                }
             }
             if (t & TT_CRATE) {
                 gef_draw_sprite(gc, clip_crate, to_rect);
             }
         }
     }
+
+
+    snowflakes_draw(gc, gc->xres, gc->yres, shared_data->time);
 }
 
 void game_load_level_from_str(game *g, const char *level_str) {

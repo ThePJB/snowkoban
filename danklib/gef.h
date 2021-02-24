@@ -40,7 +40,7 @@ colour gef_rgb(int r, int g, int b);
 colour gef_rgba(int r, int g, int b, int a);
 
 
-gef_context gef_init(char *name, int xres, int yres, int frame_cap);
+gef_context gef_init(char *name, int xres, int yres);
 void gef_load_atlas(gef_context *cg, char *path);
 void gef_draw_sprite(gef_context *cg, SDL_Rect clip, SDL_Rect to_rect);
 void gef_teardown(gef_context *gc);
