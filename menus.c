@@ -1,5 +1,6 @@
 #include "menus.h"
 #include "util.h"
+#include "snowflakes.h"
 #include <stdbool.h>
 
 void main_menu_on_focus(shared_data *shared_data, void *scene_data) {
@@ -60,10 +61,13 @@ void main_menu_draw(shared_data *shared_data, void *scene_data, gef_context *gc,
     const colour button_colour = gef_rgb(100, 100, 255);
     const colour background_colour = gef_rgb(150, 150, 150);
 
+    gef_draw_rect(gc, background_colour, 0, 0, gc->xres, gc->yres);
+
+    snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time);
+
     int menu_x = screen_center_x - button_w/2;
     int menu_y = screen_center_y - menu_height/2;
 
-    gef_draw_rect(gc, background_colour, 0, 0, gc->xres, gc->yres);
     
     for (int i = 0; i < num_buttons; i++) {
         if (main_menu_data->selection == i) {
@@ -173,6 +177,8 @@ void level_menu_draw(shared_data *shared_data, void *scene_data, gef_context *gc
     const colour background_colour = gef_rgb(150, 150, 150);
 
     gef_draw_rect(gc, background_colour, 0, 0, gc->xres, gc->yres);
+
+    snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time);
 
     for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {

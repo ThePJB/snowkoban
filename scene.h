@@ -32,4 +32,5 @@ typedef struct shared_data {
     int selected_level;
     bool completed[NUM_LEVELS];
     float time;
+    float interp_time;
 } shared_data;

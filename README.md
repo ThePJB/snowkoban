@@ -30,12 +30,16 @@
 
  - might be weird that its when you made the move, not right before when you made the next move
 
- - facing direction
  - maybe entities should actually just be entities instead of tiles
+ - that would tidy up tile logic too
+
+ - transition levels, then wind blows, snow blows, whoosh swipe to the next one
+
 
 ## Non specific issues
  - fix sound design
  - fix art
+   - todo mine celeste for inspo
  - main menu art
  - steam banner thing
  - tone and theme

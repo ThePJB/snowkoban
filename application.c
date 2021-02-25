@@ -43,6 +43,8 @@ void application_update(application *app, double dt) {
     }
 
     app->shared_data.time += dt;
+    app->shared_data.interp_time += dt;
+    app->shared_data.interp_time += min(2*dt, 0.1 * (app->shared_data.time - app->shared_data.interp_time));
 
     return; // probably dont do much here since its mostly input driven
 }

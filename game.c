@@ -4,7 +4,7 @@
 #include "coolmath.h"
 #include "snowflakes.h"
 
-void history_erase(history *h);
+void history_erase(history *h, float t);
 
 bool game_check_victory(game *g);
 bool game_is_tile_walkable(game *g, int x, int y, int dx, int dy);
@@ -278,7 +278,7 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     }
 
 
-    snowflakes_draw(gc, gc->xres, gc->yres, shared_data->time);
+    snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time);
 }
 
 void game_load_level_from_str(game *g, const char *level_str, shared_data *shared_data) {
@@ -426,8 +426,9 @@ history history_init() {
     return h;
 }
 
-void history_erase(history *h) {
+void history_erase(history *h, float t) {
     h->length = 1;
+    h->records[0].time = t;
 }
 
 void history_append_record(history *h, history_record r) {
@@ -507,7 +508,7 @@ void game_on_focus(shared_data *shared_data, void *scene_data) {
     game *g = (game *)scene_data;
     
     g->current_level_num = shared_data->selected_level;
-    history_erase(&g->history);
+    history_erase(&g->history, shared_data->time);
     grid_delete(g->current_level);
     game_load_level_from_str(g, shared_data->levels[g->current_level_num], shared_data);
 }
