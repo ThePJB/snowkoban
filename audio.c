@@ -14,7 +14,9 @@ audio audio_load_sounds() {
     Mix_AllocateChannels(NUM_CS);
 
     Mix_PlayMusic(a.bgm, -1);
-    Mix_VolumeMusic(32);
+    Mix_VolumeMusic(64);
+    Mix_VolumeChunk(a.movefinal, 64);
+    Mix_VolumeChunk(a.win, 70);
     //Mix_FadeInMusic(app->bgm, -1, 2000);
 
     return a;

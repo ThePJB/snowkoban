@@ -82,6 +82,10 @@ void gef_draw_sprite(gef_context *gc, SDL_Rect clip, SDL_Rect to_rect) {
     SDL_RenderCopy(gc->renderer, gc->atlas, &clip, &to_rect);
 }
 
+void gef_draw_sprite_ex(gef_context *gc, SDL_Rect clip, SDL_Rect to_rect, double angle, SDL_RendererFlip flip) {
+    SDL_RenderCopyEx(gc->renderer, gc->atlas, &clip, &to_rect, angle, NULL, flip);
+}
+
 void gef_clear(gef_context *gc) {
     SDL_SetRenderDrawColor(gc->renderer, 0, 0, 0, 255);
     SDL_RenderClear(gc->renderer);

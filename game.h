@@ -18,8 +18,14 @@ typedef enum {
 
 typedef struct {
     tile_type t;
-    int x;
-    int y;
+    union {
+        struct {
+            int x;
+            int y;
+        };
+        float time;
+    };
+
 } history_record;
 
 typedef struct {
@@ -35,15 +41,16 @@ typedef struct {
     char *current_level_name;
     history history;
     audio *audio;
+    bool player_faces_left;
 } game;
 
 history history_init();
 
 void history_append_record(history *h, history_record r);
 
-void game_append_history(game *g);
-void game_undo(game *g);
+void game_append_history(game *g, float time);
+bool game_undo(game *g, shared_data *shared_data);
 
-void game_load_level_from_str(game *g, const char *level_str);
+void game_load_level_from_str(game *g, const char *level_str, shared_data *shared_data);
 
 game game_init(audio *audio, shared_data *shared_data);

@@ -3,18 +3,21 @@
  - tnt boxes that take something out and make it ground
  - crumbly block no going back
  - multiple players (cloning machine?)
+ - ice cube that slides no matter what its on
 
 ## Game Features
  - custom levels in main menu
  - you win screen
  - reset, undo buttons that also hint 
  - write save to disk
+ - mobile
 
 ## Bugs
  - no hole sound if u slide into it
   - no ice sound if you go snowicesnow
   - needs to just call the sound thing unconditionally amongst the movement
- - is there memory leaks?
+ - is there memory leaks? or how to bring down memory usage
+ - there is one phantom undo stack
 
 ## Required juice
  - print level name when u go into it
@@ -22,9 +25,13 @@
  - 3d or 2d, autotile warcraft style would probably work
  - if 2d, how we doing scaling / size enforcement, have different zoom levels and pad with wall? or fix lvl sizes
  - maybe enforcing a certain level size / aspect ratio, or just center it for drawing and surround with WALL_TEXTURE?
- - snow effect, and it rewinds with undos
- - music rewinds with undos
+ - make snow effect smooth (quick) rewind will look even cooler
  - reflection in ice effect? with like an ice mask so u draw ice base, entity upside down, ice mask
+
+ - might be weird that its when you made the move, not right before when you made the next move
+
+ - facing direction
+ - maybe entities should actually just be entities instead of tiles
 
 ## Non specific issues
  - fix sound design

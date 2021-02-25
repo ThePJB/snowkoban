@@ -25,37 +25,13 @@ const char *levels[] = {
     "########\n",
 
     // this might be too commutative to force you to double up
-    // maybe add some ice to this corner thing
+    // unless its forced in this way
     "double up\n"
     "###########\n"
     "### b b tt#\n"
-    "#     #####\n"
+    "#   #######\n"
     "#        p#\n"
     "###########\n",
-
-    "shitty level\n"
-    "###########\n"
-    "#         #\n"
-    "#  p     b#\n"
-    "#    b    #\n"
-    "#        t#\n"
-    "#        t#\n"
-    "#    b   t#\n"
-    "###########\n",
-
-    "diamond\n"
-    "##############\n"
-    "#            #\n"
-    "#       ##   #\n"
-    "## #####    t#\n"
-    "## #     ## ##\n"
-    "## #  b  #   #\n"
-    "## # bpb #  t#\n"
-    "## ## b ##  t#\n"
-    "##           #\n"
-    "#    #########\n"
-    "#           t#\n"
-    "##############\n",
 
     "ice to meet you\n"
     "#########\n"
@@ -77,16 +53,6 @@ const char *levels[] = {
     "#/#////#\n"
     "#//////#\n"
     "########\n",
-
-        // this might be too commutative to force you to double up
-        // try with ice
-        // its kind of like ice cracks wall pairs again
-    "double up\n"
-    "###########\n"
-    "#     b tt#\n"
-    "# b   #####\n"
-    "#        p#\n"
-    "###########\n",
     
     "maze 1\n"
     "##############\n"
@@ -158,9 +124,6 @@ const char *levels[] = {
     "# b           #\n"
     "#             #\n"
     "###############\n",
-
-
-
 
 
     "block puzzle\n"
@@ -286,26 +249,7 @@ const char *levels[] = {
     "#t######\n"
     "########\n",
 
-    // this level is too lomg, transpose it
-    "be careful\n"
-    "#############\n"
-    "#t     /    #\n"
-    "#      /   T#\n"
-    "#      /   b#\n"
-    "#      /    #\n"
-    "# #####/#####\n"
-    "#      / c  #\n"
-    "##  b  / c  #\n"
-    "#      /    #\n"
-    "# #####/#####\n"
-    "#      /    #\n"
-    "##     B    #\n"
-    "#      /   t#\n"
-    "# #####/#####\n"
-    "#      /    #\n"
-    "#     #c#   #\n"
-    "#      p    #\n"
-    "#############\n",
+
 
     "I swear we had this before\n"
     "###############\n"
