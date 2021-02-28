@@ -7,6 +7,10 @@ void main_menu_on_focus(shared_data *shared_data, void *scene_data) {
     return;
 }
 
+void main_menu_update(shared_data *shared_data, void *scene_data, double dt) {
+    return;
+}
+
 void main_menu_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) {
     main_menu *main_menu_data = (main_menu*)scene_data;
 
@@ -95,6 +99,7 @@ main_menu main_menu_init(gef_context *gc) {
             .draw = main_menu_draw,
             .handle_input = main_menu_handle_input,
             .on_focus = main_menu_on_focus,
+            .update = main_menu_update,
         },
         .move_noise = Mix_LoadWAV("assets/menu-move.wav"),
         .select_noise = Mix_LoadWAV("assets/menu-select.wav"),
@@ -110,6 +115,10 @@ main_menu main_menu_init(gef_context *gc) {
 }
 
 void level_menu_on_focus(shared_data *shared_data, void *scene_data) {
+    return;
+}
+
+void level_menu_update(shared_data *shared_data, void *scene_data, double dt) {
     return;
 }
 
@@ -218,6 +227,7 @@ level_menu level_menu_init(gef_context *gc, shared_data *shared_data) {
             .draw = level_menu_draw,
             .handle_input = level_menu_handle_input,
             .on_focus = level_menu_on_focus,
+            .update = level_menu_update,
         },
         .move_noise = Mix_LoadWAV("assets/menu-move.wav"),
         .select_noise = Mix_LoadWAV("assets/menu-select.wav"),

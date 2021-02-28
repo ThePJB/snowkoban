@@ -34,6 +34,13 @@ typedef struct {
     int backing_size;
 } history;
 
+typedef enum {
+    GS_NORMAL,
+    GS_VICTORY_FADE_OUT,
+    GS_FADE_IN,
+    NUM_GS,
+} game_state;
+
 typedef struct {
     scene_interface s;
     grid current_level;
@@ -42,6 +49,9 @@ typedef struct {
     history history;
     audio *audio;
     bool player_faces_left;
+
+    float state_t;
+    game_state state;
 } game;
 
 history history_init();

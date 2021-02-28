@@ -22,6 +22,7 @@ typedef struct {
     void (*draw)(struct shared_data *shared_data, void *, gef_context *gc, double dt);
     void (*handle_input)(struct shared_data *shared_data, void *, SDL_Event);
     void (*on_focus)(struct shared_data *shared_data, void *);
+    void (*update)(struct shared_data *shared_data, void *, double dt);
 } scene_interface;
 
 typedef struct shared_data {

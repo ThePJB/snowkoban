@@ -77,10 +77,31 @@ void game_move_entity(game *g, int x, int y, int dx, int dy, tile_type entity_ty
     return;
 }
 
+void game_update(shared_data *shared_data, void *scene_data, double dt) {
+    game *g = (game *)scene_data;
 
+    g->state_t += dt;
+
+    if (g->state == GS_VICTORY_FADE_OUT) {
+        if (g->state_t > 1) {
+            g->state = GS_FADE_IN;
+            g->state_t = 0;
+            shared_data->completed[shared_data->selected_level] = true;
+            shared_data->selected_level++;
+            g->s.on_focus(shared_data, g);
+        }
+    } else if (g->state == GS_FADE_IN) {
+        if (g->state_t > 1) {
+            g->state = GS_NORMAL;
+            g->state_t = 0;
+        }
+    }
+}
 
 void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) {
     game *g = (game *)scene_data;
+
+    if (g->state != GS_NORMAL) return;
 
     if (e.type  == SDL_KEYDOWN) {
         SDL_Keycode sym = e.key.keysym.sym;
@@ -163,13 +184,10 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
             }
             break_player_moving_loop:
             if (game_check_victory(g)) {
-                printf("u win\n");
-                shared_data->completed[shared_data->selected_level] = true;
-                shared_data->selected_level++;
-                g->s.on_focus(shared_data, g);
+                Mix_PlayChannel(CS_WIN, g->audio->win, 0);
+                g->state = GS_VICTORY_FADE_OUT;
+                g->state_t = 0;
             }
-
-
 
         } else if (reset) {
             g->s.on_focus(shared_data, g);
@@ -226,7 +244,18 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     xo = xo / tsize * tsize;
     yo = yo / tsize * tsize;
 
-    for (int i = 0; i < (gc->xres + 1) * tsize; i += tsize) {
+    float wipe_t = 0;
+    if (g->state == GS_VICTORY_FADE_OUT) {
+        wipe_t = g->state_t;
+        wipe_t = cm_slow_start2(wipe_t);
+        xo += wipe_t * gc->xres;
+    } else if (g->state == GS_FADE_IN) {
+        wipe_t = g->state_t;
+        wipe_t = cm_slow_start2(1 - wipe_t);
+        xo += -1 * wipe_t * gc->xres;
+    }
+
+    for (int i = (xo % tsize) - tsize; i < (gc->xres + 1) * tsize; i += tsize) {
         for (int j = 0; j < (gc->yres + 1) * tsize; j += tsize) {
             SDL_Rect to_rect = (SDL_Rect) {i, j, tsize, tsize};
             gef_draw_sprite(gc, clip_wall, to_rect);
@@ -408,7 +437,6 @@ bool game_check_victory(game *g) {
             }
         }
     }
-    Mix_PlayChannel(CS_WIN, g->audio->win, 0);
     return true;
 }
 
@@ -521,10 +549,13 @@ game game_init(audio *audio, shared_data *shared_data) {
         .draw = game_draw,
         .handle_input = game_handle_input,
         .on_focus = game_on_focus,
+        .update = game_update,
     };
 
     g.player_faces_left = true;
     g.audio = audio;
+    g.state = GS_NORMAL;
+    g.state_t = 0;
 
     return g;
 }

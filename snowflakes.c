@@ -35,6 +35,7 @@ void snowflakes_draw(gef_context *gc, int xres, int yres, float t) {
     const int vxh_magnitude = 200;
 
     const int potential_xmax = sin_magnitude + vxh_magnitude;
+    
 
     for (int starting_x = -potential_xmax; starting_x < xres + potential_xmax; starting_x += spacing) {
         float phase = hash_floatn(starting_x, 0, slowness);
@@ -52,3 +53,4 @@ void snowflakes_draw(gef_context *gc, int xres, int yres, float t) {
         snowflake_draw(gc, x, y, pixel_size);
     }
 }
+

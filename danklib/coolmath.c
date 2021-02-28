@@ -29,3 +29,31 @@ float cm_unlerp(float a, float b, float t) {
 float cm_remap(float prev_lower, float prev_upper, float new_lower, float new_upper, float a) {
     return cm_lerp(new_lower, new_upper, cm_unlerp(prev_lower, prev_upper, a));
 }
+
+float cm_slow_start(float t) {
+    return t*t;
+}
+
+float cm_slow_stop(float t) {
+    return 1 - cm_slow_start(1-t);
+}
+
+float cm_slow_start2(float t) {
+    return cm_slow_start(cm_slow_start(t));
+}
+
+float cm_slow_stop2(float t) {
+    return cm_slow_stop(cm_slow_stop(t));
+}
+
+float cm_slow_start_stop(float t) {
+    return cm_lerp(
+        cm_slow_start(t),
+        cm_slow_stop(t),
+        t
+    );
+}
+
+float cm_slow_start_stop2(float t) {
+    return cm_slow_start_stop(cm_slow_start_stop(t));
+}
