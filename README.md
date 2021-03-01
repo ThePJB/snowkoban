@@ -111,3 +111,28 @@ Christmas is pretty fucking trash. What else is snow and icy?
  - yetis
  - you could be tibet santa
  - Siberia? escaped from russian prison.
+
+
+-------------------------------------------------
+
+big refactor:
+
+regressions:
+ - no tile sounds
+ - undo walk into wall
+    - nb the movement algorithm is very handy but also fucking annoying for these XCC
+
+
+todos:
+ - anim with a t parameter should be doable now
+ - reset sets time to 0
+ - cool wipe noise for going back
+ - draw title for level
+ - clean up all of the print statements
+ - need font, maybe just use a nice pixel font (like the gogatd one)
+ - fps + profile
+ - memory safety on max undos or something
+
+bugs:
+ - first undo deletes everything
+ - second undo crashes

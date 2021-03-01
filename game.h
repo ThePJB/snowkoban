@@ -3,29 +3,12 @@
 #include "grid.h"
 #include "scene.h"
 #include "audio.h"
-
-typedef enum {
-    TT_WALL = 1,
-    TT_SNOW = 2,
-    TT_BOX = 4,
-    TT_TARGET = 8,
-    TT_ICE = 16,
-    TT_PLAYER = 32,
-    TT_CRATE = 64,
-    TT_SENTINEL = 128,
-    TT_HOLE = 256,
-} tile_type;
+#include "entity.h"
+#include "level.h"
 
 typedef struct {
-    tile_type t;
-    union {
-        struct {
-            int x;
-            int y;
-        };
-        float time;
-    };
-
+    entity_vla v;
+    float time;
 } history_record;
 
 typedef struct {
@@ -43,15 +26,12 @@ typedef enum {
 
 typedef struct {
     scene_interface s;
-    grid current_level;
-    int current_level_num;
-    char *current_level_name;
     history history;
     audio *audio;
-    bool player_faces_left;
 
     float state_t;
     game_state state;
+    level level;
 } game;
 
 history history_init();

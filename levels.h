@@ -24,14 +24,14 @@ const char *levels[] = {
     "# bt   #\n"
     "########\n",
 
-    // this might be too commutative to force you to double up
-    // unless its forced in this way
-    "double up\n"
-    "###########\n"
-    "### b b tt#\n"
-    "#   #######\n"
-    "#        p#\n"
-    "###########\n",
+    "constraints\n"
+    "##########\n"
+    "#        #\n"
+    "#   bb  p#\n"
+    "#  #######\n"
+    "#       t#\n"
+    "#       t#\n"
+    "##########\n",
 
     "sticky\n"
     "###########\n"
