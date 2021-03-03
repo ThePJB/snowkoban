@@ -4,20 +4,24 @@
  - crumbly block no going back
  - multiple players (cloning machine?)
  - ice cube that slides no matter what its on
+ - what if it was about building a snowman (getting the balls of snow to the right size where they go up by 1 every time you push on snow so you have to find a traversal of the correct distance, there would be bases and the rule is 3 high decreasing by 1)
+  - have dirt, thin snow, deep snow
 
 ## Game Features
+ - rewrite block pushing to be iterative, do sound that way
+ - OR do it recursively but keeping track of times... dont like that really
  - custom levels in main menu
- - you win screen
+ - in game menu (scene stack?)
  - reset, undo buttons that also hint 
  - write save to disk
  - mobile
 
 ## Bugs
- - no hole sound if u slide into it
-  - no ice sound if you go snowicesnow
-  - needs to just call the sound thing unconditionally amongst the movement
- - is there memory leaks? or how to bring down memory usage
- - there is one phantom undo stack
+ - no movt sound
+ - no character facing
+ - no character animations
+ - i think high memory usage from fonts - maybe switch to a stylized bitmap font
+ - no sliding
 
 ## Required juice
  - print level name when u go into it
@@ -27,13 +31,6 @@
  - maybe enforcing a certain level size / aspect ratio, or just center it for drawing and surround with WALL_TEXTURE?
  - make snow effect smooth (quick) rewind will look even cooler
  - reflection in ice effect? with like an ice mask so u draw ice base, entity upside down, ice mask
-
- - might be weird that its when you made the move, not right before when you made the next move
-
- - maybe entities should actually just be entities instead of tiles
- - that would tidy up tile logic too
-
- - transition levels, then wind blows, snow blows, whoosh swipe to the next one
 
 
 ## Non specific issues
@@ -46,6 +43,7 @@
   - needs to maybe be funny and christmasy but not really, pivot each time you unlock a mechanic?
   - fake rpg?
  - bgm rewinds with undos
+ - investigate fps
 
 ## Refactor
  - maybe tile prototypes:
@@ -75,20 +73,6 @@
  use ice to unstick 2 blocks stuck together
 
 
-#######
-  b tt#
-b #####
-
-
-# #####
- cb tt#
-#b#####
-
-
-##########
-  b t///t#
-b ########
-
 or its ice, then open at the other end, and theres some use for it, but u had to use it to get first present in  location
 
 fake receptacle, just a right angle with no space
@@ -113,26 +97,20 @@ Christmas is pretty fucking trash. What else is snow and icy?
  - Siberia? escaped from russian prison.
 
 
--------------------------------------------------
+ --------
 
-big refactor:
+current problem:
+this entity vla swapping thing is kind of retarded
+its so theres an old state and a new state to tween between for animation
 
-regressions:
- - no tile sounds
- - undo walk into wall
-    - nb the movement algorithm is very handy but also fucking annoying for these XCC
+but im also using it to get dx/dy for sliding on ice
+
+so really at the end of animation is when you would do the swapping
+then if it was ice you would update it and do more animation based on dx/dy
+maybe I should just store dx/dy on entities
+if it was sliding it would remain, otherwise it would be set to 0
 
 
-todos:
- - anim with a t parameter should be doable now
- - reset sets time to 0
- - cool wipe noise for going back
- - draw title for level
- - clean up all of the print statements
- - need font, maybe just use a nice pixel font (like the gogatd one)
- - fps + profile
- - memory safety on max undos or something
+---------
 
-bugs:
- - first undo deletes everything
- - second undo crashes
+ oo a fractal / procedural walking sim would be cool

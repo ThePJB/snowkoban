@@ -5,7 +5,11 @@
 #include "snowflakes.h"
 #include "level.h"
 
+//#define DEBUG_HISTORY
+
 void history_erase(history *h, float t);
+
+const float step_time = 0.05;
 
 void game_update(shared_data *shared_data, void *scene_data, double dt) {
     game *g = (game *)scene_data;
@@ -25,6 +29,18 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
             g->state = GS_NORMAL;
             g->state_t = 0;
         }
+    } else if (g->state == GS_ANIMATE) {
+        if (g->state_t > step_time) {
+            g->state = GS_NORMAL;
+            g->state_t = 0;
+
+            if (level_do_ice(&g->level)) {
+                printf("\n\nDO ICE\n");
+                g->state = GS_ANIMATE;
+            } else {
+                printf("\n\nNO ICE\n");
+            }
+        }
     }
 }
 
@@ -33,6 +49,7 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
     
 
     if (g->state == GS_VICTORY_FADE_OUT) return;
+    if (g->state == GS_ANIMATE) return;
 
     if (e.type  == SDL_KEYDOWN) {
         SDL_Keycode sym = e.key.keysym.sym;
@@ -72,7 +89,8 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
             for (int i = 0; i < g->level.entities.num_entities; i++) {
                 if (g->level.entities.entities[i].et == ET_PLAYER) {
                     if (level_move_entity(&g->level, i, dx, dy)) {
-                        printf("append history\n");
+                        g->state = GS_ANIMATE;
+                        g->state_t = 0;
                     }
                 }
             }
@@ -131,8 +149,6 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
         xo += -1 * wipe_t * gc->xres;
     }
 
-    level_draw(&g->level, gc, xo, yo);
-
     SDL_Rect clip_wall = {0, 0, 16, 16};
 
     for (int i = (xo % tsize) - tsize; i < (gc->xres + 1) * tsize; i += tsize) {
@@ -142,7 +158,13 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
         }
     }
 
-    level_draw(&g->level, gc, xo, yo);
+    if (g->state == GS_ANIMATE) {
+        //level_draw(&g->level, gc, xo, yo, cm_slow_stop2(g->state_t / step_time));
+        level_draw(&g->level, gc, xo, yo, g->state_t / step_time);
+    } else {
+        level_draw(&g->level, gc, xo, yo, 1);
+    }
+    
 
     snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time);
 }
@@ -175,6 +197,13 @@ void history_append_record(history *h, history_record r) {
 }
 
 void game_append_history(game *g, float time) {
+    #ifdef DEBUG_HISTORY
+    printf("appending to history, current state:\n...\n");
+    for (int i = max(g->history.length-2, 0); i < g->history.length; i++) {
+        printf("t: %f\n", g->history.records[i].time);
+        entity_vla_print(&g->history.records[i].v);
+    }
+    #endif
     if (g->history.backing_size == g->history.length - 1) {
         g->history.backing_size *= 2;
         g->history.records = realloc(g->history.records, sizeof(history_record) * g->history.backing_size);        
@@ -185,10 +214,22 @@ void game_append_history(game *g, float time) {
         .v = entity_vla_clone(&g->level.entities),
     };
 
+    #ifdef DEBUG_HISTORY
+    printf("\nnew record: t %f, v:\n", r.time);
+    entity_vla_print(&r.v);
+    #endif
+
     g->history.records[g->history.length++] = r;
 }
 
 bool game_undo(game *g, shared_data *shared_data) {
+    #ifdef DEBUG_HISTORY
+    printf("undoing, current state:\n...\n");
+    for (int i = max(g->history.length-2, 0); i < g->history.length; i++) {
+        printf("t: %f\n", g->history.records[i].time);
+        entity_vla_print(&g->history.records[i].v);
+    }
+    #endif
 
     // already at the start
     if (g->history.length == 0) {
@@ -203,6 +244,14 @@ bool game_undo(game *g, shared_data *shared_data) {
 
     Mix_RewindMusic();
     Mix_SetMusicPosition(shared_data->time);
+
+    #ifdef DEBUG_HISTORY
+    printf("undoing, new state:\n...\n");
+    for (int i = max(g->history.length-2, 0); i < g->history.length; i++) {
+        printf("t: %f\n", g->history.records[i].time);
+        entity_vla_print(&g->history.records[i].v);
+    }
+    #endif
 
     return true;
 }

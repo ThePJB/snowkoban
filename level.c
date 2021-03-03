@@ -1,9 +1,8 @@
 #include "level.h"
 
+#include "coolmath.h"
+
 tile_prototype tile_prototypes[NUM_TT];
-
-
-
 
 entity *level_get_entity(level *l, int idx) {
     return &l->entities.entities[idx];
@@ -102,6 +101,8 @@ void level_init(level *l, const char *level_str) {
                             .et = e,
                             .x = i,
                             .y = j,
+                            .dx = 0,
+                            .dy = 0,
                         });
                     }
 
@@ -115,7 +116,8 @@ void level_init(level *l, const char *level_str) {
     }
 }
 
-void level_draw(level *l, gef_context *gc, int xo, int yo) {
+// t from 0 to 1
+void level_draw(level *l, gef_context *gc, int xo, int yo, float t) {
     const int tsize = 64;
     
     for (int i = 0; i < l->tiles.w; i++) {
@@ -129,7 +131,11 @@ void level_draw(level *l, gef_context *gc, int xo, int yo) {
     for (int i = 0; i < l->entities.num_entities; i++) {
         entity *e = level_get_entity(l, i);
         if (e->et == ET_TARGET) {
-            SDL_Rect to_rect = {xo + tsize * e->x, yo + tsize * e->y, tsize, tsize};
+            SDL_Rect to_rect = {
+                xo + tsize * cm_lerp(e->x - e->dx, e->x, t),
+                yo + tsize * cm_lerp(e->y - e->dy, e->y, t),
+                tsize, tsize
+            };
             gef_draw_sprite(gc, entity_prototype_get(e->et).clip, to_rect);
         }
     }
@@ -138,7 +144,11 @@ void level_draw(level *l, gef_context *gc, int xo, int yo) {
     for (int i = 0; i < l->entities.num_entities; i++) {
         entity *e = level_get_entity(l, i);
         if (e->et != ET_TARGET && e->et != ET_NONE) {
-            SDL_Rect to_rect = {xo + tsize * e->x, yo + tsize * e->y, tsize, tsize};
+            SDL_Rect to_rect = {
+                xo + tsize * cm_lerp(e->x - e->dx, e->x, t),
+                yo + tsize * cm_lerp(e->y - e->dy, e->y, t),
+                tsize, tsize
+            };
             gef_draw_sprite(gc, entity_prototype_get(e->et).clip, to_rect);
         }
     }
@@ -210,11 +220,31 @@ int level_get_movable_entity_index_at(level *l, int x, int y) {
     return -1;
 }
 
+bool level_can_move_entity(level *l, int entity_idx, int dx, int dy) {
+    entity *e = level_get_entity(l, entity_idx);
+    int dest_x = e->x + dx;
+    int dest_y = e->y + dy;
+    tile_type t = level_get_tile(l, dest_x, dest_y);
+    if (t == TT_NONE || t == TT_WALL) {
+        return false;
+    }
+    int dest_entity_idx = level_get_movable_entity_index_at(l, dest_x, dest_y);
+    if (dest_entity_idx == -1 || level_can_move_entity(l, dest_entity_idx, dx, dy)) {
+        return true;
+    }
+    return false;    
+}
+
 // stop doing it recursively, just do 1 step at a time, then it will animate easily
 // and avoid the recursive sound tangly mess situation
 // player cant move while stuff happening
 bool level_move_entity(level *l, int entity_idx, int dx, int dy) {
+    if (!level_can_move_entity(l, entity_idx, dx, dy)) {
+        return false;
+    }
     entity *e = level_get_entity(l, entity_idx);
+    e->dx = dx;
+    e->dy = dy;
     int dest_x = e->x + dx;
     int dest_y = e->y + dy;
     tile_type t = level_get_tile(l, dest_x, dest_y);
@@ -231,4 +261,27 @@ bool level_move_entity(level *l, int entity_idx, int dx, int dy) {
         return true;
     }
     return false;
+}
+
+bool level_do_ice(level *l) {
+    bool any_ice = false;
+    for (int i = 0; i < l->entities.num_entities; i++) {
+        entity *e = &l->entities.entities[i];
+
+        if (e->dx == 0 && e->dy == 0) {
+            continue;
+        }
+
+        if (level_get_tile(l, e->x, e->y) == TT_ICE && level_can_move_entity(l, i, e->dx, e->dy)) {
+            printf("do ice for %s: true\n", entity_prototype_get(e->et).name);
+            level_move_entity(l, i, e->dx, e->dy);
+            any_ice = true;
+        } else {
+            e->dx = 0;
+            e->dy = 0;
+            printf("do ice for %s: false\n", entity_prototype_get(e->et).name);
+        }
+
+    }
+    return any_ice;
 }

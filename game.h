@@ -21,6 +21,7 @@ typedef enum {
     GS_NORMAL,
     GS_VICTORY_FADE_OUT,
     GS_FADE_IN,
+    GS_ANIMATE,
     NUM_GS,
 } game_state;
 

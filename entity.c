@@ -33,7 +33,7 @@ void entity_vla_append(entity_vla *v, entity e) {
 
 entity_vla entity_vla_clone(entity_vla *v) {
     entity_vla v2 = {0};
-    v2.backing_array_size = starting_entity_array_size;
+    v2.backing_array_size = v->backing_array_size;
     v2.num_entities = v->num_entities;
     v2.entities = malloc(v->backing_array_size * sizeof(entity));
     memset(v2.entities, 0, sizeof(entity) * v2.backing_array_size);

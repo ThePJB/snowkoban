@@ -22,6 +22,8 @@ typedef struct {
     entity_type et;
     int x;
     int y;
+    int dx;
+    int dy;
 } entity;
 
 typedef struct {

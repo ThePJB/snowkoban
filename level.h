@@ -29,8 +29,9 @@ typedef struct {
 
 void level_init(level *l, const char *level_str);
 void level_destroy(level *l);
-void level_draw(level *l, gef_context *gc, int xo, int yo);
+void level_draw(level *l, gef_context *gc, int xo, int yo, float t);
 bool level_move_entity(level *l, int entity_idx, int dx, int dy);
 void level_set_tile(level *l, int x, int y, tile_type t);
 tile_type level_get_tile(level *l, int x, int y);
 bool level_check_victory(level *l);
+bool level_do_ice(level *l);
