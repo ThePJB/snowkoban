@@ -99,16 +99,14 @@ Christmas is pretty fucking trash. What else is snow and icy?
 
  --------
 
-current problem:
-this entity vla swapping thing is kind of retarded
-its so theres an old state and a new state to tween between for animation
-
-but im also using it to get dx/dy for sliding on ice
-
-so really at the end of animation is when you would do the swapping
-then if it was ice you would update it and do more animation based on dx/dy
-maybe I should just store dx/dy on entities
-if it was sliding it would remain, otherwise it would be set to 0
+ok i fixed sliding and stuff i think
+todo 
+ - input buffering
+ - sound
+ - animations etc
+ - split target from ents and make it a tile? target/snow and target/ice? eh not until the need arises
+ - split player from entities? eh
+ - was tired for level design maybe tomorrow. I did put in some good hours today nice job me
 
 
 ---------

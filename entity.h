@@ -18,12 +18,20 @@ typedef struct {
     bool moveable;
 } entity_prototype;
 
+
+/*
+previous dx and dy are weird, they are used for sliding and drawing.
+its not really obvious why its got to be separate from normal dx and dy til you try implementing
+its so level step can happen without just forgetting the sliding / moving direction basically
+*/
 typedef struct {
     entity_type et;
     int x;
     int y;
     int dx;
     int dy;
+    int previous_dx;
+    int previous_dy;
 } entity;
 
 typedef struct {

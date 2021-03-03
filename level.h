@@ -35,3 +35,6 @@ void level_set_tile(level *l, int x, int y, tile_type t);
 tile_type level_get_tile(level *l, int x, int y);
 bool level_check_victory(level *l);
 bool level_do_ice(level *l);
+bool level_do_ice_for_entity(level *l, int entity_idx);
+
+void level_step(level *l);

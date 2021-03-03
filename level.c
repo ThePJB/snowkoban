@@ -14,7 +14,6 @@ void level_init(level *l, const char *level_str) {
     tile_prototypes[TT_HOLE] = (tile_prototype){"hole", "h", {112, 0, 16, 16}};
     tile_prototypes[TT_WALL] = (tile_prototype){"wall", "#", {0, 0, 16, 16}};
     tile_prototypes[TT_NONE] = (tile_prototype){"none", "", {112, 0, 16, 16}};
-
     
     entity_vla_init(&l->entities);
 
@@ -132,8 +131,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, float t) {
         entity *e = level_get_entity(l, i);
         if (e->et == ET_TARGET) {
             SDL_Rect to_rect = {
-                xo + tsize * cm_lerp(e->x - e->dx, e->x, t),
-                yo + tsize * cm_lerp(e->y - e->dy, e->y, t),
+                xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t),
+                yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t),
                 tsize, tsize
             };
             gef_draw_sprite(gc, entity_prototype_get(e->et).clip, to_rect);
@@ -145,8 +144,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, float t) {
         entity *e = level_get_entity(l, i);
         if (e->et != ET_TARGET && e->et != ET_NONE) {
             SDL_Rect to_rect = {
-                xo + tsize * cm_lerp(e->x - e->dx, e->x, t),
-                yo + tsize * cm_lerp(e->y - e->dy, e->y, t),
+                xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t),
+                yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t),
                 tsize, tsize
             };
             gef_draw_sprite(gc, entity_prototype_get(e->et).clip, to_rect);
@@ -226,12 +225,14 @@ bool level_can_move_entity(level *l, int entity_idx, int dx, int dy) {
     int dest_y = e->y + dy;
     tile_type t = level_get_tile(l, dest_x, dest_y);
     if (t == TT_NONE || t == TT_WALL) {
+        printf("no, wall\n");
         return false;
     }
     int dest_entity_idx = level_get_movable_entity_index_at(l, dest_x, dest_y);
     if (dest_entity_idx == -1 || level_can_move_entity(l, dest_entity_idx, dx, dy)) {
         return true;
     }
+    printf("no, blocked by entity\n");
     return false;    
 }
 
@@ -239,6 +240,7 @@ bool level_can_move_entity(level *l, int entity_idx, int dx, int dy) {
 // and avoid the recursive sound tangly mess situation
 // player cant move while stuff happening
 bool level_move_entity(level *l, int entity_idx, int dx, int dy) {
+    printf("moving %s\n", entity_prototype_get(l->entities.entities[entity_idx].et).name);
     if (!level_can_move_entity(l, entity_idx, dx, dy)) {
         return false;
     }
@@ -254,8 +256,6 @@ bool level_move_entity(level *l, int entity_idx, int dx, int dy) {
     int dest_entity_idx = level_get_movable_entity_index_at(l, dest_x, dest_y);
     if (dest_entity_idx == -1 || level_move_entity(l, dest_entity_idx, dx, dy)) {
         // no entity or its able to move
-        e->x = dest_x;
-        e->y = dest_y;
         // todo play sound as well, sound goes in tile prototype
         // todo ice
         return true;
@@ -263,22 +263,39 @@ bool level_move_entity(level *l, int entity_idx, int dx, int dy) {
     return false;
 }
 
+void level_step(level *l) {
+    for (int i = 0; i < l->entities.num_entities; i++) {
+        entity *e = &l->entities.entities[i];
+
+        e->x += e->dx;
+        e->y += e->dy;
+
+        e->previous_dx = e->dx;
+        e->previous_dy = e->dy;
+
+        e->dx = 0;
+        e->dy = 0;
+
+        // no ice yet
+    }
+}
+
 bool level_do_ice(level *l) {
     bool any_ice = false;
     for (int i = 0; i < l->entities.num_entities; i++) {
         entity *e = &l->entities.entities[i];
 
-        if (e->dx == 0 && e->dy == 0) {
+        if (e->previous_dx == 0 && e->previous_dy == 0) {
             continue;
         }
 
-        if (level_get_tile(l, e->x, e->y) == TT_ICE && level_can_move_entity(l, i, e->dx, e->dy)) {
+        if (level_get_tile(l, e->x, e->y) == TT_ICE && level_can_move_entity(l, i, e->previous_dx, e->previous_dy)) {
             printf("do ice for %s: true\n", entity_prototype_get(e->et).name);
-            level_move_entity(l, i, e->dx, e->dy);
+            level_move_entity(l, i, e->previous_dx, e->previous_dy);
             any_ice = true;
         } else {
-            e->dx = 0;
-            e->dy = 0;
+            //e->dx = 0;
+            //e->dy = 0;
             printf("do ice for %s: false\n", entity_prototype_get(e->et).name);
         }
 

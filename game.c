@@ -11,35 +11,34 @@ void history_erase(history *h, float t);
 
 const float step_time = 0.05;
 
+// action of the state machine
+// is this retarded yes
+void game_set_state(game *g, game_state state) {
+    g->state_t = 0;
+    g->state = state;
+}
+
+// basically just goes through state machine
 void game_update(shared_data *shared_data, void *scene_data, double dt) {
     game *g = (game *)scene_data;
 
     g->state_t += dt;
 
-    if (g->state == GS_VICTORY_FADE_OUT) {
-        if (g->state_t > 1) {
-            g->state = GS_FADE_IN;
-            g->state_t = 0;
-            shared_data->completed[shared_data->selected_level] = true;
-            shared_data->selected_level++;
-            g->s.on_focus(shared_data, g);
-        }
-    } else if (g->state == GS_FADE_IN) {
-        if (g->state_t > 1) {
-            g->state = GS_NORMAL;
-            g->state_t = 0;
-        }
-    } else if (g->state == GS_ANIMATE) {
-        if (g->state_t > step_time) {
-            g->state = GS_NORMAL;
-            g->state_t = 0;
+    if (g->state == GS_VICTORY_FADE_OUT && g->state_t > 1) {
+        game_set_state(g, GS_FADE_IN);
+        shared_data->completed[shared_data->selected_level] = true;
+        shared_data->selected_level++;
+        g->s.on_focus(shared_data, g);
 
-            if (level_do_ice(&g->level)) {
-                printf("\n\nDO ICE\n");
-                g->state = GS_ANIMATE;
-            } else {
-                printf("\n\nNO ICE\n");
-            }
+    } else if (g->state == GS_FADE_IN && g->state_t > 1) {
+        game_set_state(g, GS_NORMAL);
+
+    } else if (g->state == GS_ANIMATE && g->state_t > step_time) {
+        if (level_do_ice(&g->level)) {
+            game_set_state(g, GS_ANIMATE);
+            level_step(&g->level);
+        } else {
+            game_set_state(g, GS_NORMAL);
         }
     }
 }
@@ -94,6 +93,8 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
                     }
                 }
             }
+
+            level_step(&g->level);
 
             if (level_check_victory(&g->level)) {
                 Mix_PlayChannel(CS_WIN, g->audio->win, 0);
@@ -159,7 +160,6 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     }
 
     if (g->state == GS_ANIMATE) {
-        //level_draw(&g->level, gc, xo, yo, cm_slow_stop2(g->state_t / step_time));
         level_draw(&g->level, gc, xo, yo, g->state_t / step_time);
     } else {
         level_draw(&g->level, gc, xo, yo, 1);
