@@ -109,6 +109,12 @@ todo
  - was tired for level design maybe tomorrow. I did put in some good hours today nice job me
 
 
+ ok somethings fucked in history land
+ at one point it tried to allocate like infinity memory and failed, idk why (after several big pauses from i guess the same thing presumably)
+ could probably unit test
+ idk which layer but probably history layer
+
+
 ---------
 
  oo a fractal / procedural walking sim would be cool

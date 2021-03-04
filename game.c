@@ -9,7 +9,7 @@
 
 void history_erase(history *h, float t);
 
-const float step_time = 0.05;
+const float step_time = 0.5;
 
 // action of the state machine
 // is this retarded yes
@@ -204,7 +204,7 @@ void game_append_history(game *g, float time) {
         entity_vla_print(&g->history.records[i].v);
     }
     #endif
-    if (g->history.backing_size == g->history.length - 1) {
+    if (g->history.length >= g->history.backing_size - 2) {
         g->history.backing_size *= 2;
         g->history.records = realloc(g->history.records, sizeof(history_record) * g->history.backing_size);        
     }

@@ -9,8 +9,8 @@ entity *level_get_entity(level *l, int idx) {
 }
 
 void level_init(level *l, const char *level_str) {
-    tile_prototypes[TT_SNOW] = (tile_prototype){"snow", " ptb", {16, 0, 16, 16}};
-    tile_prototypes[TT_ICE] = (tile_prototype){"ice", "/PTB", {32, 0, 16, 16}};
+    tile_prototypes[TT_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}};
+    tile_prototypes[TT_ICE] = (tile_prototype){"ice", "/PTBC", {32, 0, 16, 16}};
     tile_prototypes[TT_HOLE] = (tile_prototype){"hole", "h", {112, 0, 16, 16}};
     tile_prototypes[TT_WALL] = (tile_prototype){"wall", "#", {0, 0, 16, 16}};
     tile_prototypes[TT_NONE] = (tile_prototype){"none", "", {112, 0, 16, 16}};
@@ -240,7 +240,6 @@ bool level_can_move_entity(level *l, int entity_idx, int dx, int dy) {
 // and avoid the recursive sound tangly mess situation
 // player cant move while stuff happening
 bool level_move_entity(level *l, int entity_idx, int dx, int dy) {
-    printf("moving %s\n", entity_prototype_get(l->entities.entities[entity_idx].et).name);
     if (!level_can_move_entity(l, entity_idx, dx, dy)) {
         return false;
     }
@@ -290,13 +289,11 @@ bool level_do_ice(level *l) {
         }
 
         if (level_get_tile(l, e->x, e->y) == TT_ICE && level_can_move_entity(l, i, e->previous_dx, e->previous_dy)) {
-            printf("do ice for %s: true\n", entity_prototype_get(e->et).name);
             level_move_entity(l, i, e->previous_dx, e->previous_dy);
             any_ice = true;
         } else {
             //e->dx = 0;
             //e->dy = 0;
-            printf("do ice for %s: false\n", entity_prototype_get(e->et).name);
         }
 
     }
