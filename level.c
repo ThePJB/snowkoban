@@ -8,7 +8,7 @@ entity *level_get_entity(level *l, int idx) {
     return &l->entities.entities[idx];
 }
 
-void level_init(level *l, const char *level_str) {
+void level_init(level *l, const char *level_str, gef_context *gc, font_handle font) {
     tile_prototypes[TT_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}};
     tile_prototypes[TT_ICE] = (tile_prototype){"ice", "/PTBC", {32, 0, 16, 16}};
     tile_prototypes[TT_HOLE] = (tile_prototype){"hole", "h", {112, 0, 16, 16}};
@@ -37,6 +37,7 @@ void level_init(level *l, const char *level_str) {
                 l->title[i-1] = '\0';
                 i = 0;
                 title = false;
+                l->title_handle = gef_make_text(gc, font, l->title, 255, 255, 255);
             }
             current_pos++;
             continue;
@@ -170,6 +171,7 @@ void level_destroy(level *l) {
         l->title = 0;
     }
     entity_vla_destroy(&l->entities);
+    gef_destroy_text(l->title_handle);
 }
 
 tile_type level_get_tile(level *l, int x, int y) {
@@ -225,14 +227,12 @@ bool level_can_move_entity(level *l, int entity_idx, int dx, int dy) {
     int dest_y = e->y + dy;
     tile_type t = level_get_tile(l, dest_x, dest_y);
     if (t == TT_NONE || t == TT_WALL) {
-        printf("no, wall\n");
         return false;
     }
     int dest_entity_idx = level_get_movable_entity_index_at(l, dest_x, dest_y);
     if (dest_entity_idx == -1 || level_can_move_entity(l, dest_entity_idx, dx, dy)) {
         return true;
     }
-    printf("no, blocked by entity\n");
     return false;    
 }
 

@@ -101,6 +101,7 @@ Christmas is pretty fucking trash. What else is snow and icy?
 
 ok i fixed sliding and stuff i think
 todo 
+ - fix holes
  - input buffering
  - sound
  - animations etc
@@ -114,6 +115,16 @@ todo
  could probably unit test
  idk which layer but probably history layer
 
+ a sokoban rules overworld and like collectibles would be really cool
+
+ conveyor belts
+
+ barricades for N presents
+
+
+diode and double diode
+
+leaking font thing is that bad?
 
 ---------
 

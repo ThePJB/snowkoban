@@ -26,6 +26,8 @@ typedef struct {
 } scene_interface;
 
 typedef struct shared_data {
+    gef_context gc;
+
     bool keep_going;
     scene_index current_scene;
     const char** levels;

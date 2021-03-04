@@ -9,7 +9,7 @@
 
 void history_erase(history *h, float t);
 
-const float step_time = 0.5;
+const float step_time = 0.05;
 
 // action of the state machine
 // is this retarded yes
@@ -39,6 +39,11 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
             level_step(&g->level);
         } else {
             game_set_state(g, GS_NORMAL);
+            if (level_check_victory(&g->level)) {
+                Mix_PlayChannel(CS_WIN, g->audio->win, 0);
+                g->state = GS_VICTORY_FADE_OUT;
+                g->state_t = 0;
+            }
         }
     }
 }
@@ -95,12 +100,6 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
             }
 
             level_step(&g->level);
-
-            if (level_check_victory(&g->level)) {
-                Mix_PlayChannel(CS_WIN, g->audio->win, 0);
-                g->state = GS_VICTORY_FADE_OUT;
-                g->state_t = 0;
-            }
 
         } else if (reset) {
             g->s.on_focus(shared_data, g);
@@ -167,6 +166,13 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     
 
     snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time);
+
+    if (g->state == GS_FADE_IN) {
+        float downness = cm_slow_stop2(min(g->state_t * 2, 1));
+        int y = downness * 100 - 50;
+        int x = gc->xres / 2 - g->level.title_handle.w / 2;
+        gef_draw_text(gc, g->level.title_handle, x, y);
+    }
 }
 
 #define HISTORY_STARTING_SIZE 100
@@ -261,7 +267,11 @@ void game_on_focus(shared_data *shared_data, void *scene_data) {
     
     history_erase(&g->history, shared_data->time);
     level_destroy(&g->level);
-    level_init(&g->level, shared_data->levels[shared_data->selected_level]);
+
+    font_handle title_font = gef_load_font("assets/Hack-Regular.ttf", 36); // leak
+    level_init(&g->level, shared_data->levels[shared_data->selected_level], &shared_data->gc, title_font);
+    game_set_state(g, GS_FADE_IN);
+
 }
 
 game game_init(audio *audio, shared_data *shared_data) {

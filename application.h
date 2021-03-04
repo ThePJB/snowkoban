@@ -13,8 +13,6 @@
 
 
 typedef struct {
-    gef_context gc;
-
     scene_interface* scenes[NUM_SCENES];
     
     scene_index previous_scene;

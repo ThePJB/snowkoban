@@ -25,9 +25,10 @@ typedef struct {
     char *title;
     grid tiles;
     entity_vla entities;
+    text_handle title_handle;
 } level;
 
-void level_init(level *l, const char *level_str);
+void level_init(level *l, const char *level_str, gef_context *gc, font_handle font);
 void level_destroy(level *l);
 void level_draw(level *l, gef_context *gc, int xo, int yo, float t);
 bool level_move_entity(level *l, int entity_idx, int dx, int dy);
