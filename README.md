@@ -8,8 +8,6 @@
   - have dirt, thin snow, deep snow
 
 ## Game Features
- - rewrite block pushing to be iterative, do sound that way
- - OR do it recursively but keeping track of times... dont like that really
  - custom levels in main menu
  - in game menu (scene stack?)
  - reset, undo buttons that also hint 
@@ -18,10 +16,7 @@
 
 ## Bugs
  - no movt sound
- - no character facing
- - no character animations
  - i think high memory usage from fonts - maybe switch to a stylized bitmap font
- - no sliding
 
 ## Required juice
  - print level name when u go into it

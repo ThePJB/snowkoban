@@ -9,8 +9,10 @@ entity *level_get_entity(level *l, int idx) {
 }
 
 void level_init(level *l, const char *level_str, gef_context *gc, font_handle font) {
+    l->player_faces_left = false;
+
     tile_prototypes[TT_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}};
-    tile_prototypes[TT_ICE] = (tile_prototype){"ice", "/PTBC", {32, 0, 16, 16}};
+    tile_prototypes[TT_ICE] = (tile_prototype){"ice", "/PTBC", {32, 16, 16, 16}};
     tile_prototypes[TT_HOLE] = (tile_prototype){"hole", "h", {112, 0, 16, 16}};
     tile_prototypes[TT_WALL] = (tile_prototype){"wall", "#", {0, 0, 16, 16}};
     tile_prototypes[TT_NONE] = (tile_prototype){"none", "", {112, 0, 16, 16}};
@@ -117,15 +119,58 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
 }
 
 // t from 0 to 1
-void level_draw(level *l, gef_context *gc, int xo, int yo, float t) {
+void level_draw(level *l, gef_context *gc, int xo, int yo, float t, float time) {
     const int tsize = 64;
-    
+    const int spirtesheet_size = 16;
+    const int pxsize = 4;
+    const float reflection_aspect_ratio = 1;
+    const SDL_Rect ice_bg_clip = {32, 0, 16, 16};
+
+    int player_frame = cm_frac(time) > 0.5;
+
+    // first draw ice background
+    for (int i = 0; i < l->tiles.w; i++) {
+        for (int j = 0; j < l->tiles.h; j++) {
+            if (level_get_tile(l, i, j) == TT_ICE) {
+                SDL_Rect to_rect = {xo + tsize * i, yo + tsize * j, tsize, tsize};
+                gef_draw_sprite(gc, ice_bg_clip, to_rect);
+            }
+        }
+    }
+
+    // then draw entity reflections
+    for (int i = 0; i < l->entities.num_entities; i++) {
+        entity *e = level_get_entity(l, i);
+        if (e->et != ET_TARGET && e->et != ET_NONE) {
+
+            int reflection_offset = tsize - (2*pxsize*entity_prototype_get(e->et).base_h);
+            SDL_Rect to_rect = {
+                xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t),
+                yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t) + reflection_offset,
+                tsize, tsize * reflection_aspect_ratio
+            };
+            SDL_Rect from_rect = entity_prototype_get(e->et).clip;
+            SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
+            if (e->et == ET_PLAYER) {
+                if (!l->player_faces_left) {
+                    flip |= SDL_FLIP_HORIZONTAL;
+                }
+                
+                from_rect.y += player_frame * spirtesheet_size;
+            }
+            gef_draw_sprite_ex(gc, from_rect, to_rect, 0, flip);
+        }
+    }
+
+    // then draw tiles incl. ice fg    
     for (int i = 0; i < l->tiles.w; i++) {
         for (int j = 0; j < l->tiles.h; j++) {
             SDL_Rect to_rect = {xo + tsize * i, yo + tsize * j, tsize, tsize};
             gef_draw_sprite(gc, tile_prototypes[level_get_tile(l, i, j)].clip, to_rect);
         }
     }
+
+    // then draw entities
 
     // draw order: first draw receptacles
     for (int i = 0; i < l->entities.num_entities; i++) {
@@ -137,6 +182,7 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, float t) {
                 tsize, tsize
             };
             gef_draw_sprite(gc, entity_prototype_get(e->et).clip, to_rect);
+
         }
     }
 
@@ -149,7 +195,15 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, float t) {
                 yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t),
                 tsize, tsize
             };
-            gef_draw_sprite(gc, entity_prototype_get(e->et).clip, to_rect);
+            SDL_Rect from_rect = entity_prototype_get(e->et).clip;
+            SDL_RendererFlip flip = SDL_FLIP_NONE;
+            if (e->et == ET_PLAYER) {
+                if (!l->player_faces_left) {
+                    flip |= SDL_FLIP_HORIZONTAL;
+                }
+                from_rect.y += player_frame * spirtesheet_size;
+            }
+            gef_draw_sprite_ex(gc, from_rect, to_rect, 0, flip);
         }
     }
 }
@@ -275,7 +329,6 @@ void level_step(level *l) {
         e->dx = 0;
         e->dy = 0;
 
-        // no ice yet
     }
 }
 

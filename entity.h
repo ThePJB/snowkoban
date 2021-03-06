@@ -16,6 +16,7 @@ typedef struct {
     const char *symbols;
     SDL_Rect clip;
     bool moveable;
+    int base_h;
 } entity_prototype;
 
 

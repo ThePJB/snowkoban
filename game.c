@@ -82,10 +82,10 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
                 dy = 1;
             } else if (left) {
                 dx = -1;
-                //g->player_faces_left = true;
+                g->level.player_faces_left = true;
             } else if (right) {
                 dx = 1;
-                //g->player_faces_left = false;
+                g->level.player_faces_left = false;
             }
 
             game_append_history(g, shared_data->time);
@@ -159,9 +159,9 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     }
 
     if (g->state == GS_ANIMATE) {
-        level_draw(&g->level, gc, xo, yo, g->state_t / step_time);
+        level_draw(&g->level, gc, xo, yo, g->state_t / step_time, shared_data->time);
     } else {
-        level_draw(&g->level, gc, xo, yo, 1);
+        level_draw(&g->level, gc, xo, yo, 1, shared_data->time);
     }
     
 
