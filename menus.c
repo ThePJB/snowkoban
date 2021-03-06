@@ -38,7 +38,7 @@ void main_menu_handle_input(shared_data *shared_data, void *scene_data, SDL_Even
             if (selection == 0) {
                 shared_data->current_scene = SCENE_LEVEL_MENU;
             } else if (selection == 1) {
-                printf("settings nyi\n");
+                shared_data->current_scene = SCENE_SETTINGS_MENU;
             } else if (selection == 2) {
                 shared_data->keep_going = false;
             }
@@ -67,7 +67,10 @@ void main_menu_draw(shared_data *shared_data, void *scene_data, gef_context *gc,
 
     gef_draw_rect(gc, background_colour, 0, 0, gc->xres, gc->yres);
 
-    snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time);
+
+    if (shared_data->draw_snow) {
+        snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time, shared_data->snow_offset_base);
+    }
 
     int menu_x = screen_center_x - button_w/2;
     int menu_y = screen_center_y - menu_height/2;
@@ -187,7 +190,10 @@ void level_menu_draw(shared_data *shared_data, void *scene_data, gef_context *gc
 
     gef_draw_rect(gc, background_colour, 0, 0, gc->xres, gc->yres);
 
-    snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time);
+
+    if (shared_data->draw_snow) {
+        snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time, shared_data->snow_offset_base);
+    }
 
     for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {

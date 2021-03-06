@@ -9,7 +9,7 @@
 
 void history_erase(history *h, float t);
 
-const float step_time = 0.05;
+const float step_time = 0.1;
 
 // action of the state machine
 // is this retarded yes
@@ -25,25 +25,40 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
     g->state_t += dt;
 
     if (g->state == GS_VICTORY_FADE_OUT && g->state_t > 1) {
+        // FADE OUT -> FADE IN
+
         game_set_state(g, GS_FADE_IN);
         shared_data->completed[shared_data->selected_level] = true;
         shared_data->selected_level++;
         g->s.on_focus(shared_data, g);
+        shared_data->snow_offset_base += shared_data->snow_offset_current;
+        shared_data->snow_offset_current = 0;
 
     } else if (g->state == GS_FADE_IN && g->state_t > 1) {
+        // FADE IN -> NORMAL
+
+        /*
+        shared_data->snow_offset_base += shared_data->snow_offset_current;
+        shared_data->snow_offset_current = 0;
+        */
+        
         game_set_state(g, GS_NORMAL);
 
     } else if (g->state == GS_ANIMATE && g->state_t > step_time) {
         if (level_do_ice(&g->level)) {
+            // ANIMATE -> MORE ANIMATE
+
             game_set_state(g, GS_ANIMATE);
             level_step(&g->level);
+        } else if(level_check_victory(&g->level)) {
+            // ANIMATE -> VICTORY FADE OUT
+
+            Mix_PlayChannel(CS_WIN, g->audio->win, 0);
+            game_set_state(g, GS_VICTORY_FADE_OUT);
         } else {
+            // ANIMATE -> NORMAL
+
             game_set_state(g, GS_NORMAL);
-            if (level_check_victory(&g->level)) {
-                Mix_PlayChannel(CS_WIN, g->audio->win, 0);
-                g->state = GS_VICTORY_FADE_OUT;
-                g->state_t = 0;
-            }
         }
     }
 }
@@ -138,34 +153,50 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     xo = xo / tsize * tsize;
     yo = yo / tsize * tsize;
 
-    float wipe_t = 0;
+    int64_t t_start = get_us();
+
+    float wipe_t = g->state_t;
     if (g->state == GS_VICTORY_FADE_OUT) {
-        wipe_t = g->state_t;
         wipe_t = cm_slow_start2(wipe_t);
         xo += wipe_t * gc->xres;
+
+        shared_data->snow_offset_current = -wipe_t * gc->xres;
+
     } else if (g->state == GS_FADE_IN) {
-        wipe_t = g->state_t;
         wipe_t = cm_slow_start2(1 - wipe_t);
         xo += -1 * wipe_t * gc->xres;
+
+        shared_data->snow_offset_current = wipe_t * gc->xres;
+
     }
 
-    SDL_Rect clip_wall = {0, 0, 16, 16};
+    int64_t t_fade = get_us();
 
-    for (int i = (xo % tsize) - tsize; i < (gc->xres + 1) * tsize; i += tsize) {
-        for (int j = 0; j < (gc->yres + 1) * tsize; j += tsize) {
+    SDL_Rect clip_wall = {0, 0, 16, 16};
+  
+    for (int i = (xo % tsize) - tsize; i < (gc->xres + tsize); i += tsize) {
+        for (int j = 0; j < (gc->yres + tsize); j += tsize) {
             SDL_Rect to_rect = (SDL_Rect) {i, j, tsize, tsize};
             gef_draw_sprite(gc, clip_wall, to_rect);
         }
     }
+
+    int64_t t_fill = get_us();
 
     if (g->state == GS_ANIMATE) {
         level_draw(&g->level, gc, xo, yo, g->state_t / step_time, shared_data->time);
     } else {
         level_draw(&g->level, gc, xo, yo, 1, shared_data->time);
     }
+
+    int64_t t_level = get_us();
     
 
-    snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time);
+    if (shared_data->draw_snow) {
+        snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time, shared_data->snow_offset_base + shared_data->snow_offset_current);
+    }
+
+    int64_t t_snow = get_us();
 
     if (g->state == GS_FADE_IN) {
         float downness = cm_slow_stop2(min(g->state_t * 2, 1));
@@ -173,6 +204,18 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
         int x = gc->xres / 2 - g->level.title_handle.w / 2;
         gef_draw_text(gc, g->level.title_handle, x, y);
     }
+
+    int64_t t_text = get_us();
+
+    #ifdef PROFILE
+    printf("t_fade = %f, t_fill = %f, t_level = %f, t_snow = %f, t_text = %f\n",
+        (t_fade - t_start) / 1000.0,
+        (t_fill - t_fade) / 1000.0,
+        (t_level - t_fill) / 1000.0,
+        (t_snow - t_level) / 1000.0,
+        (t_text - t_snow) / 1000.0
+    );
+    #endif
 }
 
 #define HISTORY_STARTING_SIZE 100

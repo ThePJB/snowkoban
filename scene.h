@@ -7,6 +7,7 @@
 typedef enum {
     SCENE_MAIN_MENU,
     SCENE_LEVEL_MENU,
+    SCENE_SETTINGS_MENU,
     SCENE_GAME,
     NUM_SCENES,
 } scene_index;
@@ -36,4 +37,10 @@ typedef struct shared_data {
     bool completed[NUM_LEVELS];
     float time;
     float interp_time;
+
+    bool draw_snow;
+    float snow_offset_base;
+    float snow_offset_current;
+
+
 } shared_data;

@@ -1,6 +1,8 @@
 #include "application.h"
 #include "levels.h"
 #include "util.h"
+#include "settings_menu.h"
+
 
 void application_init(application *app, int xres, int yres, bool do_start_level, int start_level) {
     
@@ -12,6 +14,9 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
         .selected_level = 0,
         .completed = {false},
         .time = 0,
+        .draw_snow = true,
+        .snow_offset_base = 0,
+        .snow_offset_current = 0,
     };
 
     app->shared_data.gc = gef_init("snowkoban", xres, yres);
@@ -29,6 +34,8 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
     *(main_menu*)app->scenes[SCENE_MAIN_MENU] = main_menu_init(&app->shared_data.gc);
     app->scenes[SCENE_LEVEL_MENU] = malloc(sizeof(level_menu));
     *(level_menu*)app->scenes[SCENE_LEVEL_MENU] = level_menu_init(&app->shared_data.gc, &app->shared_data);
+    app->scenes[SCENE_SETTINGS_MENU] = malloc(sizeof(settings_menu));
+    *(settings_menu*)app->scenes[SCENE_SETTINGS_MENU] = settings_menu_init(&app->shared_data.gc);
     app->scenes[SCENE_GAME] = malloc(sizeof(game));
     *(game*)app->scenes[SCENE_GAME] = game_init(&app->audio, &app->shared_data);
 
@@ -55,7 +62,7 @@ void application_update(application *app, double dt) {
         dt
     );
 
-    return; // probably dont do much here since its mostly input driven
+    return;
 }
 
 void application_draw(application *app, double dt) {

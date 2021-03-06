@@ -17,18 +17,19 @@
 ## Bugs
  - no movt sound
  - i think high memory usage from fonts - maybe switch to a stylized bitmap font
+ - record undo points from just running at a wall
 
 ## Required juice
- - print level name when u go into it
- - animated character and other stuff?
+ - snow wipe. maybe i can get there with 1 variable and some moddy tricks. Keep the multiple of xres and add xo as the mod part
+    - wipiing is annoying lol print out wipe state
+ - level number
  - 3d or 2d, autotile warcraft style would probably work
  - if 2d, how we doing scaling / size enforcement, have different zoom levels and pad with wall? or fix lvl sizes
  - maybe enforcing a certain level size / aspect ratio, or just center it for drawing and surround with WALL_TEXTURE?
- - make snow effect smooth (quick) rewind will look even cooler
- - reflection in ice effect? with like an ice mask so u draw ice base, entity upside down, ice mask
 
 
 ## Non specific issues
+ - whats with memory usage lol
  - fix sound design
  - fix art
    - todo mine celeste for inspo
@@ -37,8 +38,6 @@
  - tone and theme
   - needs to maybe be funny and christmasy but not really, pivot each time you unlock a mechanic?
   - fake rpg?
- - bgm rewinds with undos
- - investigate fps
 
 ## Refactor
  - maybe tile prototypes:
@@ -124,3 +123,13 @@ leaking font thing is that bad?
 ---------
 
  oo a fractal / procedural walking sim would be cool
+
+
+
+wiping is fuggen annoying
+-------------------------
+
+in shared data have float wipe thats like incs whenever you go forward or decs whenever you go back. by 2 because 1 is for wipe out and 1 is for wipe in
+then use that to calculate wipe offsets and snow offset
+
+ok its fine now, maybe if i make the menus wipe later I will
