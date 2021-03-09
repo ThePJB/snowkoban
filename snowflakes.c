@@ -11,7 +11,6 @@ takes time variable
 and it needs to make them, have them move down, and delete them
 so they exist over some interval made of noise etc
 
-
 */
 
 void snowflake_draw(gef_context *gc, int x, int y, int s) {
@@ -39,8 +38,6 @@ void snowflakes_draw(gef_context *gc, int xres, int yres, float t, int xo) {
     int start_seed = -(potential_xmax/spacing) - 1;
     int end_seed = (potential_xmax + xres)/spacing + 1;
     
-    //for (int starting_x = -potential_xmax + xo; starting_x < xres + potential_xmax + xo; starting_x += spacing) {
-
     for (int seed = start_seed; seed < end_seed; seed++) {
 
         float phase = hash_floatn(seed, 0, slowness);

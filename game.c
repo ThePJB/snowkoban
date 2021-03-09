@@ -18,6 +18,31 @@ void game_set_state(game *g, game_state state) {
     g->state = state;
 }
 
+void game_move_player(game *g, int dx, int dy, float time) {
+    if (!dx && !dy) {
+        return;
+    }
+
+    if (dx > 0) {
+        g->level.player_faces_left = false;
+    } else if (dx < 0) {
+        g->level.player_faces_left = true;
+    }
+
+    game_append_history(g, time);
+
+    for (int i = 0; i < g->level.entities.num_entities; i++) {
+        if (g->level.entities.entities[i].et == ET_PLAYER) {
+            if (level_move_entity(&g->level, i, dx, dy)) {
+                g->state = GS_ANIMATE;
+                g->state_t = 0;
+            }
+        }
+    }
+
+    level_step(&g->level);
+}
+
 // basically just goes through state machine
 void game_update(shared_data *shared_data, void *scene_data, double dt) {
     game *g = (game *)scene_data;
@@ -36,11 +61,6 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
 
     } else if (g->state == GS_FADE_IN && g->state_t > 1) {
         // FADE IN -> NORMAL
-
-        /*
-        shared_data->snow_offset_base += shared_data->snow_offset_current;
-        shared_data->snow_offset_current = 0;
-        */
         
         game_set_state(g, GS_NORMAL);
 
@@ -55,6 +75,14 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
 
             Mix_PlayChannel(CS_WIN, g->audio->win, 0);
             game_set_state(g, GS_VICTORY_FADE_OUT);
+        } else if (g->buffered_move_dx != 0 || g->buffered_move_dy != 0) {
+            // ANIMATE -> MORE ANIMATE
+            
+            game_move_player(g, g->buffered_move_dx, g->buffered_move_dy, shared_data->time);
+            g->buffered_move_dx = 0;
+            g->buffered_move_dy = 0;
+            
+            // gets set to animate in game_move_player...
         } else {
             // ANIMATE -> NORMAL
 
@@ -63,12 +91,14 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
     }
 }
 
+
+
 void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) {
     game *g = (game *)scene_data;
     
 
     if (g->state == GS_VICTORY_FADE_OUT) return;
-    if (g->state == GS_ANIMATE) return;
+    //if (g->state == GS_ANIMATE) return; // lets see what breaks if you reset or undo while animating
 
     if (e.type  == SDL_KEYDOWN) {
         SDL_Keycode sym = e.key.keysym.sym;
@@ -97,24 +127,16 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
                 dy = 1;
             } else if (left) {
                 dx = -1;
-                g->level.player_faces_left = true;
             } else if (right) {
                 dx = 1;
-                g->level.player_faces_left = false;
             }
 
-            game_append_history(g, shared_data->time);
-
-            for (int i = 0; i < g->level.entities.num_entities; i++) {
-                if (g->level.entities.entities[i].et == ET_PLAYER) {
-                    if (level_move_entity(&g->level, i, dx, dy)) {
-                        g->state = GS_ANIMATE;
-                        g->state_t = 0;
-                    }
-                }
+            if (g->state == GS_ANIMATE) {
+                g->buffered_move_dx = dx;
+                g->buffered_move_dy = dy;
+            } else {
+                game_move_player(g, dx, dy, shared_data->time);
             }
-
-            level_step(&g->level);
 
         } else if (reset) {
             g->s.on_focus(shared_data, g);

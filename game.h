@@ -33,6 +33,9 @@ typedef struct {
     float state_t;
     game_state state;
     level level;
+
+    int buffered_move_dx;
+    int buffered_move_dy;
 } game;
 
 history history_init();

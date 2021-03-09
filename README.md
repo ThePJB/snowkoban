@@ -48,7 +48,8 @@
 
  ## Level Concepts
  - got to have newtons cradling with one on snow in the middle of the ice!
- - 
+  - doesnt really work cause u can just get in there as player?
+ - intersecting ice rings
 
 
  - crate knocks a block
@@ -120,16 +121,10 @@ diode and double diode
 
 leaking font thing is that bad?
 
+--------------
+
+can pimp the shit out of undo, make things slide back and control snow slidebackyness
+
 ---------
 
  oo a fractal / procedural walking sim would be cool
-
-
-
-wiping is fuggen annoying
--------------------------
-
-in shared data have float wipe thats like incs whenever you go forward or decs whenever you go back. by 2 because 1 is for wipe out and 1 is for wipe in
-then use that to calculate wipe offsets and snow offset
-
-ok its fine now, maybe if i make the menus wipe later I will
