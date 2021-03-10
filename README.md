@@ -6,45 +6,37 @@
  - ice cube that slides no matter what its on
  - what if it was about building a snowman (getting the balls of snow to the right size where they go up by 1 every time you push on snow so you have to find a traversal of the correct distance, there would be bases and the rule is 3 high decreasing by 1)
   - have dirt, thin snow, deep snow
+ - water is better flavour than hole lol and you can play a splash animation
+ - tree you can walk through but not push blocks through
 
 ## Game Features
+ - more cohesion would be nice. like maybe track the total number of presents so theres a number that goes up.
+ - bonus levels where u just pump
+ - extra hard collectibles like coloured santa hats would be cool
+ - immersive overworld would be cool but maybe a ceebs, idk how undos would work if you had actual puzzles in there, and also camera panning. maybe divide into stages. could be cool to chunk levels that way
  - custom levels in main menu
  - in game menu (scene stack?)
  - reset, undo buttons that also hint 
+ - settings
+  - sound, music volume
+  - write settings to disk
+  - res
  - write save to disk
  - mobile
+ - full screen
 
 ## Bugs
  - no movt sound
- - i think high memory usage from fonts - maybe switch to a stylized bitmap font
  - record undo points from just running at a wall
+ - music rewinds to zero
 
 ## Required juice
- - snow wipe. maybe i can get there with 1 variable and some moddy tricks. Keep the multiple of xres and add xo as the mod part
-    - wipiing is annoying lol print out wipe state
  - level number
- - 3d or 2d, autotile warcraft style would probably work
- - if 2d, how we doing scaling / size enforcement, have different zoom levels and pad with wall? or fix lvl sizes
- - maybe enforcing a certain level size / aspect ratio, or just center it for drawing and surround with WALL_TEXTURE?
-
-
-## Non specific issues
- - whats with memory usage lol
- - fix sound design
- - fix art
-   - todo mine celeste for inspo
- - main menu art
- - steam banner thing
- - tone and theme
-  - needs to maybe be funny and christmasy but not really, pivot each time you unlock a mechanic?
-  - fake rpg?
-
-## Refactor
- - maybe tile prototypes:
-  - moves
-  - clip
-  - something take care of the bit shifting
-   - could have slides. lol if there were little ice skating penguins
+ - scale level to the biggest that will fit
+ - nice undos
+ - better sounds
+ - nicer font
+ - steam banner
 
  ## Level Concepts
  - got to have newtons cradling with one on snow in the middle of the ice!
@@ -80,37 +72,6 @@ so the hard part would be getting up to that part
 
 
 
-
- ## Aesthetic
-Christmas is pretty fucking trash. What else is snow and icy?
- - i mean tongue in cheek christmas might be redeemable?
- - vikings
- - penguins
- - eskimos
- - yetis
- - you could be tibet santa
- - Siberia? escaped from russian prison.
-
-
- --------
-
-ok i fixed sliding and stuff i think
-todo 
- - fix holes
- - input buffering
- - sound
- - animations etc
- - split target from ents and make it a tile? target/snow and target/ice? eh not until the need arises
- - split player from entities? eh
- - was tired for level design maybe tomorrow. I did put in some good hours today nice job me
-
-
- ok somethings fucked in history land
- at one point it tried to allocate like infinity memory and failed, idk why (after several big pauses from i guess the same thing presumably)
- could probably unit test
- idk which layer but probably history layer
-
- a sokoban rules overworld and like collectibles would be really cool
 
  conveyor belts
 

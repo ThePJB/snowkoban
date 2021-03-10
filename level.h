@@ -29,7 +29,7 @@ typedef struct {
     bool player_faces_left;
 } level;
 
-void level_init(level *l, const char *level_str, gef_context *gc, font_handle font);
+void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, int level_num);
 void level_destroy(level *l);
 void level_draw(level *l, gef_context *gc, int xo, int yo, float t, float time);
 bool level_move_entity(level *l, int entity_idx, int dx, int dy);

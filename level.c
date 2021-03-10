@@ -8,7 +8,7 @@ entity *level_get_entity(level *l, int idx) {
     return &l->entities.entities[idx];
 }
 
-void level_init(level *l, const char *level_str, gef_context *gc, font_handle font) {
+void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, int level_num) {
     l->player_faces_left = false;
 
     tile_prototypes[TT_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}};
@@ -39,7 +39,6 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
                 l->title[i-1] = '\0';
                 i = 0;
                 title = false;
-                l->title_handle = gef_make_text(gc, font, l->title, 255, 255, 255);
             }
             current_pos++;
             continue;
@@ -68,7 +67,10 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
         current_pos++;
     }
 
-    printf("loading %s\n", l->title);
+    char buf[256] = {0};
+    sprintf(buf, "%d. %s", level_num, l->title);
+    l->title_handle = gef_make_text(gc, font, buf, 255, 255, 255);
+    printf("loading %d. %s\n", level_num, l->title);
 
     l->tiles = grid_init(sizeof(tile_type), width, j);
     current_pos = grid_start;

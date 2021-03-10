@@ -334,7 +334,7 @@ void game_on_focus(shared_data *shared_data, void *scene_data) {
     level_destroy(&g->level);
 
     font_handle title_font = gef_load_font("assets/Hack-Regular.ttf", 36); // leak
-    level_init(&g->level, shared_data->levels[shared_data->selected_level], &shared_data->gc, title_font);
+    level_init(&g->level, shared_data->levels[shared_data->selected_level], &shared_data->gc, title_font, shared_data->selected_level);
     game_set_state(g, GS_FADE_IN);
 
 }
