@@ -429,6 +429,30 @@ const char *levels[] = {
     "#  /  #  / t#\n"
     "#############\n",
 
+    "promotion\n"
+    "##########\n"
+    "# /p/ / /#\n"
+    "#/ / / / #\n"
+    "# / / / /#\n"
+    "#/ /b/ / #\n"
+    "# / /c/ /#\n"
+    "#/ / / / #\n"
+    "# / / / /#\n"
+    "#/ /t/ / #\n"
+    "##########\n",
+
+    "corner\n"
+    "############\n"
+    "#  #########\n"
+    "#     c  ###\n"
+    "# ##  b  ###\n"
+    "# c/     ###\n"
+    "### ####/###\n"
+    "### ##t / ##\n"
+    "### ##### ##\n"
+    "###p      ##\n"
+    "############\n",
+
 
     // what about a bistable latch, states A and B
     // and ur in 1 or 2
@@ -452,10 +476,10 @@ const char *levels[] = {
     "#    # /////////#\n"
     "#      /////////#\n"
     "#    / /////////#\n"
-    "#ttt#/##/#//////#\n"
+    "#tt##/##/#//////#\n"
     "#####/#////////##\n"
     "#    /#////////##\n"
-    "# bb /b////////##\n"
+    "#  b /b////////##\n"
     "# p  /#///////###\n"
     "#    /#///#/////#\n"
     "#####/###########\n"
@@ -508,17 +532,6 @@ const char *levels[] = {
     "###########/####\n"
     "################\n",
 
-    "scaffolding\n"
-    "###########\n"
-    "#        t#\n"
-    "#  p      #\n"
-    "# bb /   t#\n"
-    "# ### #####\n"
-    "#   c c   #\n"
-    "#  c c    #\n"
-    "#         #\n"
-    "###########\n",
-
     "squeeze\n"
     "#t######\n"
     "#      #\n"
@@ -530,7 +543,25 @@ const char *levels[] = {
     "####   #\n"
     "########\n",
 
+    // take a block through 4 quadrants
+
     // try to make a hard level thats highly constrained, e.g. block and target are on the same wall
+
+
+    "straight and narrow\n"
+    "##############\n"
+    "#   /        #\n"
+    "#c p/        #\n"
+    "#  b/      ct#\n"
+    "# ##/#########\n"
+    "#   /        #\n"
+    "#   /        #\n"
+    "#   /        #\n"
+    "# cc/  c c c #\n"
+    "####/ ########\n"
+    "##############\n",
+
+
 
     "winner\n"
     "ttttttttttttttt\n"

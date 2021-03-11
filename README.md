@@ -27,6 +27,9 @@
 
 ## Bugs
  - no movt sound
+    - redo audio, i think just have it basically be a singleton / global, with an enum for the different sounds
+    - see how jank it sounds just calling when player lands on block
+    - maybe want something more sophisticated like while sliding play ice sound
  - record undo points from just running at a wall
  - music rewinds to zero
 
@@ -34,6 +37,9 @@
  - level number
  - scale level to the biggest that will fit
  - nice undos
+   - vhs rewind effect
+   - maybe a clean one with bars just moving and jumping around with t
+   - could get some noise from sprite uvs
  - better sounds
  - nicer font
  - steam banner
@@ -43,6 +49,12 @@
   - doesnt really work cause u can just get in there as player?
  - intersecting ice rings
 
+
+cool device
+ #
+c/
+
+corner you can go around once, maybe you have to push a block behind the crate going the other way
 
  - crate knocks a block
   - need crate somewhere but it knocks a present so u have to move that first
