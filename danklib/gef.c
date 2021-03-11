@@ -33,6 +33,8 @@ gef_context gef_init(char *name, int xres, int yres) {
     if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) gef_die(&gc, "couldn't init SDL_img");
     if (TTF_Init() == -1) gef_die(&gc, "couldn't init SDL_ttf");
     
+    SDL_SetRenderDrawBlendMode(gc.renderer, SDL_BLENDMODE_BLEND);
+
     return gc;
 }
 
@@ -102,7 +104,7 @@ void gef_draw_square(gef_context *gc, colour c, int x, int y, int s) {
 }
 
 void gef_draw_rect(gef_context *gc, colour c, int x, int y, int w, int h) {
-    SDL_SetRenderDrawColor(gc->renderer, c.r, c.g, c.b, 255);
+    SDL_SetRenderDrawColor(gc->renderer, c.r, c.g, c.b, c.a);
     SDL_RenderFillRect(gc->renderer, &(SDL_Rect){x, y, w, h});
 }
 

@@ -5,11 +5,13 @@
 #include "snowflakes.h"
 #include "level.h"
 
+
 //#define DEBUG_HISTORY
 
 void history_erase(history *h, float t);
 
 const float step_time = 0.1;
+const float wipe_time = 1.2;
 
 // action of the state machine
 // is this retarded yes
@@ -49,7 +51,7 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
 
     g->state_t += dt;
 
-    if (g->state == GS_VICTORY_FADE_OUT && g->state_t > 1) {
+    if (g->state == GS_VICTORY_FADE_OUT && g->state_t > wipe_time) {
         // FADE OUT -> FADE IN
 
         game_set_state(g, GS_FADE_IN);
@@ -59,7 +61,7 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
         shared_data->snow_offset_base += shared_data->snow_offset_current;
         shared_data->snow_offset_current = 0;
 
-    } else if (g->state == GS_FADE_IN && g->state_t > 1) {
+    } else if (g->state == GS_FADE_IN && g->state_t > wipe_time) {
         // FADE IN -> NORMAL
         
         game_set_state(g, GS_NORMAL);
@@ -164,7 +166,18 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
 void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, double dt) {
     game *g = (game *)scene_data;
 
-    const int tsize = 64;
+    const int t_start_size = 16;
+
+    const int max_scale = 6;
+    
+    // determine the scale factor
+    int scale_factor = 1;
+    while ((scale_factor + 1) * t_start_size * g->level.tiles.w < gc->xres &&
+           (scale_factor + 1) * t_start_size * g->level.tiles.h < gc->yres && scale_factor < max_scale) {
+               scale_factor++;
+    }
+
+    const int tsize = t_start_size * scale_factor;
 
     const int level_w_px = tsize * g->level.tiles.w;
     const int level_h_px = tsize * g->level.tiles.h;
@@ -177,7 +190,7 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
 
     int64_t t_start = get_us();
 
-    float wipe_t = g->state_t;
+    float wipe_t = g->state_t / wipe_time;
     if (g->state == GS_VICTORY_FADE_OUT) {
         wipe_t = cm_slow_start2(wipe_t);
         xo += wipe_t * gc->xres;
@@ -206,16 +219,16 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     int64_t t_fill = get_us();
 
     if (g->state == GS_ANIMATE) {
-        level_draw(&g->level, gc, xo, yo, g->state_t / step_time, shared_data->time);
+        level_draw(&g->level, gc, xo, yo, scale_factor, g->state_t / step_time, shared_data->time);
     } else {
-        level_draw(&g->level, gc, xo, yo, 1, shared_data->time);
+        level_draw(&g->level, gc, xo, yo, scale_factor, 1, shared_data->time);
     }
 
     int64_t t_level = get_us();
     
 
     if (shared_data->draw_snow) {
-        snowflakes_draw(gc, gc->xres, gc->yres, shared_data->interp_time, shared_data->snow_offset_base + shared_data->snow_offset_current);
+        snowflakes_draw(gc, gc->xres, gc->yres, shared_data->time, shared_data->snow_offset_base + shared_data->snow_offset_current);
     }
 
     int64_t t_snow = get_us();
@@ -228,6 +241,7 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     }
 
     int64_t t_text = get_us();
+
 
     #ifdef PROFILE
     printf("t_fade = %f, t_fill = %f, t_level = %f, t_snow = %f, t_text = %f\n",
@@ -311,7 +325,6 @@ bool game_undo(game *g, shared_data *shared_data) {
     g->history.length--;
     shared_data->time = g->history.records[g->history.length].time;
     g->level.entities = g->history.records[g->history.length].v;
-    
 
     Mix_RewindMusic();
     Mix_SetMusicPosition(shared_data->time);
@@ -350,11 +363,9 @@ game game_init(audio *audio, shared_data *shared_data) {
         .update = game_update,
     };
 
-    //g.player_faces_left = true;
     g.audio = audio;
     g.state = GS_NORMAL;
     g.state_t = 0;
-
 
     return g;
 }

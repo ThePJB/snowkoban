@@ -8,8 +8,12 @@
   - have dirt, thin snow, deep snow
  - water is better flavour than hole lol and you can play a splash animation
  - tree you can walk through but not push blocks through
+ - sleigh that can only be pulled lol
 
 ## Game Features
+ - maybe a screen when u start a new game thats like press u to undo
+ - maybe more dopamine when you finish a level like fireworks particles and it says winner lol
+ - present collect, ok that would be easy to add
  - more cohesion would be nice. like maybe track the total number of presents so theres a number that goes up.
  - bonus levels where u just pump
  - extra hard collectibles like coloured santa hats would be cool
@@ -32,14 +36,16 @@
     - maybe want something more sophisticated like while sliding play ice sound
  - record undo points from just running at a wall
  - music rewinds to zero
+ - wipe is like really sickness inducing at high res lol
+   - maybe i could do a blizzard wipe or something that wouldn't be so chunderific
+   - or wipe could be slower
+ - snowflakes speed is resolution dependent
+ - snowflakes could probably scale with res as well
 
 ## Required juice
- - level number
  - scale level to the biggest that will fit
  - nice undos
-   - vhs rewind effect
-   - maybe a clean one with bars just moving and jumping around with t
-   - could get some noise from sprite uvs
+   - ok this was fun to make but i dont keep enough information about entity positions etc and undo logic is bad enough
  - better sounds
  - nicer font
  - steam banner

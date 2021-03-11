@@ -121,10 +121,9 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
 }
 
 // t from 0 to 1
-void level_draw(level *l, gef_context *gc, int xo, int yo, float t, float time) {
-    const int tsize = 64;
+void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, float time) {
     const int spirtesheet_size = 16;
-    const int pxsize = 4;
+    const int tsize = spirtesheet_size * pxsize;
     const float reflection_aspect_ratio = 1;
     const SDL_Rect ice_bg_clip = {32, 0, 16, 16};
 
