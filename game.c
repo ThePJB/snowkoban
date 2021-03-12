@@ -13,12 +13,27 @@ void history_erase(history *h, float t);
 const float step_time = 0.1;
 const float wipe_time = 1.2;
 
-// action of the state machine
-// is this retarded yes
 void game_set_state(game *g, game_state state) {
     g->state_t = 0;
     g->state = state;
 }
+
+void title_set_state(game *g, title_state state) {
+    g->title_state_t = 0;
+    g->title_state = state;
+}
+
+void title_sm_update(game *g, float dt) {
+    g->title_state_t += dt;
+    if (g->title_state == TS_FADE_IN && g->title_state_t > 1) {
+        title_set_state(g, TS_SHOW);
+    } else if (g->title_state == TS_SHOW && g->title_state_t > 2) {
+        title_set_state(g, TS_FADE_OUT);
+    } else if (g->title_state == TS_FADE_OUT && g->title_state_t > 1) {
+        title_set_state(g, TS_NO_SHOW);
+    }
+}
+
 
 void game_move_player(game *g, int dx, int dy, float time, audio *a) {
     if (!dx && !dy) {
@@ -48,6 +63,8 @@ void game_move_player(game *g, int dx, int dy, float time, audio *a) {
 // basically just goes through state machine
 void game_update(shared_data *shared_data, void *scene_data, double dt) {
     game *g = (game *)scene_data;
+
+    title_sm_update(g, dt);
 
     g->state_t += dt;
 
@@ -231,10 +248,18 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
 
     int64_t t_snow = get_us();
 
-    if (g->state == GS_FADE_IN) {
-        float downness = cm_slow_stop2(min(g->state_t * 2, 1));
+    int x = gc->xres / 2 - g->level.title_handle.w / 2;
+
+    if (g->title_state == TS_FADE_IN) {
+        float downness = cm_slow_stop2(g->title_state_t);
         int y = downness * 100 - 50;
-        int x = gc->xres / 2 - g->level.title_handle.w / 2;
+        gef_draw_text(gc, g->level.title_handle, x, y);
+    } else if (g->title_state == TS_FADE_OUT) {
+        float upness = cm_slow_start2(g->title_state_t);
+        int y = (1 - upness) * 100 - 50;
+        gef_draw_text(gc, g->level.title_handle, x, y);
+    } else if (g->title_state == TS_SHOW) {
+        int y = 50;
         gef_draw_text(gc, g->level.title_handle, x, y);
     }
 
@@ -344,10 +369,9 @@ void game_on_focus(shared_data *shared_data, void *scene_data) {
     history_erase(&g->history, shared_data->time);
     level_destroy(&g->level);
 
-    font_handle title_font = gef_load_font("assets/Hack-Regular.ttf", 36); // leak
-    level_init(&g->level, shared_data->levels[shared_data->selected_level], &shared_data->gc, title_font, shared_data->selected_level + 1);
+    level_init(&g->level, shared_data->levels[shared_data->selected_level], &shared_data->gc, shared_data->title_font, shared_data->selected_level + 1);
     game_set_state(g, GS_FADE_IN);
-
+    title_set_state(g, TS_FADE_IN);
 }
 
 game game_init(shared_data *shared_data) {
@@ -363,6 +387,9 @@ game game_init(shared_data *shared_data) {
 
     g.state = GS_NORMAL;
     g.state_t = 0;
+
+    g.title_state = TS_NO_SHOW;
+    g.title_state_t = 0;
 
     return g;
 }

@@ -51,6 +51,7 @@ typedef struct shared_data {
 
     // style stuff
     button_style menu_button_style;
+    font_handle title_font;
 
 
 

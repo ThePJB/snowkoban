@@ -34,6 +34,8 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
 
         .line_thickness = 6,
     };
+
+    app->shared_data.title_font = gef_load_font("assets/Hack-Regular.ttf", 48);
     
     app->previous_scene = -1;
 

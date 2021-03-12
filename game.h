@@ -25,12 +25,23 @@ typedef enum {
     NUM_GS,
 } game_state;
 
+typedef enum {
+    TS_NO_SHOW,
+    TS_FADE_IN,
+    TS_SHOW,
+    TS_FADE_OUT,
+} title_state;
+
 typedef struct {
     scene_interface s;
     history history;
 
     float state_t;
     game_state state;
+
+    float title_state_t;
+    title_state title_state;
+    
     level level;
 
     int buffered_move_dx;

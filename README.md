@@ -24,20 +24,14 @@
  - custom levels in main menu
  - in game menu (scene stack?)
  - reset, undo buttons that also hint     <<<<< this is a good idea
- - settings
-  - sound, music volume
-  - write settings to disk
-  - res
+ - settings - write to disk
+ - res - text input
  - write save to disk
  - mobile
  - full screen
  - level select preview
 
 ## Bugs
- - no movt sound
-    - redo audio, i think just have it basically be a singleton / global, with an enum for the different sounds
-    - see how jank it sounds just calling when player lands on block
-    - maybe want something more sophisticated like while sliding play ice sound
  - record undo points from just running at a wall
  - music rewinds to zero sometimes
  - wipe is like really sickness inducing at high res lol
@@ -45,9 +39,10 @@
    - or wipe could be slower
  - snowflakes speed is resolution dependent
  - snowflakes could probably scale with res as well
- - title hang around longer
  - mouse for menus
  - maybe further back music skip would be good
+ - audio is a bit quiet on eg sliding ice
+ - now i think there is a memory leak
 
 ## Required juice
  - nice undos
