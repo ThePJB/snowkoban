@@ -9,6 +9,9 @@
  - water is better flavour than hole lol and you can play a splash animation
  - tree you can walk through but not push blocks through
  - sleigh that can only be pulled lol
+ - conveyor belts
+ - barricades for N presents
+ - wrapping machine: boxes into presents
 
 ## Game Features
  - maybe a screen when u start a new game thats like press u to undo
@@ -20,7 +23,7 @@
  - immersive overworld would be cool but maybe a ceebs, idk how undos would work if you had actual puzzles in there, and also camera panning. maybe divide into stages. could be cool to chunk levels that way
  - custom levels in main menu
  - in game menu (scene stack?)
- - reset, undo buttons that also hint 
+ - reset, undo buttons that also hint     <<<<< this is a good idea
  - settings
   - sound, music volume
   - write settings to disk
@@ -28,6 +31,7 @@
  - write save to disk
  - mobile
  - full screen
+ - level select preview
 
 ## Bugs
  - no movt sound
@@ -35,75 +39,37 @@
     - see how jank it sounds just calling when player lands on block
     - maybe want something more sophisticated like while sliding play ice sound
  - record undo points from just running at a wall
- - music rewinds to zero
+ - music rewinds to zero sometimes
  - wipe is like really sickness inducing at high res lol
    - maybe i could do a blizzard wipe or something that wouldn't be so chunderific
    - or wipe could be slower
  - snowflakes speed is resolution dependent
  - snowflakes could probably scale with res as well
+ - title hang around longer
+ - mouse for menus
 
 ## Required juice
- - scale level to the biggest that will fit
  - nice undos
    - ok this was fun to make but i dont keep enough information about entity positions etc and undo logic is bad enough
+ - nicer resets would be good though, pop through the undos quickly
  - better sounds
  - nicer font
  - steam banner
 
  ## Level Concepts
- - got to have newtons cradling with one on snow in the middle of the ice!
-  - doesnt really work cause u can just get in there as player?
- - intersecting ice rings
+ - ice rings
+ - ice lines
+ - one way corner
+ - newtons cradle (kinda doesnt work, too commutative and blocks and player are interchangeable)
+ - crates in the way
+ - diode
+ - ice to unstick
+ - break the crate foundation
+ - use present to block before taking it all the way
+ - multi stage levels
+ - any interesting ice partitioning levels stuff
 
 
-cool device
- #
-c/
+ ----------------------
 
-corner you can go around once, maybe you have to push a block behind the crate going the other way
-
- - crate knocks a block
-  - need crate somewhere but it knocks a present so u have to move that first
- - crate gets in the way e.g. makes a corner so u cant push something
- like 
- - to get to area have to move through a crate that fucks a block unless i do something first
-
- one way ice: walking on it from the side then theres a recess when u come back in
-
- what about a whole level made of crates where you cant move any of them except like one to win
-
- push a chain of crates to unstick a present
-
-
- use ice to unstick 2 blocks stuck together
-
-
-or its ice, then open at the other end, and theres some use for it, but u had to use it to get first present in  location
-
-fake receptacle, just a right angle with no space
-
-
-hole puzzles:
-you can push crates down to get rid of them
-next to ice, you cant go that way on the ice but can still go across, AND no wall so you cant skate up to return to that row
-so the hard part would be getting up to that part
-
-
-
-
- conveyor belts
-
- barricades for N presents
-
-
-diode and double diode
-
-leaking font thing is that bad?
-
---------------
-
-can pimp the shit out of undo, make things slide back and control snow slidebackyness
-
----------
-
- oo a fractal / procedural walking sim would be cool
+ better puzzles = more constrained? aka red herrings bad?
