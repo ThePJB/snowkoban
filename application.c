@@ -1,7 +1,6 @@
 #include "application.h"
 #include "levels.h"
 #include "util.h"
-#include "settings_menu.h"
 
 
 void application_init(application *app, int xres, int yres, bool do_start_level, int start_level) {
@@ -17,18 +16,26 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
         .draw_snow = true,
         .snow_offset_base = 0,
         .snow_offset_current = 0,
+
+        .max_scale = 8,
     };
 
     app->shared_data.gc = gef_init("snowkoban", xres, yres);
     gef_load_atlas(&app->shared_data.gc, "assets/snowkoban.png");
 
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
-        printf("failed to open audio\n");
-    }
+    app->shared_data.a = audio_init();
 
-    app->audio = audio_load_sounds();
+    app->shared_data.menu_button_style = (button_style) {
+        .bg = gef_rgb(80, 150, 220),
+        .line = gef_rgb(100, 100, 100),
+        .highlight = gef_rgb(255, 255, 0),
+        .text = gef_rgb(255, 255, 255),
+        .f = gef_load_font("assets/Hack-Regular.ttf", 48),
+
+        .line_thickness = 6,
+    };
+    
     app->previous_scene = -1;
-
 
     app->scenes[SCENE_MAIN_MENU] = malloc(sizeof(main_menu));
     *(main_menu*)app->scenes[SCENE_MAIN_MENU] = main_menu_init(&app->shared_data.gc);
@@ -37,7 +44,7 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
     app->scenes[SCENE_SETTINGS_MENU] = malloc(sizeof(settings_menu));
     *(settings_menu*)app->scenes[SCENE_SETTINGS_MENU] = settings_menu_init(&app->shared_data.gc);
     app->scenes[SCENE_GAME] = malloc(sizeof(game));
-    *(game*)app->scenes[SCENE_GAME] = game_init(&app->audio, &app->shared_data);
+    *(game*)app->scenes[SCENE_GAME] = game_init(&app->shared_data);
 
     if (do_start_level) {
         app->shared_data.current_scene = SCENE_GAME;
@@ -77,6 +84,7 @@ void application_draw(application *app, double dt) {
 }
 
 void application_handle_input(application *app) {
+
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0) {
         if (e.type == SDL_QUIT) {

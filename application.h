@@ -2,7 +2,9 @@
 
 #include "gef.h"
 #include "scene.h"
-#include "menus.h"
+#include "level_menu.h"
+#include "main_menu.h"
+#include "settings_menu.h"
 #include "game.h"
 #include <stdbool.h>
 #include <SDL_mixer.h>
@@ -16,8 +18,6 @@ typedef struct {
     scene_interface* scenes[NUM_SCENES];
     
     scene_index previous_scene;
-
-    audio audio;
 
     shared_data shared_data;
     

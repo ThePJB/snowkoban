@@ -11,11 +11,11 @@ entity *level_get_entity(level *l, int idx) {
 void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, int level_num) {
     l->player_faces_left = false;
 
-    tile_prototypes[TT_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}};
-    tile_prototypes[TT_ICE] = (tile_prototype){"ice", "/PTBC", {32, 16, 16, 16}};
-    tile_prototypes[TT_HOLE] = (tile_prototype){"hole", "h", {112, 0, 16, 16}};
-    tile_prototypes[TT_WALL] = (tile_prototype){"wall", "#", {0, 0, 16, 16}};
-    tile_prototypes[TT_NONE] = (tile_prototype){"none", "", {112, 0, 16, 16}};
+    tile_prototypes[TT_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}, CS_SNOW_FOOTSTEP};
+    tile_prototypes[TT_ICE] = (tile_prototype){"ice", "/PTBC", {32, 16, 16, 16}, CS_SLIP};
+    tile_prototypes[TT_HOLE] = (tile_prototype){"hole", "h", {112, 0, 16, 16}, CS_NONE};
+    tile_prototypes[TT_WALL] = (tile_prototype){"wall", "#", {0, 0, 16, 16}, CS_NONE};
+    tile_prototypes[TT_NONE] = (tile_prototype){"none", "", {112, 0, 16, 16}, CS_NONE};
     
     entity_vla_init(&l->entities);
 
@@ -294,7 +294,7 @@ bool level_can_move_entity(level *l, int entity_idx, int dx, int dy) {
 // stop doing it recursively, just do 1 step at a time, then it will animate easily
 // and avoid the recursive sound tangly mess situation
 // player cant move while stuff happening
-bool level_move_entity(level *l, int entity_idx, int dx, int dy) {
+bool level_move_entity(level *l, int entity_idx, int dx, int dy, audio *a) {
     if (!level_can_move_entity(l, entity_idx, dx, dy)) {
         return false;
     }
@@ -304,11 +304,14 @@ bool level_move_entity(level *l, int entity_idx, int dx, int dy) {
     int dest_x = e->x + dx;
     int dest_y = e->y + dy;
     tile_type t = level_get_tile(l, dest_x, dest_y);
+
+    audio_play(a, tile_prototypes[t].walk_sound);
+
     if (t == TT_NONE || t == TT_WALL) {
         return false;
     }
     int dest_entity_idx = level_get_movable_entity_index_at(l, dest_x, dest_y);
-    if (dest_entity_idx == -1 || level_move_entity(l, dest_entity_idx, dx, dy)) {
+    if (dest_entity_idx == -1 || level_move_entity(l, dest_entity_idx, dx, dy, a)) {
         // no entity or its able to move
         // todo play sound as well, sound goes in tile prototype
         // todo ice
@@ -333,7 +336,7 @@ void level_step(level *l) {
     }
 }
 
-bool level_do_ice(level *l) {
+bool level_do_ice(level *l, audio *a) {
     bool any_ice = false;
     for (int i = 0; i < l->entities.num_entities; i++) {
         entity *e = &l->entities.entities[i];
@@ -343,7 +346,7 @@ bool level_do_ice(level *l) {
         }
 
         if (level_get_tile(l, e->x, e->y) == TT_ICE && level_can_move_entity(l, i, e->previous_dx, e->previous_dy)) {
-            level_move_entity(l, i, e->previous_dx, e->previous_dy);
+            level_move_entity(l, i, e->previous_dx, e->previous_dy, a);
             any_ice = true;
         } else {
             //e->dx = 0;

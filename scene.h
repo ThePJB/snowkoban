@@ -2,6 +2,8 @@
 
 #include <SDL.h>
 #include "gef.h"
+#include "audio.h"
+#include "button.h"
 #include <stdbool.h>
 
 typedef enum {
@@ -27,7 +29,13 @@ typedef struct {
 } scene_interface;
 
 typedef struct shared_data {
+    // subsystems (also settings in here)
     gef_context gc;
+    audio a;
+
+    // setting stuff
+    bool draw_snow;
+    int max_scale;
 
     bool keep_going;
     scene_index current_scene;
@@ -38,9 +46,13 @@ typedef struct shared_data {
     float time;
     float interp_time;
 
-    bool draw_snow;
     float snow_offset_base;
     float snow_offset_current;
+
+    // style stuff
+    button_style menu_button_style;
+
+
 
 
 } shared_data;

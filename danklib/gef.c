@@ -47,6 +47,10 @@ void gef_load_atlas(gef_context *gc, char *path) {
 
 font_handle gef_load_font(char *path, int size) {
     TTF_Font *f = TTF_OpenFont(path, size);
+    if (!f) {
+        printf("error loading font %s: %s\n", path, TTF_GetError());
+        exit(1);
+    }
     return (font_handle) {
         .gfont = f,
     };

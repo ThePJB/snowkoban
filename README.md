@@ -47,6 +47,7 @@
  - snowflakes could probably scale with res as well
  - title hang around longer
  - mouse for menus
+ - maybe further back music skip would be good
 
 ## Required juice
  - nice undos
@@ -73,3 +74,7 @@
  ----------------------
 
  better puzzles = more constrained? aka red herrings bad?
+
+ ----------------------
+
+ style: specify some things and also have a parent (or be created from a parent). is that how CSS?

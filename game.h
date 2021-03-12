@@ -28,7 +28,6 @@ typedef enum {
 typedef struct {
     scene_interface s;
     history history;
-    audio *audio;
 
     float state_t;
     game_state state;
@@ -47,4 +46,4 @@ bool game_undo(game *g, shared_data *shared_data);
 
 void game_load_level_from_str(game *g, const char *level_str, shared_data *shared_data);
 
-game game_init(audio *audio, shared_data *shared_data);
+game game_init(shared_data *shared_data);

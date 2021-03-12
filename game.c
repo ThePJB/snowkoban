@@ -20,7 +20,7 @@ void game_set_state(game *g, game_state state) {
     g->state = state;
 }
 
-void game_move_player(game *g, int dx, int dy, float time) {
+void game_move_player(game *g, int dx, int dy, float time, audio *a) {
     if (!dx && !dy) {
         return;
     }
@@ -35,7 +35,7 @@ void game_move_player(game *g, int dx, int dy, float time) {
 
     for (int i = 0; i < g->level.entities.num_entities; i++) {
         if (g->level.entities.entities[i].et == ET_PLAYER) {
-            if (level_move_entity(&g->level, i, dx, dy)) {
+            if (level_move_entity(&g->level, i, dx, dy, a)) {
                 g->state = GS_ANIMATE;
                 g->state_t = 0;
             }
@@ -67,7 +67,7 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
         game_set_state(g, GS_NORMAL);
 
     } else if (g->state == GS_ANIMATE && g->state_t > step_time) {
-        if (level_do_ice(&g->level)) {
+        if (level_do_ice(&g->level, &shared_data->a)) {
             // ANIMATE -> MORE ANIMATE
 
             game_set_state(g, GS_ANIMATE);
@@ -75,12 +75,12 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
         } else if(level_check_victory(&g->level)) {
             // ANIMATE -> VICTORY FADE OUT
 
-            Mix_PlayChannel(CS_WIN, g->audio->win, 0);
+            audio_play(&shared_data->a, CS_WIN);
             game_set_state(g, GS_VICTORY_FADE_OUT);
         } else if (g->buffered_move_dx != 0 || g->buffered_move_dy != 0) {
             // ANIMATE -> MORE ANIMATE
             
-            game_move_player(g, g->buffered_move_dx, g->buffered_move_dy, shared_data->time);
+            game_move_player(g, g->buffered_move_dx, g->buffered_move_dy, shared_data->time, &shared_data->a);
             g->buffered_move_dx = 0;
             g->buffered_move_dy = 0;
             
@@ -137,12 +137,12 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
                 g->buffered_move_dx = dx;
                 g->buffered_move_dy = dy;
             } else {
-                game_move_player(g, dx, dy, shared_data->time);
+                game_move_player(g, dx, dy, shared_data->time, &shared_data->a);
             }
 
         } else if (reset) {
             g->s.on_focus(shared_data, g);
-            Mix_PlayChannel(CS_LOSE, g->audio->lose, 0);
+            audio_play(&shared_data->a, CS_LOSE);
         } else if (sym == SDLK_q) {
             if (shared_data->selected_level == 0) {
                 return;
@@ -157,7 +157,7 @@ void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) 
             g->s.on_focus(shared_data, g);
         } else if (sym == SDLK_u) {
             if (game_undo(g, shared_data)) {
-                Mix_PlayChannel(CS_UNDO, g->audio->undo, 0);
+                audio_play(&shared_data->a, CS_UNDO);
             }
         }
     }
@@ -167,13 +167,11 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     game *g = (game *)scene_data;
 
     const int t_start_size = 16;
-
-    const int max_scale = 6;
     
     // determine the scale factor
     int scale_factor = 1;
     while ((scale_factor + 1) * t_start_size * g->level.tiles.w < gc->xres &&
-           (scale_factor + 1) * t_start_size * g->level.tiles.h < gc->yres && scale_factor < max_scale) {
+           (scale_factor + 1) * t_start_size * g->level.tiles.h < gc->yres && scale_factor < shared_data->max_scale) {
                scale_factor++;
     }
 
@@ -352,7 +350,7 @@ void game_on_focus(shared_data *shared_data, void *scene_data) {
 
 }
 
-game game_init(audio *audio, shared_data *shared_data) {
+game game_init(shared_data *shared_data) {
     game g = {0};
     g.history = history_init();
 
@@ -363,7 +361,6 @@ game game_init(audio *audio, shared_data *shared_data) {
         .update = game_update,
     };
 
-    g.audio = audio;
     g.state = GS_NORMAL;
     g.state_t = 0;
 
