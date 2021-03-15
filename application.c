@@ -1,6 +1,7 @@
 #include "application.h"
 #include "levels.h"
 #include "util.h"
+#include "level_menu_new.h"
 
 
 void application_init(application *app, int xres, int yres, bool do_start_level, int start_level) {
@@ -18,6 +19,24 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
         .snow_offset_current = 0,
 
         .max_scale = 8,
+
+
+        // new level stuff
+        .worlds = {
+            #include "world_1.h"
+            ,
+            #include "world_2.h"
+            ,
+            #include "world_3.h"
+            ,
+            #include "world_4.h"
+            ,
+            #include "world_5.h"
+            ,
+        },
+        .world_idx = 0,
+        .level_idx = 0,
+        .num_worlds = 5,
     };
 
     app->shared_data.gc = gef_init("snowkoban", xres, yres);
@@ -41,8 +60,10 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
 
     app->scenes[SCENE_MAIN_MENU] = malloc(sizeof(main_menu));
     *(main_menu*)app->scenes[SCENE_MAIN_MENU] = main_menu_init(&app->shared_data.gc);
-    app->scenes[SCENE_LEVEL_MENU] = malloc(sizeof(level_menu));
-    *(level_menu*)app->scenes[SCENE_LEVEL_MENU] = level_menu_init(&app->shared_data.gc, &app->shared_data);
+    //app->scenes[SCENE_LEVEL_MENU] = malloc(sizeof(level_menu));
+    //*(level_menu*)app->scenes[SCENE_LEVEL_MENU] = level_menu_init(&app->shared_data.gc, &app->shared_data);
+    app->scenes[SCENE_LEVEL_MENU] = malloc(sizeof(level_menu_new));
+    *(level_menu_new*)app->scenes[SCENE_LEVEL_MENU] = level_menu_new_init(&app->shared_data.gc, &app->shared_data);
     app->scenes[SCENE_SETTINGS_MENU] = malloc(sizeof(settings_menu));
     *(settings_menu*)app->scenes[SCENE_SETTINGS_MENU] = settings_menu_init(&app->shared_data.gc);
     app->scenes[SCENE_GAME] = malloc(sizeof(game));

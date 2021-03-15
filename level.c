@@ -8,7 +8,7 @@ entity *level_get_entity(level *l, int idx) {
     return &l->entities.entities[idx];
 }
 
-void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, int level_num) {
+void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, shared_data *shared_data) {
     l->player_faces_left = false;
 
     tile_prototypes[TT_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}, CS_SNOW_FOOTSTEP};
@@ -68,9 +68,8 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
     }
 
     char buf[256] = {0};
-    sprintf(buf, "%d. %s", level_num, l->title);
+    sprintf(buf, "%d - %d %s", shared_data->world_idx, shared_data->level_idx, l->title);
     l->title_handle = gef_make_text(gc, font, buf, 255, 255, 255);
-    printf("loading %d. %s\n", level_num, l->title);
 
     l->tiles = grid_init(sizeof(tile_type), width, j);
     current_pos = grid_start;
@@ -122,8 +121,8 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
 
 // t from 0 to 1
 void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, float time) {
-    const int spirtesheet_size = 16;
-    const int tsize = spirtesheet_size * pxsize;
+    const int spritesheet_size = 16;
+    const int tsize = spritesheet_size * pxsize;
     const float reflection_aspect_ratio = 1;
     const SDL_Rect ice_bg_clip = {32, 0, 16, 16};
 
@@ -157,7 +156,7 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
                     flip |= SDL_FLIP_HORIZONTAL;
                 }
                 
-                from_rect.y += player_frame * spirtesheet_size;
+                from_rect.y += player_frame * spritesheet_size;
             }
             gef_draw_sprite_ex(gc, from_rect, to_rect, 0, flip);
         }
@@ -202,7 +201,7 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
                 if (!l->player_faces_left) {
                     flip |= SDL_FLIP_HORIZONTAL;
                 }
-                from_rect.y += player_frame * spirtesheet_size;
+                from_rect.y += player_frame * spritesheet_size;
             }
             gef_draw_sprite_ex(gc, from_rect, to_rect, 0, flip);
         }

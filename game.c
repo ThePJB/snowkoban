@@ -72,11 +72,36 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
         // FADE OUT -> FADE IN
 
         game_set_state(g, GS_FADE_IN);
-        shared_data->completed[shared_data->selected_level] = true;
-        shared_data->selected_level++;
-        g->s.on_focus(shared_data, g);
+        level_set *w = &shared_data->worlds[shared_data->world_idx];
+
+        // tally progress
+        if (! w->completed[shared_data->level_idx]) {
+            w->completed[shared_data->level_idx] = true;
+            int n_presents = 0;
+            for (int i = 0; i < g->level.entities.num_entities; i++) {
+                if (g->level.entities.entities[i].et == ET_PRESENT) {
+                    w->collected_presents++;
+                }
+            }
+        }
+
         shared_data->snow_offset_base += shared_data->snow_offset_current;
         shared_data->snow_offset_current = 0;
+        
+        if (shared_data->level_idx >= w->num_levels - 1) {
+            // kick back to the main menu
+            shared_data->current_scene = SCENE_LEVEL_MENU;
+            if (shared_data->world_idx < shared_data->num_worlds - 1) {
+                shared_data->level_idx = 0;
+                shared_data->world_idx++;
+            } else {
+                // you finished da game
+            }
+        } else {
+            // next level
+            shared_data->level_idx++;
+            g->s.on_focus(shared_data, g);    
+        }
 
     } else if (g->state == GS_FADE_IN && g->state_t > wipe_time) {
         // FADE IN -> NORMAL
@@ -369,7 +394,9 @@ void game_on_focus(shared_data *shared_data, void *scene_data) {
     history_erase(&g->history, shared_data->time);
     level_destroy(&g->level);
 
-    level_init(&g->level, shared_data->levels[shared_data->selected_level], &shared_data->gc, shared_data->title_font, shared_data->selected_level + 1);
+    const char *level_str = shared_data->worlds[shared_data->world_idx].levels[shared_data->level_idx];
+
+    level_init(&g->level, level_str, &shared_data->gc, shared_data->title_font, shared_data);
     game_set_state(g, GS_FADE_IN);
     title_set_state(g, TS_FADE_IN);
 }

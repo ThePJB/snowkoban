@@ -4,6 +4,7 @@
 #include "gef.h"
 #include "audio.h"
 #include "button.h"
+#include "level_set.h"
 #include <stdbool.h>
 
 typedef enum {
@@ -39,10 +40,7 @@ typedef struct shared_data {
 
     bool keep_going;
     scene_index current_scene;
-    const char** levels;
-    int num_levels;
-    int selected_level;
-    bool completed[NUM_LEVELS];
+    
     float time;
     float interp_time;
 
@@ -53,7 +51,16 @@ typedef struct shared_data {
     button_style menu_button_style;
     font_handle title_font;
 
+    // level stuff (deprecated)
+    const char** levels;
+    int num_levels;
+    int selected_level;
+    bool completed[NUM_LEVELS];
 
+    level_set worlds[10];
+    int world_idx;
+    int num_worlds;
+    int level_idx;
 
 
 } shared_data;

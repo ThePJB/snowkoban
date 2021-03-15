@@ -5,6 +5,7 @@
 #include "gef.h"
 #include "entity.h"
 #include "audio.h"
+#include "scene.h"
 
 typedef enum {
     TT_NONE,
@@ -31,7 +32,7 @@ typedef struct {
     bool player_faces_left;
 } level;
 
-void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, int level_num);
+void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, shared_data *shared_data);
 void level_destroy(level *l);
 void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, float time);
 bool level_move_entity(level *l, int entity_idx, int dx, int dy, audio *a);

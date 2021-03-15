@@ -65,6 +65,11 @@
  - multi stage levels
  - any interesting ice partitioning levels stuff
 
+# Level groupings
+ - basic sokoban shit, sticky etc
+ - welcome to ice
+ - welcome to boxes
+ - pushing things onto ice
 
  ----------------------
 
@@ -73,3 +78,6 @@
  ----------------------
 
  style: specify some things and also have a parent (or be created from a parent). is that how CSS?
+
+ ----------------------------
+ rn we are trying to load some random ass memory for a level. idk why
