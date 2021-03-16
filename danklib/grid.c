@@ -4,23 +4,23 @@
 #include <stdbool.h>
 #include "grid.h"
 
-grid grid_init(size_t size, int w, int h) {
+grid grid_init(size_t size, size_t w, size_t h) {
     grid g = {0};
     g.size = size;
     g.w = w;
     g.h = h;
-    g.data = calloc(w*h, size);
+    g.data = (uint8_t*)calloc(w*h, size);
     return g;
 }
 
 // buf: size
-void grid_set(grid g, void *buf, int x, int y) {
+void grid_set(grid g, void *buf, size_t x, size_t y) {
     int index = y * g.w + x;
     memcpy(g.data + (index * g.size), buf, g.size);
 }
 
 // buf: size
-bool grid_get(grid g, void *buf, int x, int y) {
+bool grid_get(grid g, void *buf, size_t x, size_t y) {
     if (x < 0 || x > g.w || y < 0 || y > g.h) {
         return false;
     }
@@ -32,13 +32,13 @@ bool grid_get(grid g, void *buf, int x, int y) {
 int x_neigh_indices[] = {-1,  0,  1, -1,  1, -1,  0, 1};
 int y_neigh_indices[] = {-1, -1, -1,  0,  0,  1,  1, 1};
 
-bool grid_validate_indices(grid g, int x, int y) {
+bool grid_validate_indices(grid g, size_t x, size_t y) {
     return (x >= 0 && x < g.w && y >= 0 && y < g.h);
 }
 
 // buf: size
 // return is neighbour
-bool grid_get_neighbour8(grid g, void *buf, int x, int y, int n) {
+bool grid_get_neighbour8(grid g, void *buf, size_t x, size_t y, int n) {
 
     if (n > 9) {
         printf("bad neighbour index grid_get_neighbour8\n");
@@ -53,7 +53,7 @@ bool grid_get_neighbour8(grid g, void *buf, int x, int y, int n) {
     return true;
 }
 
-bool grid_index_neighbour8(grid g, int x, int y, int n, int *xp, int *yp) {
+bool grid_index_neighbour8(grid g, size_t x, size_t y, int n, int *xp, int *yp) {
 
     if (n > 9) {
         printf("bad neighbour index grid_index_neighbour8\n");

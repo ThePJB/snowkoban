@@ -34,15 +34,15 @@ typedef enum {
 
 typedef struct {
     scene_interface s;
-    history history;
+    history m_history;
 
     float state_t;
     game_state state;
 
     float title_state_t;
-    title_state title_state;
+    title_state m_title_state;
     
-    level level;
+    level m_level;
 
     int buffered_move_dx;
     int buffered_move_dy;

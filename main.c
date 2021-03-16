@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
     application_init(&app, 1600, 900, do_level_start, level_num);
     
     double dt = 0.001;
-    while (app.shared_data.keep_going) {
+    while (app.m_shared_data.keep_going) {
         int64_t tstart = get_us();
 
         application_handle_input(&app);

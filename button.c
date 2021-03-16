@@ -1,7 +1,7 @@
 #include "button.h"
 #include <stdio.h>
 
-void button_generic_draw(gef_context *gc, button_style bs, SDL_Rect r, char *text, bool rollover) {
+void button_generic_draw(gef_context *gc, button_style bs, SDL_Rect r, const char *text, bool rollover) {
     SDL_Rect line_rect = (SDL_Rect) {
         r.x - bs.line_thickness,
         r.y - bs.line_thickness,
@@ -22,19 +22,19 @@ void button_generic_draw(gef_context *gc, button_style bs, SDL_Rect r, char *tex
     gef_destroy_text(t);
 }
 
-void button_bool_draw(gef_context *gc, button_style bs, SDL_Rect r, char *text, bool value, bool rollover) {
+void button_bool_draw(gef_context *gc, button_style bs, SDL_Rect r, const char *text, bool value, bool rollover) {
     char buffer[256] = {0};
     sprintf(buffer, "%s: %s", text, value ? "ON" : "OFF");
     button_generic_draw(gc, bs, r, buffer, rollover);
 }
 
-void button_percent_draw(gef_context *gc, button_style bs, SDL_Rect r, char *text, float value, bool rollover) {
+void button_percent_draw(gef_context *gc, button_style bs, SDL_Rect r, const char *text, float value, bool rollover) {
     char buffer[256] = {0};
     sprintf(buffer, "%s: %d%%", text, (int)(value * 100));
     button_generic_draw(gc, bs, r, buffer, rollover);
 }
 
-void button_int_draw(gef_context *gc, button_style bs, SDL_Rect r, char *text, int value, bool rollover) {
+void button_int_draw(gef_context *gc, button_style bs, SDL_Rect r, const char *text, int value, bool rollover) {
     char buffer[256] = {0};
     sprintf(buffer, "%s: %d", text, value);
     button_generic_draw(gc, bs, r, buffer, rollover);

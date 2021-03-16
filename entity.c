@@ -23,9 +23,9 @@ entity_prototype entity_prototype_get(entity_type et) {
 void entity_vla_append(entity_vla *v, entity e) {
     if (v->num_entities == v->backing_array_size - 1) {
         v->backing_array_size *= 2;
-        v->entities = realloc(v->entities, sizeof(entity) * v->backing_array_size);
+        v->entities = (entity *)realloc(v->entities, sizeof(entity) * v->backing_array_size);
         for (int i = v->backing_array_size / 2; i < v->backing_array_size; i++) {
-            v->entities[i] = (entity){0};
+            v->entities[i].et = ET_NONE;
         }
     }
     v->entities[v->num_entities++] = e;
@@ -35,7 +35,7 @@ entity_vla entity_vla_clone(entity_vla *v) {
     entity_vla v2 = {0};
     v2.backing_array_size = v->backing_array_size;
     v2.num_entities = v->num_entities;
-    v2.entities = malloc(v->backing_array_size * sizeof(entity));
+    v2.entities = (entity *)malloc(v->backing_array_size * sizeof(entity));
     memset(v2.entities, 0, sizeof(entity) * v2.backing_array_size);
     memmove(v2.entities, v->entities, sizeof(entity) * v->num_entities);
     return v2;
@@ -51,7 +51,7 @@ void entity_vla_destroy(entity_vla *v) {
 }
 
 void entity_vla_init(entity_vla *v) {
-    v->entities = calloc(starting_entity_array_size, sizeof(entity));
+    v->entities = (entity*)calloc(starting_entity_array_size, sizeof(entity));
     v->num_entities = 0;
     v->backing_array_size = starting_entity_array_size;
 }

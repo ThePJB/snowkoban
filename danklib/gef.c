@@ -9,7 +9,7 @@
 
 
 
-gef_context gef_init(char *name, int xres, int yres) {
+gef_context gef_init(const char *name, int xres, int yres) {
     printf("initializing graphics...\n");
     gef_context gc;
 
@@ -38,14 +38,14 @@ gef_context gef_init(char *name, int xres, int yres) {
     return gc;
 }
 
-void gef_load_atlas(gef_context *gc, char *path) {
+void gef_load_atlas(gef_context *gc, const char *path) {
     SDL_Surface* loaded_surface = IMG_Load(path);
     gc->atlas = SDL_CreateTextureFromSurface(gc->renderer, loaded_surface);
     if (gc->atlas == NULL) gef_die(gc, "couldn't create texture");
     SDL_FreeSurface(loaded_surface);
 }
 
-font_handle gef_load_font(char *path, int size) {
+font_handle gef_load_font(const char *path, int size) {
     TTF_Font *f = TTF_OpenFont(path, size);
     if (!f) {
         printf("error loading font %s: %s\n", path, TTF_GetError());
@@ -56,9 +56,9 @@ font_handle gef_load_font(char *path, int size) {
     };
 }
 
-text_handle gef_make_text(gef_context *gc, font_handle f, char *text, int r, int g, int b) {
-    SDL_Surface *text_surface = TTF_RenderText_Blended(f.gfont, text, (SDL_Color){.a=255, .r=r, .g=g, .b=b});
-    SDL_Surface *text_shadow_surface = TTF_RenderText_Blended(f.gfont, text, (SDL_Color){.a=255, .r=0, .g=0, .b=0});
+text_handle gef_make_text(gef_context *gc, font_handle f, const char *text, int r, int g, int b) {
+    SDL_Surface *text_surface = TTF_RenderText_Blended(f.gfont, text, (SDL_Color){.r=r, .g=g, .b=b, .a=255});
+    SDL_Surface *text_shadow_surface = TTF_RenderText_Blended(f.gfont, text, (SDL_Color){.r=0, .g=0, .b=0, .a=255});
     SDL_Texture *texture = SDL_CreateTextureFromSurface(gc->renderer, text_surface);
     SDL_Texture *texture_shadow = SDL_CreateTextureFromSurface(gc->renderer, text_shadow_surface);
     text_handle t = (text_handle) {
@@ -75,8 +75,10 @@ text_handle gef_make_text(gef_context *gc, font_handle f, char *text, int r, int
 }
 
 void gef_draw_text(gef_context *gc, text_handle text, int x, int y) {
-    SDL_RenderCopy(gc->renderer, text.texture_shadow, NULL, &(SDL_Rect) {x+2, y+2, text.w, text.h});
-    SDL_RenderCopy(gc->renderer, text.texture, NULL, &(SDL_Rect) {x, y, text.w, text.h});
+    SDL_Rect shadow_to_rect = (SDL_Rect) {x+2, y+2, text.w, text.h};
+    SDL_Rect to_rect = (SDL_Rect) {x, y, text.w, text.h};
+    SDL_RenderCopy(gc->renderer, text.texture_shadow, NULL, &shadow_to_rect);
+    SDL_RenderCopy(gc->renderer, text.texture, NULL, &to_rect);
 };
 
 void gef_destroy_text(text_handle text) {
@@ -103,13 +105,15 @@ void gef_draw_pixel(gef_context *gc, colour c, int x, int y) {
 }
 
 void gef_draw_square(gef_context *gc, colour c, int x, int y, int s) {
+    SDL_Rect to_rect = (SDL_Rect) {x, y, s, s};
     SDL_SetRenderDrawColor(gc->renderer, c.r, c.g, c.b, 255);
-    SDL_RenderFillRect(gc->renderer, &(SDL_Rect){x, y, s, s});
+    SDL_RenderFillRect(gc->renderer, &to_rect);
 }
 
 void gef_draw_rect(gef_context *gc, colour c, int x, int y, int w, int h) {
+    SDL_Rect to_rect = (SDL_Rect) {x, y, w, h};
     SDL_SetRenderDrawColor(gc->renderer, c.r, c.g, c.b, c.a);
-    SDL_RenderFillRect(gc->renderer, &(SDL_Rect){x, y, w, h});
+    SDL_RenderFillRect(gc->renderer, &to_rect);
 }
 
 void gef_present(gef_context *gc) {

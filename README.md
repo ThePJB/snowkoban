@@ -51,6 +51,15 @@
  - better sounds
  - nicer font
  - steam banner
+ - snow particles when u walk
+ - tilt player when sliding
+ - at the end presents hoover into ur total
+
+ ## Level menu stuff
+ - maybe just one world at a time on screen, like how super meat boy does
+ - then u can have bigger chunks, nice previews, progressive disclosure etc
+ - level, world numbers for presentation
+ - nicer font plus text drawing hole fuark
 
  ## Level Concepts
  - ice rings

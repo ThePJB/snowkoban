@@ -20,20 +20,19 @@ void game_set_state(game *g, game_state state) {
 
 void title_set_state(game *g, title_state state) {
     g->title_state_t = 0;
-    g->title_state = state;
+    g->m_title_state = state;
 }
 
 void title_sm_update(game *g, float dt) {
     g->title_state_t += dt;
-    if (g->title_state == TS_FADE_IN && g->title_state_t > 1) {
+    if (g->m_title_state == TS_FADE_IN && g->title_state_t > 1) {
         title_set_state(g, TS_SHOW);
-    } else if (g->title_state == TS_SHOW && g->title_state_t > 2) {
+    } else if (g->m_title_state == TS_SHOW && g->title_state_t > 2) {
         title_set_state(g, TS_FADE_OUT);
-    } else if (g->title_state == TS_FADE_OUT && g->title_state_t > 1) {
+    } else if (g->m_title_state == TS_FADE_OUT && g->title_state_t > 1) {
         title_set_state(g, TS_NO_SHOW);
     }
 }
-
 
 void game_move_player(game *g, int dx, int dy, float time, audio *a) {
     if (!dx && !dy) {
@@ -41,23 +40,23 @@ void game_move_player(game *g, int dx, int dy, float time, audio *a) {
     }
 
     if (dx > 0) {
-        g->level.player_faces_left = false;
+        g->m_level.player_faces_left = false;
     } else if (dx < 0) {
-        g->level.player_faces_left = true;
+        g->m_level.player_faces_left = true;
     }
 
     game_append_history(g, time);
 
-    for (int i = 0; i < g->level.entities.num_entities; i++) {
-        if (g->level.entities.entities[i].et == ET_PLAYER) {
-            if (level_move_entity(&g->level, i, dx, dy, a)) {
+    for (int i = 0; i < g->m_level.entities.num_entities; i++) {
+        if (g->m_level.entities.entities[i].et == ET_PLAYER) {
+            if (level_move_entity(&g->m_level, i, dx, dy, a)) {
                 g->state = GS_ANIMATE;
                 g->state_t = 0;
             }
         }
     }
 
-    level_step(&g->level);
+    level_step(&g->m_level);
 }
 
 // basically just goes through state machine
@@ -78,8 +77,8 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
         if (! w->completed[shared_data->level_idx]) {
             w->completed[shared_data->level_idx] = true;
             int n_presents = 0;
-            for (int i = 0; i < g->level.entities.num_entities; i++) {
-                if (g->level.entities.entities[i].et == ET_PRESENT) {
+            for (int i = 0; i < g->m_level.entities.num_entities; i++) {
+                if (g->m_level.entities.entities[i].et == ET_PRESENT) {
                     w->collected_presents++;
                 }
             }
@@ -109,12 +108,12 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
         game_set_state(g, GS_NORMAL);
 
     } else if (g->state == GS_ANIMATE && g->state_t > step_time) {
-        if (level_do_ice(&g->level, &shared_data->a)) {
+        if (level_do_ice(&g->m_level, &shared_data->a)) {
             // ANIMATE -> MORE ANIMATE
 
             game_set_state(g, GS_ANIMATE);
-            level_step(&g->level);
-        } else if(level_check_victory(&g->level)) {
+            level_step(&g->m_level);
+        } else if(level_check_victory(&g->m_level)) {
             // ANIMATE -> VICTORY FADE OUT
 
             audio_play(&shared_data->a, CS_WIN);
@@ -134,8 +133,6 @@ void game_update(shared_data *shared_data, void *scene_data, double dt) {
         }
     }
 }
-
-
 
 void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) {
     game *g = (game *)scene_data;
@@ -212,15 +209,15 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     
     // determine the scale factor
     int scale_factor = 1;
-    while ((scale_factor + 1) * t_start_size * g->level.tiles.w < gc->xres &&
-           (scale_factor + 1) * t_start_size * g->level.tiles.h < gc->yres && scale_factor < shared_data->max_scale) {
+    while ((scale_factor + 1) * t_start_size * g->m_level.tiles.w < gc->xres &&
+           (scale_factor + 1) * t_start_size * g->m_level.tiles.h < gc->yres && scale_factor < shared_data->max_scale) {
                scale_factor++;
     }
 
     const int tsize = t_start_size * scale_factor;
 
-    const int level_w_px = tsize * g->level.tiles.w;
-    const int level_h_px = tsize * g->level.tiles.h;
+    const int level_w_px = tsize * g->m_level.tiles.w;
+    const int level_h_px = tsize * g->m_level.tiles.h;
 
     int xo = gc->xres / 2 - level_w_px/2;
     int yo = gc->yres / 2 - level_h_px/2;
@@ -249,7 +246,9 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
 
     SDL_Rect clip_wall = {0, 0, 16, 16};
   
-    for (int i = (xo % tsize) - tsize; i < (gc->xres + tsize); i += tsize) {
+    int start_wall_px = (xo % tsize) - tsize;
+    int max_wall_px = gc->xres + tsize;
+    for (int i = start_wall_px; i < max_wall_px; i += tsize) {
         for (int j = 0; j < (gc->yres + tsize); j += tsize) {
             SDL_Rect to_rect = (SDL_Rect) {i, j, tsize, tsize};
             gef_draw_sprite(gc, clip_wall, to_rect);
@@ -259,9 +258,9 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
     int64_t t_fill = get_us();
 
     if (g->state == GS_ANIMATE) {
-        level_draw(&g->level, gc, xo, yo, scale_factor, g->state_t / step_time, shared_data->time);
+        level_draw(&g->m_level, gc, xo, yo, scale_factor, g->state_t / step_time, shared_data->time);
     } else {
-        level_draw(&g->level, gc, xo, yo, scale_factor, 1, shared_data->time);
+        level_draw(&g->m_level, gc, xo, yo, scale_factor, 1, shared_data->time);
     }
 
     int64_t t_level = get_us();
@@ -273,19 +272,19 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
 
     int64_t t_snow = get_us();
 
-    int x = gc->xres / 2 - g->level.title_handle.w / 2;
+    int x = gc->xres / 2 - g->m_level.title_handle.w / 2;
 
-    if (g->title_state == TS_FADE_IN) {
+    if (g->m_title_state == TS_FADE_IN) {
         float downness = cm_slow_stop2(g->title_state_t);
         int y = downness * 100 - 50;
-        gef_draw_text(gc, g->level.title_handle, x, y);
-    } else if (g->title_state == TS_FADE_OUT) {
+        gef_draw_text(gc, g->m_level.title_handle, x, y);
+    } else if (g->m_title_state == TS_FADE_OUT) {
         float upness = cm_slow_start2(g->title_state_t);
         int y = (1 - upness) * 100 - 50;
-        gef_draw_text(gc, g->level.title_handle, x, y);
-    } else if (g->title_state == TS_SHOW) {
+        gef_draw_text(gc, g->m_level.title_handle, x, y);
+    } else if (g->m_title_state == TS_SHOW) {
         int y = 50;
-        gef_draw_text(gc, g->level.title_handle, x, y);
+        gef_draw_text(gc, g->m_level.title_handle, x, y);
     }
 
     int64_t t_text = get_us();
@@ -306,9 +305,9 @@ void game_draw(shared_data *shared_data, void *scene_data, gef_context *gc, doub
 
 history history_init() {
     history h = (history) {
-        .backing_size = HISTORY_STARTING_SIZE,
+        .records = (history_record *)malloc(HISTORY_STARTING_SIZE * sizeof(history_record)),
         .length = 0,
-        .records = malloc(HISTORY_STARTING_SIZE * sizeof(history_record)),
+        .backing_size = HISTORY_STARTING_SIZE,
     };
 
     return h;
@@ -324,7 +323,7 @@ void history_erase(history *h, float t) {
 void history_append_record(history *h, history_record r) {
     if (h->length == h->backing_size) {
         h->backing_size *= 2;
-        h->records = realloc(h->records, sizeof(history_record) * h->backing_size);
+        h->records = (history_record *)realloc(h->records, sizeof(history_record) * h->backing_size);
     }
     h->records[h->length++] = r;
 }
@@ -332,19 +331,19 @@ void history_append_record(history *h, history_record r) {
 void game_append_history(game *g, float time) {
     #ifdef DEBUG_HISTORY
     printf("appending to history, current state:\n...\n");
-    for (int i = max(g->history.length-2, 0); i < g->history.length; i++) {
-        printf("t: %f\n", g->history.records[i].time);
-        entity_vla_print(&g->history.records[i].v);
+    for (int i = max(g->m_history.length-2, 0); i < g->m_history.length; i++) {
+        printf("t: %f\n", g->m_history.records[i].time);
+        entity_vla_print(&g->m_history.records[i].v);
     }
     #endif
-    if (g->history.length >= g->history.backing_size - 2) {
-        g->history.backing_size *= 2;
-        g->history.records = realloc(g->history.records, sizeof(history_record) * g->history.backing_size);        
+    if (g->m_history.length >= g->m_history.backing_size - 2) {
+        g->m_history.backing_size *= 2;
+        g->m_history.records = (history_record *)realloc(g->m_history.records, sizeof(history_record) * g->m_history.backing_size);        
     }
 
     history_record r = (history_record) {
+        .v = entity_vla_clone(&g->m_level.entities),
         .time = time,
-        .v = entity_vla_clone(&g->level.entities),
     };
 
     #ifdef DEBUG_HISTORY
@@ -352,36 +351,36 @@ void game_append_history(game *g, float time) {
     entity_vla_print(&r.v);
     #endif
 
-    g->history.records[g->history.length++] = r;
+    g->m_history.records[g->m_history.length++] = r;
 }
 
 bool game_undo(game *g, shared_data *shared_data) {
     #ifdef DEBUG_HISTORY
     printf("undoing, current state:\n...\n");
-    for (int i = max(g->history.length-2, 0); i < g->history.length; i++) {
-        printf("t: %f\n", g->history.records[i].time);
-        entity_vla_print(&g->history.records[i].v);
+    for (int i = max(g->m_history.length-2, 0); i < g->m_history.length; i++) {
+        printf("t: %f\n", g->m_history.records[i].time);
+        entity_vla_print(&g->m_history.records[i].v);
     }
     #endif
 
     // already at the start
-    if (g->history.length == 0) {
+    if (g->m_history.length == 0) {
         return false;
     }
 
-    entity_vla_destroy(&g->level.entities);
-    g->history.length--;
-    shared_data->time = g->history.records[g->history.length].time;
-    g->level.entities = g->history.records[g->history.length].v;
+    entity_vla_destroy(&g->m_level.entities);
+    g->m_history.length--;
+    shared_data->time = g->m_history.records[g->m_history.length].time;
+    g->m_level.entities = g->m_history.records[g->m_history.length].v;
 
     Mix_RewindMusic();
     Mix_SetMusicPosition(shared_data->time);
 
     #ifdef DEBUG_HISTORY
     printf("undoing, new state:\n...\n");
-    for (int i = max(g->history.length-2, 0); i < g->history.length; i++) {
-        printf("t: %f\n", g->history.records[i].time);
-        entity_vla_print(&g->history.records[i].v);
+    for (int i = max(g->m_history.length-2, 0); i < g->m_history.length; i++) {
+        printf("t: %f\n", g->m_history.records[i].time);
+        entity_vla_print(&g->m_history.records[i].v);
     }
     #endif
 
@@ -391,19 +390,19 @@ bool game_undo(game *g, shared_data *shared_data) {
 void game_on_focus(shared_data *shared_data, void *scene_data) {
     game *g = (game *)scene_data;
     
-    history_erase(&g->history, shared_data->time);
-    level_destroy(&g->level);
+    history_erase(&g->m_history, shared_data->time);
+    level_destroy(&g->m_level);
 
     const char *level_str = shared_data->worlds[shared_data->world_idx].levels[shared_data->level_idx];
 
-    level_init(&g->level, level_str, &shared_data->gc, shared_data->title_font, shared_data);
+    level_init(&g->m_level, level_str, &shared_data->gc, shared_data->title_font, shared_data);
     game_set_state(g, GS_FADE_IN);
     title_set_state(g, TS_FADE_IN);
 }
 
 game game_init(shared_data *shared_data) {
     game g = {0};
-    g.history = history_init();
+    g.m_history = history_init();
 
     g.s = (scene_interface) {
         .draw = game_draw,
@@ -415,7 +414,7 @@ game game_init(shared_data *shared_data) {
     g.state = GS_NORMAL;
     g.state_t = 0;
 
-    g.title_state = TS_NO_SHOW;
+    g.m_title_state = TS_NO_SHOW;
     g.title_state_t = 0;
 
     return g;

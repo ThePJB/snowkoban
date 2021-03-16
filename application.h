@@ -19,7 +19,7 @@ typedef struct {
     
     scene_index previous_scene;
 
-    shared_data shared_data;
+    shared_data m_shared_data;
     
 } application;
 

@@ -20,8 +20,8 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
     entity_vla_init(&l->entities);
 
     bool title = true;
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
     int i = 0;
     int j = 0;
 
@@ -34,7 +34,7 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
         if (title) {
             i++;
             if (*current_pos == '\n') {
-                l->title = malloc(sizeof(char) * i);
+                l->title = (char *)malloc(sizeof(char) * i);
                 memcpy(l->title, level_str, sizeof(char) * i);
                 l->title[i-1] = '\0';
                 i = 0;
@@ -84,11 +84,11 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
             j++;
         } else {
             // load tiles
-            for (tile_type t = 0; t < NUM_TT; t++) {
+            for (int t = 0; t < (int)NUM_TT; t++) {
                 const char *c = tile_prototypes[t].symbols;
                 while(*c) {
                     if (*c == *current_pos) {
-                        level_set_tile(l, i, j, t);
+                        level_set_tile(l, i, j, (tile_type)t);
                         goto load_entities;
                     }
                     c++;
@@ -96,12 +96,12 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
             }
 
             load_entities:
-            for (entity_type e = 0; e < NUM_ET; e++) {
-                const char *c = entity_prototype_get(e).symbols;
+            for (int e = 0; e < (int)NUM_ET; e++) {
+                const char *c = entity_prototype_get((entity_type)e).symbols;
                 while(*c) {
                     if (*c == *current_pos) {
                         entity_vla_append(&l->entities, (entity) {
-                            .et = e,
+                            .et = (entity_type)e,
                             .x = i,
                             .y = j,
                             .dx = 0,
@@ -153,7 +153,7 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
             SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
             if (e->et == ET_PLAYER) {
                 if (!l->player_faces_left) {
-                    flip |= SDL_FLIP_HORIZONTAL;
+                    flip = (SDL_RendererFlip)(((int)flip) | ((int)SDL_FLIP_HORIZONTAL));
                 }
                 
                 from_rect.y += player_frame * spritesheet_size;
@@ -199,7 +199,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
             SDL_RendererFlip flip = SDL_FLIP_NONE;
             if (e->et == ET_PLAYER) {
                 if (!l->player_faces_left) {
-                    flip |= SDL_FLIP_HORIZONTAL;
+                    //flip |= SDL_FLIP_HORIZONTAL;
+                    flip = (SDL_RendererFlip)(((int)flip) | ((int)SDL_FLIP_HORIZONTAL));
                 }
                 from_rect.y += player_frame * spritesheet_size;
             }

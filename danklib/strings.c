@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 
-bool strings_equal(char *a, char *b) {
+bool strings_equal(const char *a, const char *b) {
     if (!a) {
         printf("nullptr passed to strings_equal_a\n");
     }
@@ -20,7 +20,7 @@ bool strings_equal(char *a, char *b) {
     return true;
 }
 
-bool strings_is_dec_int(char *a) {
+bool strings_is_dec_int(const char *a) {
     if (!a) {
         printf("nullptr passed to strings_is_int\n");
     }
@@ -34,7 +34,7 @@ bool strings_is_dec_int(char *a) {
     return true;
 }
 
-int strings_atoi(char *a) {
+int strings_atoi(const char *a) {
     if (!a) {
         printf("nullptr passed to strings_atoi\n");
     }
