@@ -3,6 +3,7 @@
 #include "snowflakes.h"
 #include "audio.h"
 #include <stdbool.h>
+#include "dankstrings.h"
 
 void level_menu_on_focus(shared_data *shared_data, void *scene_data) {
     return;

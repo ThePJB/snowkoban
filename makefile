@@ -11,12 +11,11 @@ CFLAGS += -Wno-narrowing # might be useful too, we will c
 CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-unknown-warning-option # so we can compile with both lol
 
-
 SRCS = $(wildcard *.c)
 SRCS += $(wildcard danklib/*.c)
 
 snowkoban: $(SRCS)
-	gcc $(SRCS) -o  snowkoban $(CFLAGS) $(INCLUDES) $(LDFLAGS)
+	g++ $(SRCS) -o  snowkoban $(CFLAGS) $(INCLUDES) $(LDFLAGS)
 
 .PHONY: clean
 clean:

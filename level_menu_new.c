@@ -1,7 +1,7 @@
 #include "level_menu_new.h"
 #include "util.h"
 #include "snowflakes.h"
-#include "strings.h"
+#include "dankstrings.h"
 #include "entity.h"
 #include "coolmath.h"
 

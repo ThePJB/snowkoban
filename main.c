@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include "application.h"
 #include "util.h"
+#include "dankstrings.h"
 
 //#define PROFILE
 

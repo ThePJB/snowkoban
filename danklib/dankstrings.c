@@ -1,8 +1,7 @@
-#include "strings.h"
+#include "dankstrings.h"
 
 #include <stdio.h>
 #include <math.h>
-
 bool strings_equal(const char *a, const char *b) {
     if (!a) {
         printf("nullptr passed to strings_equal_a\n");
@@ -61,6 +60,7 @@ void strings_itoa(char *a, int i) {
         return;
     }
 
+    
     int len = log10(i) + 1;
     int column = 1;
     for (int j = 0; j < len; j++) {
