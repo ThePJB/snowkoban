@@ -4,44 +4,14 @@
 #include "scene.hpp"
 #include "audio.h"
 #include "entity.h"
-#include "level.h"
+#include "level.hpp"
 
 typedef struct {
-    entity_vla v;
+    vla<entity> v;
     float time;
 } history_record;
 
-typedef struct {
-    history_record *records;
-    int length;
-    int backing_size;
-} history;
-
-/*
-typedef enum {
-    GS_NORMAL,
-    GS_VICTORY_FADE_OUT,
-    GS_FADE_IN,
-    GS_ANIMATE,
-    NUM_GS,
-} game_state;
-
-
-typedef enum {
-    TS_NO_SHOW,
-    TS_FADE_IN,
-    TS_SHOW,
-    TS_FADE_OUT,
-} title_state;
-
-*/
-
-history history_init();
-
-
 struct game : scene {
-    history m_history = history_init();
-
     float state_t = 0;
 
     float title_state_t = 0;
@@ -50,6 +20,11 @@ struct game : scene {
 
     int buffered_move_dx = 0;
     int buffered_move_dy = 0;
+
+    vla<history_record> history = vla<history_record>();
+    void clear_history();
+    void append_current_state_to_history(float time);
+    void undo(shared_data *shared_data);
     
     enum game_state {GS_NORMAL, GS_FADE_OUT, GS_FADE_IN, GS_ANIMATE};
     game_state state = GS_NORMAL;
@@ -66,10 +41,5 @@ struct game : scene {
     void handle_input(shared_data *app_d, SDL_Event e);
 };
 
-
-void history_append_record(history *h, history_record r);
-
-void game_append_history(game *g, float time);
-bool game_undo(game *g, shared_data *shared_data);
 
 void game_load_level_from_str(game *g, const char *level_str, shared_data *shared_data);

@@ -90,3 +90,8 @@
 
  ----------------------------
  rn we are trying to load some random ass memory for a level. idk why
+
+ -------------------------------
+
+ compile times defs took a hit, I wonder if its from using <functional>
+ might be worth taking it out or doing incremental

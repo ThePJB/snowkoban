@@ -3,13 +3,9 @@
 #include "util.h"
 #include "coolmath.h"
 #include "snowflakes.h"
-#include "level.h"
-
-
+#include "level.hpp"
 
 //#define DEBUG_HISTORY
-
-void history_erase(history *h, float t);
 
 const float step_time = 0.1;
 const float wipe_time = 1.2;
@@ -46,10 +42,10 @@ void game_move_player(game *g, int dx, int dy, float time, audio *a) {
         g->m_level.player_faces_left = true;
     }
 
-    game_append_history(g, time);
+    g->append_current_state_to_history(time);
 
-    for (int i = 0; i < g->m_level.entities.num_entities; i++) {
-        if (g->m_level.entities.entities[i].et == ET_PLAYER) {
+    for (int i = 0; i < g->m_level.entities.length; i++) {
+        if (g->m_level.entities.items[i].et == ET_PLAYER) {
             if (level_move_entity(&g->m_level, i, dx, dy, a)) {
                 g->state = game::GS_ANIMATE;
                 g->state_t = 0;
@@ -58,20 +54,6 @@ void game_move_player(game *g, int dx, int dy, float time, audio *a) {
     }
 
     level_step(&g->m_level);
-}
-
-// basically just goes through state machine
-void game_update(shared_data *shared_data, void *scene_data, double dt) {
-    game *g = (game *)scene_data;
-
-    
-}
-
-void game_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) {
-    game *g = (game *)scene_data;
-    
-
-
 }
 
 void game::draw(shared_data *app_d, double dt) {
@@ -186,12 +168,7 @@ void game::update(shared_data *app_d, double dt) {
         // tally progress
         if (! w->completed[app_d->level_idx]) {
             w->completed[app_d->level_idx] = true;
-            int n_presents = 0;
-            for (int i = 0; i < m_level.entities.num_entities; i++) {
-                if (m_level.entities.entities[i].et == ET_PRESENT) {
-                    w->collected_presents++;
-                }
-            }
+            int n_presents = m_level.entities.acc([](entity e) {return e.et == ET_PRESENT ? 1 : 0;});
         }
 
         app_d->snow_offset_base += app_d->snow_offset_current;
@@ -245,7 +222,7 @@ void game::update(shared_data *app_d, double dt) {
 }
 
 void game::on_focus(shared_data *app_d) {
-    history_erase(&m_history, app_d->time);
+    clear_history();
     level_destroy(&m_level);
 
     const char *level_str = app_d->worlds[app_d->world_idx].levels[app_d->level_idx];
@@ -312,95 +289,35 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
             app_d->selected_level++;
             on_focus(app_d);
         } else if (sym == SDLK_u) {
-            if (game_undo(this, app_d)) {
-                audio_play(&app_d->a, CS_UNDO);
-            }
+            undo(app_d);
         }
     }
 }
 
-#define HISTORY_STARTING_SIZE 100
-
-history history_init() {
-    history h = (history) {
-        .records = (history_record *)malloc(HISTORY_STARTING_SIZE * sizeof(history_record)),
-        .length = 0,
-        .backing_size = HISTORY_STARTING_SIZE,
-    };
-
-    return h;
+void game::clear_history() {
+    history.destroy();
+    history = vla<history_record>();
 }
 
-void history_erase(history *h, float t) {
-    for (int i = 0; i < h->length; i++) {
-        entity_vla_destroy(&h->records[i].v);
-    }
-    h->length = 0;
-}
-
-void history_append_record(history *h, history_record r) {
-    if (h->length == h->backing_size) {
-        h->backing_size *= 2;
-        h->records = (history_record *)realloc(h->records, sizeof(history_record) * h->backing_size);
-    }
-    h->records[h->length++] = r;
-}
-
-void game_append_history(game *g, float time) {
-    #ifdef DEBUG_HISTORY
-    printf("appending to history, current state:\n...\n");
-    for (int i = max(g->m_history.length-2, 0); i < g->m_history.length; i++) {
-        printf("t: %f\n", g->m_history.records[i].time);
-        entity_vla_print(&g->m_history.records[i].v);
-    }
-    #endif
-    if (g->m_history.length >= g->m_history.backing_size - 2) {
-        g->m_history.backing_size *= 2;
-        g->m_history.records = (history_record *)realloc(g->m_history.records, sizeof(history_record) * g->m_history.backing_size);        
-    }
-
-    history_record r = (history_record) {
-        .v = entity_vla_clone(&g->m_level.entities),
+void game::append_current_state_to_history(float time) {
+    history.push((history_record) {
+        .v = m_level.entities.deep_copy(),
         .time = time,
-    };
-
-    #ifdef DEBUG_HISTORY
-    printf("\nnew record: t %f, v:\n", r.time);
-    entity_vla_print(&r.v);
-    #endif
-
-    g->m_history.records[g->m_history.length++] = r;
+    });
 }
 
-bool game_undo(game *g, shared_data *shared_data) {
-    #ifdef DEBUG_HISTORY
-    printf("undoing, current state:\n...\n");
-    for (int i = max(g->m_history.length-2, 0); i < g->m_history.length; i++) {
-        printf("t: %f\n", g->m_history.records[i].time);
-        entity_vla_print(&g->m_history.records[i].v);
-    }
-    #endif
-
-    // already at the start
-    if (g->m_history.length == 0) {
-        return false;
+void game::undo(shared_data *shared_data) {
+    if (history.length == 0) {
+        return;
     }
 
-    entity_vla_destroy(&g->m_level.entities);
-    g->m_history.length--;
-    shared_data->time = g->m_history.records[g->m_history.length].time;
-    g->m_level.entities = g->m_history.records[g->m_history.length].v;
+    history_record r = history.pop_back();
+    m_level.entities.destroy();
+    m_level.entities = r.v;
+    shared_data->time = r.time;
 
     Mix_RewindMusic();
     Mix_SetMusicPosition(shared_data->time);
 
-    #ifdef DEBUG_HISTORY
-    printf("undoing, new state:\n...\n");
-    for (int i = max(g->m_history.length-2, 0); i < g->m_history.length; i++) {
-        printf("t: %f\n", g->m_history.records[i].time);
-        entity_vla_print(&g->m_history.records[i].v);
-    }
-    #endif
-
-    return true;
+    audio_play(&shared_data->a, CS_UNDO);
 }

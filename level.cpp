@@ -1,12 +1,8 @@
-#include "level.h"
+#include "level.hpp"
 
 #include "coolmath.h"
 
 tile_prototype tile_prototypes[NUM_TT];
-
-entity *level_get_entity(level *l, int idx) {
-    return &l->entities.entities[idx];
-}
 
 void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, shared_data *shared_data) {
     l->player_faces_left = false;
@@ -17,7 +13,7 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
     tile_prototypes[TT_WALL] = (tile_prototype){"wall", "#", {0, 0, 16, 16}, CS_NONE};
     tile_prototypes[TT_NONE] = (tile_prototype){"none", "", {112, 0, 16, 16}, CS_NONE};
     
-    entity_vla_init(&l->entities);
+    l->entities = vla<entity>();
 
     bool title = true;
     int width = 0;
@@ -100,7 +96,7 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
                 const char *c = entity_prototype_get((entity_type)e).symbols;
                 while(*c) {
                     if (*c == *current_pos) {
-                        entity_vla_append(&l->entities, (entity) {
+                        l->entities.push((entity) {
                             .et = (entity_type)e,
                             .x = i,
                             .y = j,
@@ -139,8 +135,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
     }
 
     // then draw entity reflections
-    for (int i = 0; i < l->entities.num_entities; i++) {
-        entity *e = level_get_entity(l, i);
+    for (int i = 0; i < l->entities.length; i++) {
+        entity *e = &l->entities.items[i];
         if (e->et != ET_TARGET && e->et != ET_NONE) {
 
             int reflection_offset = tsize - (2*pxsize*entity_prototype_get(e->et).base_h);
@@ -173,8 +169,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
     // then draw entities
 
     // draw order: first draw receptacles
-    for (int i = 0; i < l->entities.num_entities; i++) {
-        entity *e = level_get_entity(l, i);
+    for (int i = 0; i < l->entities.length; i++) {
+        entity *e = &l->entities.items[i];
         if (e->et == ET_TARGET) {
             SDL_Rect to_rect = {
                 xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t),
@@ -187,8 +183,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
     }
 
     // then draw other entity types
-    for (int i = 0; i < l->entities.num_entities; i++) {
-        entity *e = level_get_entity(l, i);
+    for (int i = 0; i < l->entities.length; i++) {
+        entity *e = &l->entities.items[i];
         if (e->et != ET_TARGET && e->et != ET_NONE) {
             SDL_Rect to_rect = {
                 xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t),
@@ -210,8 +206,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
 }
 
 bool level_is_entity_at(level *l, entity_type et, int x, int y) {
-    for (int i = 0; i < l->entities.num_entities; i++) {
-        entity *e = level_get_entity(l, i);
+    for (int i = 0; i < l->entities.length; i++) {
+        entity *e = &l->entities.items[i];
         if (e->et == et && e->x == x && e->y == y) {
             return true;
         }
@@ -225,7 +221,9 @@ void level_destroy(level *l) {
         free(l->title);
         l->title = 0;
     }
-    entity_vla_destroy(&l->entities);
+
+    l->entities.destroy();
+
     gef_destroy_text(l->title_handle);
 }
 
@@ -242,33 +240,18 @@ void level_set_tile(level *l, int x, int y, tile_type t) {
 }
 
 bool level_check_victory(level *l) {
-    for (int i = 0; i < l->entities.num_entities; i++) {
-        entity *e1 = level_get_entity(l, i);
-        if (e1->et == ET_TARGET) {
-            bool this_target_is_covered = false;
-            for (int j = 0; j < l->entities.num_entities; j++) {
-                entity *e2 = level_get_entity(l, j);
-                if (e2->et == ET_PRESENT && 
-                        e1->x == e2->x &&
-                        e1->y == e2->y) {
-                    this_target_is_covered = true;
-                    break;
-                }
-            }
-            if (!this_target_is_covered) {
-                return false;
-            }
-
-        }
-    }
-    return true;
+    return l->entities.all([l](entity e1) {
+        return e1.et != ET_TARGET || l->entities.any([e1](entity e2) {
+            return e2.et == ET_PRESENT && e2.x == e1.x && e2.y == e1.y;
+        });
+    });
 }
 
 // its kind of an invariant that theres only one 'moveable' entity at a location
 // really the receptacle has nothing in common with the other slidy boys
 int level_get_movable_entity_index_at(level *l, int x, int y) {
-    for (int i = 0; i < l->entities.num_entities; i++) {
-        entity *e = level_get_entity(l, i);
+    for (int i = 0; i < l->entities.length; i++) {
+        entity *e = &l->entities.items[i];
         if (e->et != ET_TARGET && e->x == x && e->y == y) {
             return i;
         }
@@ -277,7 +260,7 @@ int level_get_movable_entity_index_at(level *l, int x, int y) {
 }
 
 bool level_can_move_entity(level *l, int entity_idx, int dx, int dy) {
-    entity *e = level_get_entity(l, entity_idx);
+    entity *e = &l->entities.items[entity_idx];
     int dest_x = e->x + dx;
     int dest_y = e->y + dy;
     tile_type t = level_get_tile(l, dest_x, dest_y);
@@ -298,7 +281,7 @@ bool level_move_entity(level *l, int entity_idx, int dx, int dy, audio *a) {
     if (!level_can_move_entity(l, entity_idx, dx, dy)) {
         return false;
     }
-    entity *e = level_get_entity(l, entity_idx);
+    entity *e = &l->entities.items[entity_idx];
     e->dx = dx;
     e->dy = dy;
     int dest_x = e->x + dx;
@@ -321,9 +304,7 @@ bool level_move_entity(level *l, int entity_idx, int dx, int dy, audio *a) {
 }
 
 void level_step(level *l) {
-    for (int i = 0; i < l->entities.num_entities; i++) {
-        entity *e = &l->entities.entities[i];
-
+    l->entities.for_each_mut([](entity *e) {
         e->x += e->dx;
         e->y += e->dy;
 
@@ -332,14 +313,13 @@ void level_step(level *l) {
 
         e->dx = 0;
         e->dy = 0;
-
-    }
+    });
 }
 
 bool level_do_ice(level *l, audio *a) {
     bool any_ice = false;
-    for (int i = 0; i < l->entities.num_entities; i++) {
-        entity *e = &l->entities.entities[i];
+    for (int i = 0; i < l->entities.length; i++) {
+        entity *e = &l->entities.items[i];
 
         if (e->previous_dx == 0 && e->previous_dy == 0) {
             continue;

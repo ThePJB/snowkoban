@@ -19,7 +19,6 @@ typedef struct {
     int base_h;
 } entity_prototype;
 
-
 /*
 previous dx and dy are weird, they are used for sliding and drawing.
 its not really obvious why its got to be separate from normal dx and dy til you try implementing
@@ -35,15 +34,4 @@ typedef struct {
     int previous_dy;
 } entity;
 
-typedef struct {
-    entity *entities;
-    int backing_array_size;
-    int num_entities;
-} entity_vla;
-
-void entity_vla_append(entity_vla *v, entity e);
-entity_vla entity_vla_clone(entity_vla *v);
-void entity_vla_init(entity_vla *v);
-void entity_vla_destroy(entity_vla *v);
 entity_prototype entity_prototype_get(entity_type et);
-void entity_vla_print(entity_vla *v);

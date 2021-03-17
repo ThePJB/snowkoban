@@ -6,6 +6,7 @@
 #include "entity.h"
 #include "audio.h"
 #include "scene.hpp"
+#include "vla.hpp"
 
 typedef enum {
     TT_NONE,
@@ -27,7 +28,7 @@ typedef struct {
 typedef struct {
     char *title;
     grid tiles;
-    entity_vla entities;
+    vla<entity> entities;
     text_handle title_handle;
     bool player_faces_left;
 } level;
