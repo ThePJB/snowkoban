@@ -1,6 +1,7 @@
 #include "settings_menu.hpp"
 #include "snowflakes.h"
 #include "util.h"
+#include "button.h"
 
 void settings_menu::draw(shared_data *app_d, double dt) {
     const int button_w = 600;
@@ -31,17 +32,17 @@ void settings_menu::draw(shared_data *app_d, double dt) {
     SDL_Rect btn_rect = {menu_x, menu_y, button_w, button_h};
 
     int i = 0;
-    button_bool_draw(gc, app_d->menu_button_style, btn_rect, "Snow", app_d->draw_snow, selection == i++);
+    button_bool_draw(gc, &app_d->game_style, btn_rect, "Snow", app_d->draw_snow, selection == i++);
     btn_rect.y += button_h + button_spacing;
-    button_int_draw(gc, app_d->menu_button_style, btn_rect, "Max Scale", app_d->max_scale, selection == i++);
+    button_int_draw(gc, &app_d->game_style, btn_rect, "Max Scale", app_d->max_scale, selection == i++);
     btn_rect.y += button_h + button_spacing;
-    button_generic_draw(gc, app_d->menu_button_style, btn_rect, "Resolution", selection == i++);
+    button_generic_draw(gc, &app_d->game_style, btn_rect, "Resolution", selection == i++);
     btn_rect.y += button_h + button_spacing;
-    button_percent_draw(gc, app_d->menu_button_style, btn_rect, "Music Volume", app_d->a.bgm_volume, selection == i++);
+    button_percent_draw(gc, &app_d->game_style, btn_rect, "Music Volume", app_d->a.bgm_volume, selection == i++);
     btn_rect.y += button_h + button_spacing;
-    button_percent_draw(gc, app_d->menu_button_style, btn_rect, "SFX Volume", app_d->a.sfx_volume, selection == i++);
+    button_percent_draw(gc, &app_d->game_style, btn_rect, "SFX Volume", app_d->a.sfx_volume, selection == i++);
     btn_rect.y += button_h + button_spacing;
-    button_generic_draw(gc, app_d->menu_button_style, btn_rect, "Back", selection == i++);
+    button_generic_draw(gc, &app_d->game_style, btn_rect, "Back", selection == i++);
 }
 
 void settings_menu::handle_input(shared_data *app_d, SDL_Event e) {

@@ -6,6 +6,7 @@
 #include "util.h"
 #include "stdint.h"
 #include "gef.h"
+#include "dankstrings.h"
 
 
 
@@ -118,6 +119,59 @@ void gef_draw_rect(gef_context *gc, colour c, int x, int y, int w, int h) {
 
 void gef_present(gef_context *gc) {
     SDL_RenderPresent(gc->renderer);
+}
+
+bmp_font gef_load_bmp_font(gef_context *gc, const char *path, int cx, int cy) {
+    bmp_font f;
+    SDL_Surface* loaded_surface = IMG_Load(path);
+    SDL_SetColorKey(loaded_surface, SDL_TRUE, SDL_MapRGB(loaded_surface->format, 255, 0, 255));
+    f.w = loaded_surface->w;
+    f.h = loaded_surface->h;
+    f.texture = SDL_CreateTextureFromSurface(gc->renderer, loaded_surface);
+    if (gc->atlas == NULL) gef_die(gc, "couldn't create bmp font texture");
+    SDL_FreeSurface(loaded_surface);
+    f.cx = cx;
+    f.cy = cy;
+    return f;
+}
+
+SDL_Point gef_bmp_font_size(bmp_font f, bmp_font_settings fs, int nchar) {
+    return (SDL_Point) {
+        f.cx * fs.scale * (nchar) + fs.scale * fs.spacing * (nchar-1),
+        f.cy * fs.scale,
+    };
+}
+
+void gef_draw_bmp_text(gef_context *gc, bmp_font f, bmp_font_settings fs, const char *text, int x, int y) {
+    int i = 0;
+    while (*text != '\0') {
+        int num_chars_wide = f.w/f.cx;
+        int scx = ((int)*text % num_chars_wide) * f.cx;
+        int scy = ((int)*text / num_chars_wide) * f.cy;
+        SDL_Rect clip = (SDL_Rect) {
+            .x = scx,
+            .y = scy,
+            .w = f.cx,
+            .h = f.cy,
+        };
+
+        SDL_Rect to_rect = (SDL_Rect) {
+            x + (f.cx + fs.spacing) * fs.scale * i,
+            y,
+            f.cx * fs.scale,
+            f.cy * fs.scale,
+        };
+
+        SDL_RenderCopy(gc->renderer, f.texture, &clip, &to_rect);
+
+        i++;
+        text++;
+    }
+}
+
+void gef_draw_bmp_text_centered(gef_context *gc, bmp_font f, bmp_font_settings fs, const char *text, int x, int y) {
+    SDL_Point dims = gef_bmp_font_size(f, fs, strings_length(text));
+    gef_draw_bmp_text(gc, f, fs, text, x - dims.x/2, y - dims.y/2);
 }
 
 

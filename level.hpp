@@ -31,10 +31,9 @@ struct level {
     char *title;
     grid<tile> tiles;
     vla<entity> entities;
-    text_handle title_handle;
     bool player_faces_left = false;
 
-    level (){};
+    level(){};
     level(const char *level_str, shared_data *app_d);
 };
 

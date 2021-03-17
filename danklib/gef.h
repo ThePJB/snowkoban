@@ -23,6 +23,25 @@ typedef struct {
 
 typedef struct {
     SDL_Texture *texture;
+    int w;
+    int h;
+    int cx;
+    int cy;
+} bmp_font;
+
+typedef struct {
+    int scale;
+    int spacing;
+} bmp_font_settings;
+
+bmp_font gef_load_bmp_font(gef_context *gc, const char *path, int cx, int cy);
+
+SDL_Point gef_bmp_font_size(bmp_font f, bmp_font_settings fs, int nchar);
+void gef_draw_bmp_text(gef_context *gc, bmp_font f, bmp_font_settings fs, const char *text, int x, int y);
+void gef_draw_bmp_text_centered(gef_context *gc, bmp_font f, bmp_font_settings fs, const char *text, int x, int y);
+
+typedef struct {
+    SDL_Texture *texture;
     SDL_Texture *texture_shadow;
     int w;
     int h;

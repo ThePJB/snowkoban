@@ -3,11 +3,8 @@
 #include <SDL.h>
 #include "gef.h"
 #include "audio.h"
-#include "button.h"
 #include "level_set.h"
 #include <stdbool.h>
-
-
 
 typedef enum {
     SCENE_MAIN_MENU,
@@ -19,48 +16,74 @@ typedef enum {
 
 #define NUM_LEVELS 50
 
+// ui style
+struct style {
+    colour background = gef_rgb(100, 100, 200);
+    colour highlight = gef_rgb(255, 255, 0);
+    colour btn_colour = gef_rgb(80, 150, 220);
+    colour btn_line_colour = gef_rgb(100, 100, 100);
 
+    int line = 8;
 
-// the intention is that the void* points to this and that the rest of the structure
-// e.g. game, menu, etc follows in memory
-typedef struct {
-    void (*draw)(struct shared_data *shared_data, void *, gef_context *gc, double dt);
-    void (*handle_input)(struct shared_data *shared_data, void *, SDL_Event);
-    void (*on_focus)(struct shared_data *shared_data, void *);
-    void (*update)(struct shared_data *shared_data, void *, double dt);
-} scene_interface;
+    bmp_font game_font;
+    bmp_font_settings small;
+    bmp_font_settings big;
 
+    style() {};
 
-typedef struct shared_data {
+    style(gef_context *gc) {
+        game_font = gef_load_bmp_font(gc, "assets/custombold.png", 7, 8);
+
+        // base off xres, yres
+        small = (bmp_font_settings) {.scale = 3, .spacing = 1};
+        big = (bmp_font_settings) {.scale = 6, .spacing = 1};
+    }
+};
+
+struct shared_data {
     // subsystems (also settings in here)
     gef_context gc;
-    audio a;
+    audio a = audio_init();
 
     // setting stuff
-    bool draw_snow;
-    int max_scale;
+    bool draw_snow = true;
+    int max_scale = 8;
 
-    bool keep_going;
-    scene_index current_scene;
+    bool keep_going = true;
+    scene_index current_scene = SCENE_MAIN_MENU;
     
-    float time;
-    float interp_time;
+    float time = 0;
+    float interp_time = 0;
 
-    float snow_offset_base;
-    float snow_offset_current;
+    float snow_offset_base = 0;
+    float snow_offset_current = 0;
 
-    // style stuff
-    button_style menu_button_style;
-    font_handle title_font;
+    style game_style;
+
+    int world_idx = 0;
+    int num_worlds = 5;
+    int level_idx = 0;
 
     // world stuff
-    level_set worlds[10];
-    int world_idx;
-    int num_worlds;
-    int level_idx;
+    level_set worlds[5] = {
+        #include "world_1.h"
+        ,
+        #include "world_2.h"
+        ,
+        #include "world_3.h"
+        ,
+        #include "world_4.h"
+        ,
+        #include "world_5.h"
+        ,
+    };
 
-
-} shared_data;
+    shared_data(int xres, int yres, const char *title) {
+        gc = gef_init(title, xres, yres);
+        gef_load_atlas(&gc, "assets/snowkoban.png");
+        game_style = style(&gc);
+    }
+};
 
 struct scene {
     virtual void draw(shared_data *app_d, double dt) = 0;

@@ -62,10 +62,6 @@ level::level(const char *level_str, shared_data *app_d) {
         }
         current_pos++;
     }
-
-    char buf[256] = {0};
-    sprintf(buf, "%d - %d %s", app_d->world_idx, app_d->level_idx, title);
-    title_handle = gef_make_text(&app_d->gc, app_d->title_font, buf, 255, 255, 255);
     tiles = grid<tile>(width, j);
     current_pos = grid_start;
     tile t;
@@ -225,8 +221,6 @@ void level_destroy(level *l) {
     }
 
     l->entities.destroy();
-
-    gef_destroy_text(l->title_handle);
 }
 
 bool level_check_victory(level *l) {

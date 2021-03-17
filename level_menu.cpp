@@ -57,9 +57,7 @@ void level_menu::draw(shared_data *app_d, double dt) {
             world_h
         );
 
-        text_handle t = gef_make_text(gc, app_d->title_font, app_d->worlds[i].name, 255, 255, 255);
-        gef_draw_text(gc, t, world_x, world_y);
-        gef_destroy_text(t);
+        gef_draw_bmp_text(gc, app_d->game_style.game_font, app_d->game_style.big, app_d->worlds[i].name, world_x, world_y);
 
         int inset_x = world_x + inset_px;
         int inset_y = world_y + inset_px + title_h;
@@ -89,15 +87,11 @@ void level_menu::draw(shared_data *app_d, double dt) {
             } else {
                 gef_draw_rect(gc, level_colour, level_x, level_y, level_s, level_s);
             }
-            
 
             char buf[64] = {0};
             strings_itoa(buf, j);
-            text_handle t = gef_make_text(gc, app_d->title_font, buf, 255, 255, 255);
-            gef_draw_text(gc, t, level_x + level_s/2 - t.w/2, level_y + level_s/2 - t.h/2);
-            gef_destroy_text(t);
+            gef_draw_bmp_text_centered(gc, app_d->game_style.game_font, app_d->game_style.small, buf, level_x + level_s/2, level_y + level_s/2);
         }
-
 
         int present_counter_x = world_x + world_w - 250;
         int present_counter_y = world_y + world_h - 74;
@@ -113,9 +107,7 @@ void level_menu::draw(shared_data *app_d, double dt) {
         
         char buf[64] = {0};
         sprintf(buf, "%d/%d", app_d->worlds[i].collected_presents, app_d->worlds[i].total_presents);
-        t = gef_make_text(gc, app_d->title_font, buf, 255, 255, 255);
-        gef_draw_text(gc, t, present_counter_x, present_counter_y);
-        gef_destroy_text(t);
+        gef_draw_bmp_text(gc, app_d->game_style.game_font, app_d->game_style.small, buf, present_counter_x, present_counter_y);
 
         world_y += world_spacing + world_h;
     }

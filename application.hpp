@@ -14,16 +14,15 @@
 #define MAX_SCENES 16;
 
 
-typedef struct {
+struct application {
     scene *scenes[NUM_SCENES];
     
-    scene_index previous_scene;
+    scene_index previous_scene = (scene_index)-1;
 
     shared_data m_shared_data;
-    
-} application;
 
-void application_init(application *app, int xres, int yres, bool do_start_level, int start_level);
-void application_update(application *app, double dt);
-void application_draw(application *app, double dt);
-void application_handle_input(application *app);
+    application(int xres, int yres);
+    void update(double dt);
+    void draw(double dt);
+    void handle_input();   
+};

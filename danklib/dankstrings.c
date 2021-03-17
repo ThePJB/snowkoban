@@ -71,3 +71,12 @@ void strings_itoa(char *a, int i) {
     }
     a[len] = '\0';
 }
+
+int strings_length(const char *a) {
+    int i = 0;
+    while(*a != '\0') {
+        i++;
+        a++;
+    }
+    return i;
+}

@@ -98,3 +98,8 @@
 
  ----------------
  its like theres an uninitialized game or something
+
+ -----------------
+
+ probably just want to find a nice bitmap font
+ have function to get layout size as well as to draw

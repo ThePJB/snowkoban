@@ -4,7 +4,7 @@
 #include "coolmath.h"
 #include "snowflakes.h"
 #include "level.hpp"
-
+#include "dankstrings.h"
 //#define DEBUG_HISTORY
 
 const float step_time = 0.1;
@@ -121,24 +121,27 @@ void game::draw(shared_data *app_d, double dt) {
     
 
     if (app_d->draw_snow) {
-        snowflakes_draw(gc, gc->xres, gc->yres, app_d->time, app_d->snow_offset_base + app_d->snow_offset_current);
+        snowflakes_draw(gc, gc->xres, gc->yres, app_d->interp_time, app_d->snow_offset_base + app_d->snow_offset_current);
     }
 
     int64_t t_snow = get_us();
 
-    int x = gc->xres / 2 - m_level.title_handle.w / 2;
+    char buf[256];
+    sprintf(buf, "%d-%d %s", app_d->world_idx+1, app_d->level_idx+1, m_level.title);
+
+    int x = gc->xres / 2;
 
     if (m_title_state == TS_FADE_IN) {
         float downness = cm_slow_stop2(title_state_t);
         int y = downness * 100 - 50;
-        gef_draw_text(gc, m_level.title_handle, x, y);
+        gef_draw_bmp_text_centered(gc, app_d->game_style.game_font, app_d->game_style.big, buf, x, y);
     } else if (m_title_state == TS_FADE_OUT) {
         float upness = cm_slow_start2(title_state_t);
         int y = (1 - upness) * 100 - 50;
-        gef_draw_text(gc, m_level.title_handle, x, y);
+        gef_draw_bmp_text_centered(gc, app_d->game_style.game_font, app_d->game_style.big, buf, x, y);
     } else if (m_title_state == TS_SHOW) {
         int y = 50;
-        gef_draw_text(gc, m_level.title_handle, x, y);
+        gef_draw_bmp_text_centered(gc, app_d->game_style.game_font, app_d->game_style.big, buf, x, y);
     }
 
     int64_t t_text = get_us();

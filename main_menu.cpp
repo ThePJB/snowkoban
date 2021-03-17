@@ -59,12 +59,13 @@ void main_menu::draw(shared_data *app_d, double dt) {
 
     int menu_x = screen_center_x - button_w/2;
     int menu_y = screen_center_y - menu_height/2;
-    
+
     SDL_Rect btn_rect = {menu_x, menu_y, button_w, button_h};
 
-    button_generic_draw(gc, app_d->menu_button_style, btn_rect, "Play", selection == 0);
+
+    button_generic_draw(gc, &app_d->game_style, btn_rect, "Play", selection == 0);
     btn_rect.y += button_h + button_spacing;
-    button_generic_draw(gc, app_d->menu_button_style, btn_rect, "Settings", selection == 1);
+    button_generic_draw(gc, &app_d->game_style, btn_rect, "Settings", selection == 1);
     btn_rect.y += button_h + button_spacing;
-    button_generic_draw(gc, app_d->menu_button_style, btn_rect, "Quit", selection == 2);    
+    button_generic_draw(gc, &app_d->game_style, btn_rect, "Quit", selection == 2);    
 }

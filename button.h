@@ -2,23 +2,12 @@
 
 #include <stdbool.h>
 #include "gef.h"
+#include "scene.hpp"
 
-typedef struct {
-    colour bg;
-    colour line;
-    colour text;
-    colour highlight;
-    font_handle f;
+void button_generic_draw(gef_context *gc, style *s, SDL_Rect r, const char *text, bool rollover);
 
-    int line_thickness;
-} button_style;
+void button_bool_draw(gef_context *gc, style *s, SDL_Rect r, const char *text, bool value, bool rollover);
 
-void button_generic_draw(gef_context *gc, button_style bs, SDL_Rect r, const char *text, bool rollover);
+void button_percent_draw(gef_context *gc, style *s, SDL_Rect r, const char *text, float value, bool rollover);
 
-void button_bool_draw(gef_context *gc, button_style bs, SDL_Rect r, const char *text, bool value, bool rollover);
-
-void button_percent_draw(gef_context *gc, button_style bs, SDL_Rect r, const char *text, float value, bool rollover);
-
-void button_int_draw(gef_context *gc, button_style bs, SDL_Rect r, const char *text, int value, bool rollover);
-
-
+void button_int_draw(gef_context *gc, style *s, SDL_Rect r, const char *text, int value, bool rollover);

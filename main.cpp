@@ -7,6 +7,7 @@
 //#define PROFILE
 
 int main(int argc, char** argv) {
+    printf("length of carrot: %d\n", strings_length("carrot"));
     const int frame_cap = 60;
     const int frame_us = 1000000 / frame_cap;
 
@@ -26,20 +27,19 @@ int main(int argc, char** argv) {
         }
     }
 
-    application app = {0};
-    application_init(&app, 1600, 900, do_level_start, level_num);
+    application app = application(1600, 900);
     
     double dt = 0.001;
     while (app.m_shared_data.keep_going) {
         int64_t tstart = get_us();
 
-        application_handle_input(&app);
+        app.handle_input();
         int64_t t_hi = get_us();
 
-        application_update(&app, dt);
+        app.update(dt);
         int64_t t_update = get_us();
 
-        application_draw(&app, dt);
+        app.draw(dt);
         int64_t t_draw = get_us();
 
         #ifdef PROFILE
