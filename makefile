@@ -9,10 +9,16 @@ CFLAGS += -Wno-unused-const-variable
 CFLAGS += -Wno-unused-but-set-variable # might be a useful actually
 CFLAGS += -Wno-narrowing # might be useful too, we will c
 CFLAGS += -Wno-sign-compare
-CFLAGS += -Wno-unknown-warning-option # so we can compile with both lol
+#CFLAGS += -Wno-unknown-warning-option # so we can compile with both lol
+
+CFLAGS += -std=c++20
 
 SRCS = $(wildcard *.c)
+SRCS += $(wildcard *.cpp)
 SRCS += $(wildcard danklib/*.c)
+SRCS += $(wildcard danklib/*.cpp)
+
+
 
 snowkoban: $(SRCS)
 	g++ $(SRCS) -o  snowkoban $(CFLAGS) $(INCLUDES) $(LDFLAGS)

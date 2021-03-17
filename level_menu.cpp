@@ -1,26 +1,21 @@
-#include "level_menu_new.h"
+#include "level_menu.hpp"
 #include "util.h"
 #include "snowflakes.h"
 #include "dankstrings.h"
 #include "entity.h"
 #include "coolmath.h"
 
-void level_menu_new_on_focus(shared_data *shared_data, void *scene_data) {
-    return;
-}
 
-void level_menu_new_update(shared_data *shared_data, void *scene_data, double dt) {
-    return;
-}
+void level_menu::draw(shared_data *app_d, double dt) {
+    gef_context *gc = &app_d->gc;
 
-void level_menu_new_draw(shared_data *shared_data, void *scene_data, gef_context *gc, double dt) {
     const int world_w = 0.8 * gc->xres;
     const int world_h = 0.2 * gc->yres;
     const int world_spacing = 0.03 * gc->yres;
 
     const colour background_colour = gef_rgb(160, 160, 160);
     gef_draw_rect(gc, background_colour, 0, 0, gc->xres, gc->yres);
-    snowflakes_draw(gc, gc->xres, gc->yres, shared_data->time, shared_data->snow_offset_base);
+    snowflakes_draw(gc, gc->xres, gc->yres, app_d->time, app_d->snow_offset_base);
 
     const colour select_colour = gef_rgb(255, 255, 0);
     const colour level_colour = gef_rgb(128, 128, 128);
@@ -35,8 +30,8 @@ void level_menu_new_draw(shared_data *shared_data, void *scene_data, gef_context
     int world_x = gc->xres / 2 - world_w / 2;
     int world_y = world_spacing;
 
-    for (int i = 0; i < shared_data->num_worlds; i++) {
-        if (shared_data->world_idx == i) {
+    for (int i = 0; i < app_d->num_worlds; i++) {
+        if (app_d->world_idx == i) {
             gef_draw_rect(gc, select_colour, 
                 world_x - highlight_px, 
                 world_y - highlight_px, 
@@ -45,7 +40,7 @@ void level_menu_new_draw(shared_data *shared_data, void *scene_data, gef_context
             );
 
             // must draw player character as well
-            int player_frame = cm_frac(shared_data->time) > 0.5;
+            int player_frame = cm_frac(app_d->time) > 0.5;
             SDL_Rect from_rect = entity_prototype_get(ET_PLAYER).clip;
             const int spritesheet_size = 16;
             from_rect.y += player_frame * spritesheet_size;
@@ -55,32 +50,32 @@ void level_menu_new_draw(shared_data *shared_data, void *scene_data, gef_context
             gef_draw_sprite_ex(gc, from_rect, to_rect, 0, SDL_FLIP_HORIZONTAL);
         }
         
-        gef_draw_rect(gc, shared_data->worlds[i].highlight, 
+        gef_draw_rect(gc, app_d->worlds[i].highlight, 
             world_x, 
             world_y, 
             world_w, 
             world_h
         );
 
-        text_handle t = gef_make_text(gc, shared_data->title_font, shared_data->worlds[i].name, 255, 255, 255);
+        text_handle t = gef_make_text(gc, app_d->title_font, app_d->worlds[i].name, 255, 255, 255);
         gef_draw_text(gc, t, world_x, world_y);
         gef_destroy_text(t);
 
         int inset_x = world_x + inset_px;
         int inset_y = world_y + inset_px + title_h;
 
-        gef_draw_rect(gc, shared_data->worlds[i].background, 
+        gef_draw_rect(gc, app_d->worlds[i].background, 
             inset_x, 
             inset_y, 
             world_w - 2*inset_px, 
             world_h - 2*inset_px - title_h
         );
 
-        for (int j = 0; j < shared_data->worlds[i].num_levels; j++) {
+        for (int j = 0; j < app_d->worlds[i].num_levels; j++) {
             int level_x = inset_x + level_spacing + j * (level_spacing + level_s);
             int level_y = inset_y + level_spacing;
             
-            if (shared_data->world_idx == i && shared_data->level_idx == j) {
+            if (app_d->world_idx == i && app_d->level_idx == j) {
                 gef_draw_rect(gc, select_colour, 
                     level_x - highlight_px, 
                     level_y - highlight_px, 
@@ -89,7 +84,7 @@ void level_menu_new_draw(shared_data *shared_data, void *scene_data, gef_context
                 );
             }
 
-            if (shared_data->worlds[i].completed[j]) {
+            if (app_d->worlds[i].completed[j]) {
                 gef_draw_rect(gc, level_done_colour, level_x, level_y, level_s, level_s);
             } else {
                 gef_draw_rect(gc, level_colour, level_x, level_y, level_s, level_s);
@@ -98,7 +93,7 @@ void level_menu_new_draw(shared_data *shared_data, void *scene_data, gef_context
 
             char buf[64] = {0};
             strings_itoa(buf, j);
-            text_handle t = gef_make_text(gc, shared_data->title_font, buf, 255, 255, 255);
+            text_handle t = gef_make_text(gc, app_d->title_font, buf, 255, 255, 255);
             gef_draw_text(gc, t, level_x + level_s/2 - t.w/2, level_y + level_s/2 - t.h/2);
             gef_destroy_text(t);
         }
@@ -117,29 +112,21 @@ void level_menu_new_draw(shared_data *shared_data, void *scene_data, gef_context
         gef_draw_sprite(gc, entity_prototype_get(ET_PRESENT).clip, present_to_rect);
         
         char buf[64] = {0};
-        sprintf(buf, "%d/%d", shared_data->worlds[i].collected_presents, shared_data->worlds[i].total_presents);
-        t = gef_make_text(gc, shared_data->title_font, buf, 255, 255, 255);
+        sprintf(buf, "%d/%d", app_d->worlds[i].collected_presents, app_d->worlds[i].total_presents);
+        t = gef_make_text(gc, app_d->title_font, buf, 255, 255, 255);
         gef_draw_text(gc, t, present_counter_x, present_counter_y);
         gef_destroy_text(t);
 
         world_y += world_spacing + world_h;
     }
-
-    // box
-    // title pane
-    // for each level a square (maybe a preview)
-    // highlight selected world
-    // highlight selected level
 }
 
-void level_menu_new_handle_input(shared_data *shared_data, void *scene_data, SDL_Event e) {
-    level_menu_new *m = (level_menu_new*)scene_data;
-    
-    if (e.type == SDL_KEYDOWN) {
+void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
+        if (e.type == SDL_KEYDOWN) {
         SDL_Keycode sym = e.key.keysym.sym;
 
         if (sym == SDLK_ESCAPE) {
-            shared_data->current_scene = SCENE_MAIN_MENU;
+            app_d->current_scene = SCENE_MAIN_MENU;
         }
 
         bool up = sym == SDLK_UP || sym == SDLK_w || sym == SDLK_k;
@@ -148,38 +135,24 @@ void level_menu_new_handle_input(shared_data *shared_data, void *scene_data, SDL
         bool down = sym == SDLK_DOWN || sym == SDLK_s || sym == SDLK_j;
         bool select = sym == SDLK_RETURN || sym == SDLK_SPACE;
 
-        if (left && shared_data->level_idx > 0) {
-            shared_data->level_idx--;
-            audio_play(&shared_data->a, CS_MENU_MOVE);
-        } else if (right && shared_data->level_idx < shared_data->worlds[shared_data->world_idx].num_levels - 1) {
-            shared_data->level_idx++;
-            audio_play(&shared_data->a, CS_MENU_MOVE);
-        } else if (up && shared_data->world_idx > 0) {
-            shared_data->world_idx--;
-            shared_data->level_idx = 0;
-            audio_play(&shared_data->a, CS_MENU_MOVE);
-        } else if (down && shared_data->world_idx < shared_data->num_worlds - 1) {
-            shared_data->world_idx++;
-            shared_data->level_idx = 0;
-            audio_play(&shared_data->a, CS_MENU_MOVE);   
+        if (left && app_d->level_idx > 0) {
+            app_d->level_idx--;
+            audio_play(&app_d->a, CS_MENU_MOVE);
+        } else if (right && app_d->level_idx < app_d->worlds[app_d->world_idx].num_levels - 1) {
+            app_d->level_idx++;
+            audio_play(&app_d->a, CS_MENU_MOVE);
+        } else if (up && app_d->world_idx > 0) {
+            app_d->world_idx--;
+            app_d->level_idx = 0;
+            audio_play(&app_d->a, CS_MENU_MOVE);
+        } else if (down && app_d->world_idx < app_d->num_worlds - 1) {
+            app_d->world_idx++;
+            app_d->level_idx = 0;
+            audio_play(&app_d->a, CS_MENU_MOVE);   
         }
-
         if (select) {
-            shared_data->current_scene = SCENE_GAME;
-            audio_play(&shared_data->a, CS_MENU_SELECT);
+            app_d->current_scene = SCENE_GAME;
+            audio_play(&app_d->a, CS_MENU_SELECT);
         }
-
     }
-}
-
-level_menu_new level_menu_new_init(gef_context *gc, shared_data *shared_data) {
-    level_menu_new menu = (level_menu_new) {
-        .s = (scene_interface) {
-            .draw = level_menu_new_draw,
-            .handle_input = level_menu_new_handle_input,
-            .on_focus = level_menu_new_on_focus,
-            .update = level_menu_new_update,
-        },
-    };
-    return menu;
 }

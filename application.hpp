@@ -1,11 +1,11 @@
 #pragma once
 
 #include "gef.h"
-#include "scene.h"
-#include "level_menu.h"
-#include "main_menu.h"
-#include "settings_menu.h"
-#include "game.h"
+#include "scene.hpp"
+#include "level_menu.hpp"
+#include "main_menu.hpp"
+#include "settings_menu.hpp"
+#include "game.hpp"
 #include <stdbool.h>
 #include <SDL_mixer.h>
 #include "audio.h"
@@ -15,7 +15,7 @@
 
 
 typedef struct {
-    scene_interface* scenes[NUM_SCENES];
+    scene *scenes[NUM_SCENES];
     
     scene_index previous_scene;
 

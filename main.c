@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
-#include "application.h"
+#include "application.hpp"
 #include "util.h"
 #include "dankstrings.h"
 

@@ -7,6 +7,8 @@
 #include "level_set.h"
 #include <stdbool.h>
 
+
+
 typedef enum {
     SCENE_MAIN_MENU,
     SCENE_LEVEL_MENU,
@@ -28,6 +30,8 @@ typedef struct {
     void (*on_focus)(struct shared_data *shared_data, void *);
     void (*update)(struct shared_data *shared_data, void *, double dt);
 } scene_interface;
+
+
 
 typedef struct shared_data {
     // subsystems (also settings in here)
@@ -64,3 +68,10 @@ typedef struct shared_data {
 
 
 } shared_data;
+
+struct scene {
+    virtual void draw(shared_data *app_d, double dt) = 0;
+    virtual void update(shared_data *app_d, double dt) = 0;
+    virtual void on_focus(shared_data *app_d) = 0;
+    virtual void handle_input(shared_data *app_d, SDL_Event e) = 0;
+};

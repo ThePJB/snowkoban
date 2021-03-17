@@ -5,7 +5,7 @@
 #include "gef.h"
 #include "entity.h"
 #include "audio.h"
-#include "scene.h"
+#include "scene.hpp"
 
 typedef enum {
     TT_NONE,

@@ -1,7 +1,6 @@
-#include "application.h"
+#include "application.hpp"
 #include "levels.h"
 #include "util.h"
-#include "level_menu_new.h"
 
 
 void application_init(application *app, int xres, int yres, bool do_start_level, int start_level) {
@@ -64,16 +63,10 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
     
     app->previous_scene = (scene_index)-1;
 
-    app->scenes[SCENE_MAIN_MENU] = (scene_interface*)malloc(sizeof(main_menu));
-    *(main_menu*)app->scenes[SCENE_MAIN_MENU] = main_menu_init(&app->m_shared_data.gc);
-    //app->scenes[SCENE_LEVEL_MENU] = malloc(sizeof(level_menu));
-    //*(level_menu*)app->scenes[SCENE_LEVEL_MENU] = level_menu_init(&app->m_shared_data.gc, &app->m_shared_data);
-    app->scenes[SCENE_LEVEL_MENU] = (scene_interface*)malloc(sizeof(level_menu_new));
-    *(level_menu_new*)app->scenes[SCENE_LEVEL_MENU] = level_menu_new_init(&app->m_shared_data.gc, &app->m_shared_data);
-    app->scenes[SCENE_SETTINGS_MENU] = (scene_interface*)malloc(sizeof(settings_menu));
-    *(settings_menu*)app->scenes[SCENE_SETTINGS_MENU] = settings_menu_init(&app->m_shared_data.gc);
-    app->scenes[SCENE_GAME] = (scene_interface*)malloc(sizeof(game));
-    *(game*)app->scenes[SCENE_GAME] = game_init(&app->m_shared_data);
+    app->scenes[SCENE_MAIN_MENU] = new main_menu();
+    app->scenes[SCENE_SETTINGS_MENU] = new settings_menu();
+    app->scenes[SCENE_LEVEL_MENU] = new level_menu();
+    app->scenes[SCENE_GAME] = new game();
 
     if (do_start_level) {
         app->m_shared_data.current_scene = SCENE_GAME;
@@ -84,19 +77,15 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
 void application_update(application *app, double dt) {
     if (app->previous_scene != app->m_shared_data.current_scene) {
         app->previous_scene = app->m_shared_data.current_scene;
-        scene_interface *cs = app->scenes[app->m_shared_data.current_scene];
-        cs->on_focus(&app->m_shared_data, cs);
+        app->scenes[app->m_shared_data.current_scene]->on_focus(&app->m_shared_data);
     }
 
     app->m_shared_data.time += dt;
     app->m_shared_data.interp_time += dt;
     app->m_shared_data.interp_time += min(2*dt, 0.1 * (app->m_shared_data.time - app->m_shared_data.interp_time));
 
-    app->scenes[app->m_shared_data.current_scene]->update(
-        &app->m_shared_data, 
-        app->scenes[app->m_shared_data.current_scene],
-        dt
-    );
+    
+    app->scenes[app->m_shared_data.current_scene]->update(&app->m_shared_data, dt);
 
     return;
 }
@@ -104,10 +93,7 @@ void application_update(application *app, double dt) {
 void application_draw(application *app, double dt) {
     gef_clear(&app->m_shared_data.gc);
 
-    app->scenes[app->m_shared_data.current_scene]->draw(
-        &app->m_shared_data, 
-        app->scenes[app->m_shared_data.current_scene], 
-        &app->m_shared_data.gc, dt);
+    app->scenes[app->m_shared_data.current_scene]->draw(&app->m_shared_data, dt);
 
     gef_present(&app->m_shared_data.gc);
 }
@@ -120,8 +106,7 @@ void application_handle_input(application *app) {
             app->m_shared_data.keep_going = false;
             return;
         } else {
-            app->scenes[app->m_shared_data.current_scene]->handle_input(
-                &app->m_shared_data, app->scenes[app->m_shared_data.current_scene], e);
+            app->scenes[app->m_shared_data.current_scene]->handle_input(&app->m_shared_data, e);
         }
     }
 }
