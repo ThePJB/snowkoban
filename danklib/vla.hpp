@@ -32,7 +32,10 @@ struct vla {
     }
 
     void destroy() {
-        free(items);
+        if (items) {
+            free(items);
+            items = NULL;
+        }
     }
 
     void push(T item) {

@@ -95,3 +95,6 @@
 
  compile times defs took a hit, I wonder if its from using <functional>
  might be worth taking it out or doing incremental
+
+ ----------------
+ its like theres an uninitialized game or something

@@ -4,18 +4,18 @@
 
 tile_prototype tile_prototypes[NUM_TT];
 
-void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, shared_data *shared_data) {
-    l->player_faces_left = false;
-
-    tile_prototypes[TT_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}, CS_SNOW_FOOTSTEP};
-    tile_prototypes[TT_ICE] = (tile_prototype){"ice", "/PTBC", {32, 16, 16, 16}, CS_SLIP};
-    tile_prototypes[TT_HOLE] = (tile_prototype){"hole", "h", {112, 0, 16, 16}, CS_NONE};
-    tile_prototypes[TT_WALL] = (tile_prototype){"wall", "#", {0, 0, 16, 16}, CS_NONE};
-    tile_prototypes[TT_NONE] = (tile_prototype){"none", "", {112, 0, 16, 16}, CS_NONE};
+level::level(const char *level_str, shared_data *app_d) {
+    initialized = true;
     
-    l->entities = vla<entity>();
+    tile_prototypes[T_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}, CS_SNOW_FOOTSTEP};
+    tile_prototypes[T_ICE] = (tile_prototype){"ice", "/PTBC", {32, 16, 16, 16}, CS_SLIP};
+    tile_prototypes[T_HOLE] = (tile_prototype){"hole", "h", {112, 0, 16, 16}, CS_NONE};
+    tile_prototypes[T_WALL] = (tile_prototype){"wall", "#", {0, 0, 16, 16}, CS_NONE};
+    tile_prototypes[T_NONE] = (tile_prototype){"none", "", {112, 0, 16, 16}, CS_NONE};
+    
+    entities = vla<entity>();
 
-    bool title = true;
+    bool parsing_title = true;
     int width = 0;
     int height = 0;
     int i = 0;
@@ -27,14 +27,14 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
     // check and get dimensions
     while(*current_pos) {
         // load the title first
-        if (title) {
+        if (parsing_title) {
             i++;
             if (*current_pos == '\n') {
-                l->title = (char *)malloc(sizeof(char) * i);
-                memcpy(l->title, level_str, sizeof(char) * i);
-                l->title[i-1] = '\0';
+                title = (char *)malloc(sizeof(char) * i);
+                memcpy(title, level_str, sizeof(char) * i);
+                title[i-1] = '\0';
                 i = 0;
-                title = false;
+                parsing_title = false;
             }
             current_pos++;
             continue;
@@ -64,12 +64,11 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
     }
 
     char buf[256] = {0};
-    sprintf(buf, "%d - %d %s", shared_data->world_idx, shared_data->level_idx, l->title);
-    l->title_handle = gef_make_text(gc, font, buf, 255, 255, 255);
-
-    l->tiles = grid_init(sizeof(tile_type), width, j);
+    sprintf(buf, "%d - %d %s", app_d->world_idx, app_d->level_idx, title);
+    title_handle = gef_make_text(&app_d->gc, app_d->title_font, buf, 255, 255, 255);
+    tiles = grid<tile>(width, j);
     current_pos = grid_start;
-    tile_type t;
+    tile t;
     i = 0;
     j = 0;
 
@@ -84,7 +83,7 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
                 const char *c = tile_prototypes[t].symbols;
                 while(*c) {
                     if (*c == *current_pos) {
-                        level_set_tile(l, i, j, (tile_type)t);
+                        tiles.set(i, j, (tile)t);
                         goto load_entities;
                     }
                     c++;
@@ -96,7 +95,7 @@ void level_init(level *l, const char *level_str, gef_context *gc, font_handle fo
                 const char *c = entity_prototype_get((entity_type)e).symbols;
                 while(*c) {
                     if (*c == *current_pos) {
-                        l->entities.push((entity) {
+                        entities.push((entity) {
                             .et = (entity_type)e,
                             .x = i,
                             .y = j,
@@ -127,7 +126,7 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
     // first draw ice background
     for (int i = 0; i < l->tiles.w; i++) {
         for (int j = 0; j < l->tiles.h; j++) {
-            if (level_get_tile(l, i, j) == TT_ICE) {
+            if (l->tiles.get(i, j) == T_ICE) {
                 SDL_Rect to_rect = {xo + tsize * i, yo + tsize * j, tsize, tsize};
                 gef_draw_sprite(gc, ice_bg_clip, to_rect);
             }
@@ -162,7 +161,7 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
     for (int i = 0; i < l->tiles.w; i++) {
         for (int j = 0; j < l->tiles.h; j++) {
             SDL_Rect to_rect = {xo + tsize * i, yo + tsize * j, tsize, tsize};
-            gef_draw_sprite(gc, tile_prototypes[level_get_tile(l, i, j)].clip, to_rect);
+            gef_draw_sprite(gc, tile_prototypes[l->tiles.get(i, j)].clip, to_rect);
         }
     }
 
@@ -216,7 +215,10 @@ bool level_is_entity_at(level *l, entity_type et, int x, int y) {
 }
 
 void level_destroy(level *l) {
-    grid_delete(l->tiles);
+    if (!l->initialized) {
+        return;
+    }
+    l->tiles.destroy();
     if (l->title) {
         free(l->title);
         l->title = 0;
@@ -225,18 +227,6 @@ void level_destroy(level *l) {
     l->entities.destroy();
 
     gef_destroy_text(l->title_handle);
-}
-
-tile_type level_get_tile(level *l, int x, int y) {
-    tile_type t;
-    if (grid_get(l->tiles, &t, x, y)) {
-        return t;
-    };
-    return TT_NONE;
-}
-
-void level_set_tile(level *l, int x, int y, tile_type t) {
-    grid_set(l->tiles, &t, x, y);
 }
 
 bool level_check_victory(level *l) {
@@ -263,8 +253,8 @@ bool level_can_move_entity(level *l, int entity_idx, int dx, int dy) {
     entity *e = &l->entities.items[entity_idx];
     int dest_x = e->x + dx;
     int dest_y = e->y + dy;
-    tile_type t = level_get_tile(l, dest_x, dest_y);
-    if (t == TT_NONE || t == TT_WALL) {
+    tile t = l->tiles.get(dest_x, dest_y);
+    if (t == T_NONE || t == T_WALL) {
         return false;
     }
     int dest_entity_idx = level_get_movable_entity_index_at(l, dest_x, dest_y);
@@ -286,11 +276,11 @@ bool level_move_entity(level *l, int entity_idx, int dx, int dy, audio *a) {
     e->dy = dy;
     int dest_x = e->x + dx;
     int dest_y = e->y + dy;
-    tile_type t = level_get_tile(l, dest_x, dest_y);
+    tile t = l->tiles.get(dest_x, dest_y);
 
     audio_play(a, tile_prototypes[t].walk_sound);
 
-    if (t == TT_NONE || t == TT_WALL) {
+    if (t == T_NONE || t == T_WALL) {
         return false;
     }
     int dest_entity_idx = level_get_movable_entity_index_at(l, dest_x, dest_y);
@@ -325,7 +315,7 @@ bool level_do_ice(level *l, audio *a) {
             continue;
         }
 
-        if (level_get_tile(l, e->x, e->y) == TT_ICE && level_can_move_entity(l, i, e->previous_dx, e->previous_dy)) {
+        if (l->tiles.get(e->x, e->y) == T_ICE && level_can_move_entity(l, i, e->previous_dx, e->previous_dy)) {
             level_move_entity(l, i, e->previous_dx, e->previous_dy, a);
             any_ice = true;
         } else {

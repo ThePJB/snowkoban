@@ -18,10 +18,6 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
     app->m_shared_data.snow_offset_base = 0;
     app->m_shared_data.snow_offset_current = 0;
     
-    app->m_shared_data.levels = levels;
-    app->m_shared_data.num_levels = len(levels);
-    app->m_shared_data.selected_level = 0;
-    
     //app->m_shared_data.completed = {false};
     
 
@@ -67,11 +63,6 @@ void application_init(application *app, int xres, int yres, bool do_start_level,
     app->scenes[SCENE_SETTINGS_MENU] = new settings_menu();
     app->scenes[SCENE_LEVEL_MENU] = new level_menu();
     app->scenes[SCENE_GAME] = new game();
-
-    if (do_start_level) {
-        app->m_shared_data.current_scene = SCENE_GAME;
-        app->m_shared_data.selected_level = start_level;
-    }
 }
 
 void application_update(application *app, double dt) {

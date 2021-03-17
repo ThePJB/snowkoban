@@ -1,6 +1,6 @@
 #pragma once
 
-#include "grid.h"
+#include "grid.hpp"
 #include "SDL.h"
 #include "gef.h"
 #include "entity.h"
@@ -9,13 +9,13 @@
 #include "vla.hpp"
 
 typedef enum {
-    TT_NONE,
-    TT_SNOW,
-    TT_ICE,
-    TT_HOLE,
-    TT_WALL,
+    T_NONE,
+    T_SNOW,
+    T_ICE,
+    T_HOLE,
+    T_WALL,
     NUM_TT,
-} tile_type;
+} tile;
 
 typedef struct {
     const char *name;
@@ -25,20 +25,22 @@ typedef struct {
 } tile_prototype;
 
 
-typedef struct {
+struct level {
+    bool initialized = false;
+    
     char *title;
-    grid tiles;
+    grid<tile> tiles;
     vla<entity> entities;
     text_handle title_handle;
-    bool player_faces_left;
-} level;
+    bool player_faces_left = false;
 
-void level_init(level *l, const char *level_str, gef_context *gc, font_handle font, shared_data *shared_data);
+    level (){};
+    level(const char *level_str, shared_data *app_d);
+};
+
 void level_destroy(level *l);
 void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, float time);
 bool level_move_entity(level *l, int entity_idx, int dx, int dy, audio *a);
-void level_set_tile(level *l, int x, int y, tile_type t);
-tile_type level_get_tile(level *l, int x, int y);
 bool level_check_victory(level *l);
 bool level_do_ice(level *l, audio *a);
 

@@ -20,7 +20,6 @@ typedef enum {
 #define NUM_LEVELS 50
 
 
-struct shared_data;
 
 // the intention is that the void* points to this and that the rest of the structure
 // e.g. game, menu, etc follows in memory
@@ -30,7 +29,6 @@ typedef struct {
     void (*on_focus)(struct shared_data *shared_data, void *);
     void (*update)(struct shared_data *shared_data, void *, double dt);
 } scene_interface;
-
 
 
 typedef struct shared_data {
@@ -55,12 +53,7 @@ typedef struct shared_data {
     button_style menu_button_style;
     font_handle title_font;
 
-    // level stuff (deprecated)
-    const char** levels;
-    int num_levels;
-    int selected_level;
-    bool completed[NUM_LEVELS];
-
+    // world stuff
     level_set worlds[10];
     int world_idx;
     int num_worlds;

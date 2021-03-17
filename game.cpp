@@ -227,7 +227,7 @@ void game::on_focus(shared_data *app_d) {
 
     const char *level_str = app_d->worlds[app_d->world_idx].levels[app_d->level_idx];
 
-    level_init(&m_level, level_str, &app_d->gc, app_d->title_font, app_d);
+    m_level = level(level_str, app_d);
     set_state(GS_FADE_IN);
     set_title_state(TS_FADE_IN);
 }
@@ -276,18 +276,6 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
         } else if (reset) {
             on_focus(app_d);
             audio_play(&app_d->a, CS_LOSE);
-        } else if (sym == SDLK_q) {
-            if (app_d->selected_level == 0) {
-                return;
-            }
-            app_d->selected_level--;
-            on_focus(app_d);
-        } else if (sym == SDLK_e) {
-            if (app_d->selected_level == app_d->num_levels - 1) {
-                return;
-            }
-            app_d->selected_level++;
-            on_focus(app_d);
         } else if (sym == SDLK_u) {
             undo(app_d);
         }

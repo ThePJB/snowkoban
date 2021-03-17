@@ -1,6 +1,6 @@
 #pragma once
 
-#include "grid.h"
+#include "grid.hpp"
 #include "scene.hpp"
 #include "audio.h"
 #include "entity.h"
@@ -20,6 +20,8 @@ struct game : scene {
 
     int buffered_move_dx = 0;
     int buffered_move_dy = 0;
+
+    game() {};
 
     vla<history_record> history = vla<history_record>();
     void clear_history();

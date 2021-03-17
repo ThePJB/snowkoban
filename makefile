@@ -19,7 +19,6 @@ SRCS += $(wildcard danklib/*.c)
 SRCS += $(wildcard danklib/*.cpp)
 
 
-
 snowkoban: $(SRCS)
 	g++ $(SRCS) -o  snowkoban $(CFLAGS) $(INCLUDES) $(LDFLAGS)
 
