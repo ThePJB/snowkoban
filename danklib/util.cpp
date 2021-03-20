@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
-#include "util.h"
+#include "util.hpp"
 
 int util_rand_ab(int a, int b) {
     return a + rand() % b;

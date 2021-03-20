@@ -1,10 +1,10 @@
 #include "scene.hpp"
 #include "game.hpp"
-#include "util.h"
-#include "coolmath.h"
-#include "snowflakes.h"
+#include "util.hpp"
+#include "coolmath.hpp"
+#include "snowflakes.hpp"
 #include "level.hpp"
-#include "dankstrings.h"
+#include "dankstrings.hpp"
 //#define DEBUG_HISTORY
 
 const float step_time = 0.1;

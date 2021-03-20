@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scene.hpp"
-#include "gef.h"
+#include "gef.hpp"
 
 struct settings_menu : scene {
     int selection = 0;

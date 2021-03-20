@@ -1,4 +1,4 @@
-#include "entity.h"
+#include "entity.hpp"
 #include <stdbool.h>
 
 const int starting_entity_array_size = 10;

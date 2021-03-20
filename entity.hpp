@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include <SDL.h>
 
 typedef enum {
     ET_NONE,

@@ -1,8 +1,8 @@
 #include "main_menu.hpp"
-#include "util.h"
-#include "snowflakes.h"
-#include "audio.h"
-#include "button.h"
+#include "util.hpp"
+#include "snowflakes.hpp"
+#include "audio.hpp"
+#include "button.hpp"
 #include <stdbool.h>
 
 void main_menu::handle_input(shared_data *app_d, SDL_Event e) {

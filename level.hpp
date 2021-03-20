@@ -1,10 +1,10 @@
 #pragma once
 
 #include "grid.hpp"
-#include "SDL.h"
-#include "gef.h"
-#include "entity.h"
-#include "audio.h"
+#include <SDL.h>
+#include "gef.hpp"
+#include "entity.hpp"
+#include "audio.hpp"
 #include "scene.hpp"
 #include "vla.hpp"
 

@@ -1,6 +1,6 @@
-#include "rewind.h"
-#include "coolmath.h"
-#include "util.h"
+#include "rewind.hpp"
+#include "coolmath.hpp"
+#include "util.hpp"
 
 // so have a number of horizontal bars
 // variable velocity

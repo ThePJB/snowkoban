@@ -1,4 +1,4 @@
-#include "dankstrings.h"
+#include "dankstrings.hpp"
 
 #include <stdio.h>
 #include <math.h>

@@ -1,5 +1,5 @@
-#include "button.h"
-#include "dankstrings.h"
+#include "button.hpp"
+#include "dankstrings.hpp"
 #include <stdio.h>
 
 void button_generic_draw(gef_context *gc, style *s, SDL_Rect r, const char *text, bool rollover) {

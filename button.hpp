@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
-#include "gef.h"
+#include "gef.hpp"
 #include "scene.hpp"
 
 void button_generic_draw(gef_context *gc, style *s, SDL_Rect r, const char *text, bool rollover);

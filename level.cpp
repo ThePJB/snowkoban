@@ -1,6 +1,6 @@
 #include "level.hpp"
 
-#include "coolmath.h"
+#include "coolmath.hpp"
 
 tile_prototype tile_prototypes[NUM_TT];
 

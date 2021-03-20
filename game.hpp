@@ -2,8 +2,8 @@
 
 #include "grid.hpp"
 #include "scene.hpp"
-#include "audio.h"
-#include "entity.h"
+#include "audio.hpp"
+#include "entity.hpp"
 #include "level.hpp"
 
 typedef struct {

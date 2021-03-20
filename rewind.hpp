@@ -1,4 +1,4 @@
 #pragma once
-#include "gef.h"
+#include "gef.hpp"
 
 void rewind_effect(gef_context *gc, float t);

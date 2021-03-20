@@ -1,6 +1,6 @@
 #include "application.hpp"
-#include "levels.h"
-#include "util.h"
+#include "levels.hpp"
+#include "util.hpp"
 
 application::application(int xres, int yres) : m_shared_data{shared_data(xres, yres, "Snowkoban!")} {
     scenes[SCENE_MAIN_MENU] = new main_menu();

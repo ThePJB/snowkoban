@@ -1,7 +1,7 @@
 #include "settings_menu.hpp"
-#include "snowflakes.h"
-#include "util.h"
-#include "button.h"
+#include "snowflakes.hpp"
+#include "util.hpp"
+#include "button.hpp"
 
 void settings_menu::draw(shared_data *app_d, double dt) {
     const int button_w = 600;

@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "application.hpp"
-#include "util.h"
-#include "dankstrings.h"
+#include "util.hpp"
+#include "dankstrings.hpp"
 
 //#define PROFILE
 
 int main(int argc, char** argv) {
-    printf("length of carrot: %d\n", strings_length("carrot"));
     const int frame_cap = 60;
     const int frame_us = 1000000 / frame_cap;
 

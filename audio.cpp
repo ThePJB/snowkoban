@@ -1,4 +1,4 @@
-#include "audio.h"
+#include "audio.hpp"
 #include <stdio.h>
 
 audio audio_init() {

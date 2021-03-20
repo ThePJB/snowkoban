@@ -3,10 +3,10 @@
 #include <SDL_image.h>
 #include <unistd.h>
 
-#include "util.h"
-#include "stdint.h"
-#include "gef.h"
-#include "dankstrings.h"
+#include "util.hpp"
+#include <stdint.h>
+#include "gef.hpp"
+#include "dankstrings.hpp"
 
 
 

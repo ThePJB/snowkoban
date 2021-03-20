@@ -1,9 +1,9 @@
 #include "level_menu.hpp"
-#include "util.h"
-#include "snowflakes.h"
-#include "dankstrings.h"
-#include "entity.h"
-#include "coolmath.h"
+#include "util.hpp"
+#include "snowflakes.hpp"
+#include "dankstrings.hpp"
+#include "entity.hpp"
+#include "coolmath.hpp"
 
 
 void level_menu::draw(shared_data *app_d, double dt) {

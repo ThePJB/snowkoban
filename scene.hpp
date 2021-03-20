@@ -1,9 +1,9 @@
 #pragma once
 
 #include <SDL.h>
-#include "gef.h"
-#include "audio.h"
-#include "level_set.h"
+#include "gef.hpp"
+#include "audio.hpp"
+#include "level_set.hpp"
 #include <stdbool.h>
 
 typedef enum {
@@ -66,15 +66,15 @@ struct shared_data {
 
     // world stuff
     level_set worlds[5] = {
-        #include "world_1.h"
+        #include "world_1.hpp"
         ,
-        #include "world_2.h"
+        #include "world_2.hpp"
         ,
-        #include "world_3.h"
+        #include "world_3.hpp"
         ,
-        #include "world_4.h"
+        #include "world_4.hpp"
         ,
-        #include "world_5.h"
+        #include "world_5.hpp"
         ,
     };
 

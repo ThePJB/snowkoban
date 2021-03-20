@@ -1,7 +1,7 @@
-#include "gef.h"
-#include "util.h"
-#include "math.h"
-#include "coolmath.h"
+#include "gef.hpp"
+#include "util.hpp"
+#include <math.h>
+#include "coolmath.hpp"
 
 /*
 

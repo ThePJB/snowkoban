@@ -1,4 +1,4 @@
-#include "coolmath.h"
+#include "coolmath.hpp"
 
 float cm_floor(float x) {
     if (x > 0) {

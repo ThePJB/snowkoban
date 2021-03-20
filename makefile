@@ -1,7 +1,7 @@
 #LDFLAGS = -lSDL2 -lSDL2_image -lrt -lasound -ljack -lpthread -lportaudio -lm
-LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm
+LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm  -fsanitize=address
 INCLUDES = -I/usr/include/SDL2 -Iinc/ -Idanklib/ -I.
-CFLAGS = -Wall -Werror -fsanitize=address -Wfatal-errors -g -O3
+CFLAGS = -Wall -Werror -Wfatal-errors -g -O3
 
 # Warning exceptions
 CFLAGS += -Wno-unused-variable
@@ -13,14 +13,27 @@ CFLAGS += -Wno-sign-compare
 
 CFLAGS += -std=c++20
 
-SRCS = $(wildcard *.c)
 SRCS += $(wildcard *.cpp)
-SRCS += $(wildcard danklib/*.c)
 SRCS += $(wildcard danklib/*.cpp)
 
+OBJ = $(SRCS:.cpp=.o)
 
-snowkoban: $(SRCS)
-	g++ $(SRCS) -o  snowkoban $(CFLAGS) $(INCLUDES) $(LDFLAGS)
+CC = g++
 
-.PHONY: clean
+
+.PHONY: all clean
+
+all: snowkoban
+
+run: all
+	./snowkoban
+
+snowkoban: $(OBJ)
+	$(CC) -o  snowkoban $^ $(LDFLAGS)
+
+%.o: %.cpp
+	$(CC) -o $@ -c $< $(CFLAGS) $(INCLUDES)
+
+
 clean:
+	rm -f snowkoban $(OBJ)
