@@ -37,35 +37,28 @@ void main_menu::handle_input(shared_data *app_d, SDL_Event e) {
 }
 
 void main_menu::draw(shared_data *app_d, double dt) {
-    const colour bg_colour = gef_rgb(150, 150, 200);
-
-    const int num_buttons = 3;
-    const int button_w = 400;
-    const int button_h = 100;
-    const int button_spacing = 50;
-
-    gef_context *gc = &app_d->gc;
-
-    // calculations to center the buttons
-    const int screen_center_x = gc->xres/2;
-    const int screen_center_y = gc->yres/2;
-    const int menu_height = num_buttons * button_h + (num_buttons - 1) * button_spacing;
-
-    gef_draw_rect(gc, bg_colour, 0, 0, gc->xres, gc->yres);
+    gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
 
     if (app_d->draw_snow) {
-        snowflakes_draw(gc, app_d->interp_time, app_d->snow_offset_base);
+        snowflakes_draw(&app_d->gc, app_d->interp_time, app_d->snow_offset_base);
     }
 
-    int menu_x = screen_center_x - button_w/2;
-    int menu_y = screen_center_y - menu_height/2;
+    const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
+    gef_draw_rect(&app_d->gc, app_d->game_style.pane, pane_rect);
 
-    SDL_Rect btn_rect = {menu_x, menu_y, button_w, button_h};
+    for (int i = 0; i < 3; i++) {
+        const auto r = rect::centered_layout(pane_rect, 0.8*pane_rect.w, 0.2*pane_rect.h, 1,  3, 0, i);
+        const auto line_colour = selection == i ?
+            app_d->game_style.highlight:
+            app_d->game_style.btn_line_colour;
+        gef_draw_rect(&app_d->gc, line_colour, r.dilate(app_d->game_style.line));
+        gef_draw_rect(&app_d->gc, app_d->game_style.btn_colour, r);
 
-
-    button_generic_draw(gc, &app_d->game_style, btn_rect, "Play", selection == 0);
-    btn_rect.y += button_h + button_spacing;
-    button_generic_draw(gc, &app_d->game_style, btn_rect, "Settings", selection == 1);
-    btn_rect.y += button_h + button_spacing;
-    button_generic_draw(gc, &app_d->game_style, btn_rect, "Quit", selection == 2);    
+        const char *text[] = {
+            "play",
+            "settings",
+            "quit",
+        };
+        gef_draw_bmp_text_centered(&app_d->gc, app_d->game_style.game_font, app_d->game_style.big, text[i], r.center().x, r.center().y);
+    }
 }
