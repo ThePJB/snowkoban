@@ -36,8 +36,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
 
             int reflection_offset = tsize - (2*pxsize*entity_prototype_get(e->et).base_h);
             SDL_Rect to_rect = {
-                xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t),
-                yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t) + reflection_offset,
+                lround(xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t)),
+                lround(yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t) + reflection_offset),
                 tsize, tsize * reflection_aspect_ratio
             };
             SDL_Rect from_rect = entity_prototype_get(e->et).clip;
@@ -68,8 +68,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
         entity *e = &l->entities.items[i];
         if (e->et == ET_TARGET) {
             SDL_Rect to_rect = {
-                xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t),
-                yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t),
+                lround(xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t)),
+                lround(yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t)),
                 tsize, tsize
             };
             gef_draw_sprite(gc, entity_prototype_get(e->et).clip, to_rect);
@@ -82,8 +82,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
         entity *e = &l->entities.items[i];
         if (e->et != ET_TARGET && e->et != ET_NONE) {
             SDL_Rect to_rect = {
-                xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t),
-                yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t),
+                lround(xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t)),
+                lround(yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t)),
                 tsize, tsize
             };
             SDL_Rect from_rect = entity_prototype_get(e->et).clip;
