@@ -60,7 +60,7 @@ void game::draw(shared_data *app_d, double dt) {
     gef_context *gc = &app_d->gc;
 
     const int t_start_size = 16;
-    
+
     // determine the scale factor
     int scale_factor = 1;
     while ((scale_factor + 1) * t_start_size * m_level.tiles.w < gc->xres &&
@@ -99,7 +99,7 @@ void game::draw(shared_data *app_d, double dt) {
     int64_t t_fade = get_us();
 
     SDL_Rect clip_wall = {0, 0, 16, 16};
-  
+
     int start_wall_px = (xo % tsize) - tsize;
     int max_wall_px = gc->xres + tsize;
     for (int i = start_wall_px; i < max_wall_px; i += tsize) {
@@ -118,7 +118,7 @@ void game::draw(shared_data *app_d, double dt) {
     }
 
     int64_t t_level = get_us();
-    
+
 
     if (app_d->draw_snow) {
         snowflakes_draw(gc, app_d->interp_time, app_d->snow_offset_base + app_d->snow_offset_current);
@@ -154,14 +154,13 @@ void game::draw(shared_data *app_d, double dt) {
         (t_snow - t_level) / 1000.0,
         (t_text - t_snow) / 1000.0
     );
-    #endif    
+    #endif
 }
 
 void game::update(shared_data *app_d, double dt) {
     title_sm_update(dt);
 
     state_t += dt;
-
     if (state == GS_FADE_OUT && state_t > wipe_time) {
         // FADE OUT -> FADE IN
 
@@ -177,7 +176,7 @@ void game::update(shared_data *app_d, double dt) {
 
         app_d->snow_offset_base += app_d->snow_offset_current;
         app_d->snow_offset_current = 0;
-        
+
         if (app_d->level_idx >= w->lps.length - 1) {
             // kick back to the main menu
             app_d->current_scene = SCENE_LEVEL_MENU;
@@ -190,12 +189,12 @@ void game::update(shared_data *app_d, double dt) {
         } else {
             // next level
             app_d->level_idx++;
-            on_focus(app_d);    
+            on_focus(app_d);
         }
 
     } else if (state == GS_FADE_IN && state_t > wipe_time) {
         // FADE IN -> NORMAL
-        
+
         set_state(GS_NORMAL);
 
     } else if (state == GS_ANIMATE && state_t > step_time) {
@@ -209,13 +208,13 @@ void game::update(shared_data *app_d, double dt) {
 
             audio_play(&app_d->a, CS_WIN);
             set_state(GS_FADE_OUT);
-        } else if (buffered_move_dx != 0 || buffered_move_dy != 0) {
+        } else if (input_queue.size()) {
             // ANIMATE -> MORE ANIMATE
-            
-            game_move_player(this, buffered_move_dx, buffered_move_dy, app_d->time, &app_d->a);
-            buffered_move_dx = 0;
-            buffered_move_dy = 0;
-            
+            input_command command = input_queue.front();
+            input_queue.pop();
+
+            game_move_player(this, command.dx, command.dy, app_d->time, &app_d->a);
+
             // gets set to animate in game_move_player...
         } else {
             // ANIMATE -> NORMAL
@@ -269,8 +268,8 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
             }
 
             if (state == GS_ANIMATE) {
-                buffered_move_dx = dx;
-                buffered_move_dy = dy;
+                input_command command(dx, dy);
+                input_queue.push(command);
             } else {
                 game_move_player(this, dx, dy, app_d->time, &app_d->a);
             }

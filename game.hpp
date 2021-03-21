@@ -5,11 +5,22 @@
 #include "audio.hpp"
 #include "entity.hpp"
 #include "level.hpp"
+#include <queue>
 
 typedef struct {
     vla<entity> v;
     float time;
 } history_record;
+
+struct input_command {
+    int dx = 0;
+    int dy = 0;
+
+    input_command(int dx, int dy):
+        dx(dx),
+        dy(dy) {
+    }
+};
 
 struct game : scene {
     float state_t = 0;
@@ -18,8 +29,7 @@ struct game : scene {
     
     level m_level;
 
-    int buffered_move_dx = 0;
-    int buffered_move_dy = 0;
+    std::queue<input_command> input_queue = std::queue<input_command>();
 
     game() {};
 
