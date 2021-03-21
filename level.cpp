@@ -4,110 +4,10 @@
 
 tile_prototype tile_prototypes[NUM_TT];
 
-level::level(const char *level_str, shared_data *app_d) {
+level::level(const level_prototype *lp) {
     initialized = true;
-    
-    tile_prototypes[T_SNOW] = (tile_prototype){"snow", " ptbc", {16, 0, 16, 16}, CS_SNOW_FOOTSTEP};
-    tile_prototypes[T_ICE] = (tile_prototype){"ice", "/PTBC", {32, 16, 16, 16}, CS_SLIP};
-    tile_prototypes[T_HOLE] = (tile_prototype){"hole", "h", {112, 0, 16, 16}, CS_NONE};
-    tile_prototypes[T_WALL] = (tile_prototype){"wall", "#", {0, 0, 16, 16}, CS_NONE};
-    tile_prototypes[T_NONE] = (tile_prototype){"none", "", {112, 0, 16, 16}, CS_NONE};
-    
-    entities = vla<entity>();
-
-    bool parsing_title = true;
-    int width = 0;
-    int height = 0;
-    int i = 0;
-    int j = 0;
-
-    const char *current_pos = level_str;
-    const char *grid_start = 0;
-
-    // check and get dimensions
-    while(*current_pos) {
-        // load the title first
-        if (parsing_title) {
-            i++;
-            if (*current_pos == '\n') {
-                title = (char *)malloc(sizeof(char) * i);
-                memcpy(title, level_str, sizeof(char) * i);
-                title[i-1] = '\0';
-                i = 0;
-                parsing_title = false;
-            }
-            current_pos++;
-            continue;
-        }
-
-        if (!grid_start) {
-            grid_start = current_pos;
-        }
-
-        if (*current_pos == '\n') {
-            if (j == 0) {
-                width = i;
-            } else {
-                if (i == 0) {
-                    // empty line, just ignore it
-                    j--;
-                } else if (width != i) {
-                    printf("problem loading level: inconsistent width\n");
-                }
-            }
-            i = 0;
-            j++;
-        } else {
-            i++;
-        }
-        current_pos++;
-    }
-    tiles = grid<tile>(width, j);
-    current_pos = grid_start;
-    tile t;
-    i = 0;
-    j = 0;
-
-    // fill grid
-    while(*current_pos) {
-        if (*current_pos == '\n') {
-            i = 0;
-            j++;
-        } else {
-            // load tiles
-            for (int t = 0; t < (int)NUM_TT; t++) {
-                const char *c = tile_prototypes[t].symbols;
-                while(*c) {
-                    if (*c == *current_pos) {
-                        tiles.set(i, j, (tile)t);
-                        goto load_entities;
-                    }
-                    c++;
-                }
-            }
-
-            load_entities:
-            for (int e = 0; e < (int)NUM_ET; e++) {
-                const char *c = entity_prototype_get((entity_type)e).symbols;
-                while(*c) {
-                    if (*c == *current_pos) {
-                        entities.push((entity) {
-                            .et = (entity_type)e,
-                            .x = i,
-                            .y = j,
-                            .dx = 0,
-                            .dy = 0,
-                        });
-                    }
-
-                    c++;
-                }
-            }
-
-            i++;
-        }
-        current_pos++;
-    }
+    entities = lp->starting_entities.deep_copy();
+    tiles = lp->tiles.deep_copy();
 }
 
 // t from 0 to 1
@@ -215,10 +115,6 @@ void level_destroy(level *l) {
         return;
     }
     l->tiles.destroy();
-    if (l->title) {
-        free(l->title);
-        l->title = 0;
-    }
 
     l->entities.destroy();
 }
