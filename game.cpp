@@ -160,7 +160,7 @@ void game::draw(shared_data *app_d, double dt) {
 void game::update(shared_data *app_d, double dt) {
     title_sm_update(dt);
 
-    state_t += dt;
+    state_t += dt  * (1.f + input_queue.size());
     if (state == GS_FADE_OUT && state_t > wipe_time) {
         // FADE OUT -> FADE IN
 
@@ -225,6 +225,7 @@ void game::update(shared_data *app_d, double dt) {
 }
 
 void game::on_focus(shared_data *app_d) {
+    input_queue = {}; // clear queue
     clear_history();
     level_destroy(&m_level);
 
