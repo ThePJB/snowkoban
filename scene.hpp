@@ -18,13 +18,13 @@ typedef enum {
 
 // ui style
 struct style {
-    colour background = gef_rgb(100, 100, 200);
-    colour pane = gef_rgba(100, 100, 100, 150);
+    colour background = gef_rgb(160, 160, 160);
+    colour pane = gef_rgba(100, 100, 200, 150);
     colour highlight = gef_rgb(255, 255, 0);
     colour btn_colour = gef_rgb(80, 150, 220);
-    colour btn_line_colour = gef_rgb(100, 100, 100);
+    colour btn_line_colour = gef_rgb(0, 255, 255);
 
-    int line = 8;
+    int line = 6;
 
     bmp_font game_font;
     bmp_font_settings small;
