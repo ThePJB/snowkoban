@@ -1,12 +1,7 @@
-#pragma once
-
 #include "world.hpp"
 
-(level_set) {
-    .name = "Crate O'Clock",
-    .background = gef_rgb(128, 128, 64),
-    .highlight = gef_rgb(196, 196, 128),
-    .levels = {
+world make_world3(gef_context *gc) {
+    const char *levels[] = {
         "crate to meet you\n"
         "#########\n"
         "####t####\n"
@@ -105,9 +100,6 @@
         "#             #\n"
         "###############\n",
 
-    },
-    .completed = {false},
-    .num_levels = 9,
-    .total_presents = 15,
-    .collected_presents = 0,
+    };   
+    return world("crate o'clock", levels, 9, gc);
 }

@@ -116,7 +116,6 @@ world make_world2(gef_context *gc) {
         "#T///////// #\n"
         "#////////PT/#\n"
         "#############\n",
-
     };
     return world("icetown", levels, 10, gc);
 }

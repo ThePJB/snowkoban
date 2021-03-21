@@ -99,7 +99,7 @@ level_prototype::level_prototype(const char* level_str, gef_context *gc) {
     }
 
     // render preview
-    const auto preview_res = 400;
+    const auto preview_res = 2048;
 
     preview = SDL_CreateTexture(gc->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, preview_res, preview_res);
     SDL_SetRenderDrawColor(gc->renderer, 0, 0, 0, 255);

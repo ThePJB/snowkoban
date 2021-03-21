@@ -64,17 +64,67 @@ void level_menu::draw(shared_data *app_d, double dt) {
         app_d->gc.yres * 0.8)
     );
 
+    gef_draw_bmp_text_centered(&app_d->gc, app_d->game_style.game_font, app_d->game_style.big, app_d->current_world()->name, app_d->gc.xres / 2, app_d->gc.yres * 0.05);
+
     layout l = get_layout(app_d->gc.xres, app_d->gc.yres, app_d->current_world()->lps.length);
+
+    const auto entity_size = 64;
 
     for (int i = 0; i < l.num_levels; i++) {
         if (i == app_d->level_idx) {
             gef_draw_rect(&app_d->gc, app_d->game_style.highlight, l.level_rects[i].dilate(app_d->game_style.line));
         }
-        //gef_draw_rect(&app_d->gc, app_d->game_style.btn_colour, l.level_rects[i]);
         SDL_Rect r = l.level_rects[i].sdl_rect();
         SDL_RenderCopy(app_d->gc.renderer, app_d->current_world()->lps.items[i].preview, NULL, &r);
+
+        const auto vignette_colour = app_d->current_world()->lps.items[i].complete ? 
+            gef_rgba(0, 255, 0, 0):
+            gef_rgba(255, 50, 50, 50);
+
+        gef_draw_rect(&app_d->gc, vignette_colour, l.level_rects[i]);
+        
+        if (i == app_d->level_idx) {
+            auto player_clip = entity_prototype_get(ET_PLAYER).clip;
+            // bop animation
+            if (cm_frac(app_d->time) > 0.5) {
+                player_clip.y += 16;
+            }
+
+            auto to_rect = (SDL_Rect) {
+                l.level_rects[i].x - entity_size/2,
+                l.level_rects[i].y + l.level_rects[i].h/2 - entity_size/2,
+                entity_size,
+                entity_size,
+            };
+
+            gef_draw_sprite_ex(&app_d->gc, player_clip, to_rect, 0, SDL_FLIP_HORIZONTAL);
+        }
     }
 
+    // Draw present counter
+
+
+    
+    char buf[64] = {0};
+    sprintf(buf, "%d/%d", app_d->current_world()->num_presents_collected, app_d->current_world()->total_presents);
+    const auto present_text_dimensions = gef_bmp_font_size(app_d->game_style.game_font, app_d->game_style.big, strings_length(buf));
+    gef_draw_bmp_text_centered(&app_d->gc, app_d->game_style.game_font, app_d->game_style.big, buf, app_d->gc.xres * 0.5, app_d->gc.yres * 0.95);
+
+    const auto present_clip = entity_prototype_get(ET_PRESENT).clip;
+    const auto present_to_rect = (SDL_Rect) {
+        .x = app_d->gc.xres * 0.5 - entity_size - present_text_dimensions.x/2, 
+        .y = app_d->gc.yres * 0.95 - entity_size/2,
+        .w = entity_size,
+        .h = entity_size,
+    };
+    gef_draw_sprite(&app_d->gc, present_clip, present_to_rect);
+    const auto present_to_rect2 = (SDL_Rect) {
+        .x = app_d->gc.xres * 0.5 + present_text_dimensions.x/2, 
+        .y = app_d->gc.yres * 0.95 - entity_size/2,
+        .w = entity_size,
+        .h = entity_size,
+    };
+    gef_draw_sprite(&app_d->gc, present_clip, present_to_rect2);
 }
 
 /*
@@ -177,9 +227,7 @@ void level_menu::draw(shared_data *app_d, double dt) {
 
         gef_draw_sprite(gc, entity_prototype_get(ET_PRESENT).clip, present_to_rect);
         
-        char buf[64] = {0};
-        sprintf(buf, "%d/%d", app_d->worlds[i].collected_presents, app_d->worlds[i].total_presents);
-        gef_draw_bmp_text(gc, app_d->game_style.game_font, app_d->game_style.small, buf, present_counter_x, present_counter_y);
+        
 
         world_y += world_spacing + world_h;
     }

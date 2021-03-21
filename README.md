@@ -119,3 +119,13 @@ if scene has worlds, worlds can't have levels
 
 ok doing the level prototype thing, i think thats pretty clean.
 TODO tomoz is just worlds init, and the plumbing which hopefully isnt bad cause its still structured the same. game will just take level proto from world instead of char* to do an initialize
+
+----------------------------
+
+LEVEL MENU looking dope. todo:
+better layout on the buttons
+track
+maybe different snow characteristics
+wipe
+travel LR
+kick u back to where u were and u go right to the next levels

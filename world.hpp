@@ -22,7 +22,7 @@ struct level_prototype {
 struct world {
     const char *name;
     vla<level_prototype> lps;
-    int total_presents;
+    int total_presents = 0;
     int num_presents_collected = 0;
 
     world(){};

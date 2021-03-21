@@ -74,6 +74,9 @@ struct shared_data {
         game_style = style(&gc);
         worlds[0] = make_world1(&gc);
         worlds[1] = make_world2(&gc);
+        worlds[2] = make_world3(&gc);
+        worlds[3] = make_world4(&gc);
+        worlds[4] = make_world5(&gc);
     }
 
     world *current_world() {

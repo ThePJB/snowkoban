@@ -172,6 +172,7 @@ void game::update(shared_data *app_d, double dt) {
         if (!w->lps.items[app_d->level_idx].complete) {
             w->lps.items[app_d->level_idx].complete = true;
             int n_presents = m_level.entities.acc([](entity e) {return e.et == ET_PRESENT ? 1 : 0;});
+            w->num_presents_collected += n_presents;
         }
 
         app_d->snow_offset_base += app_d->snow_offset_current;

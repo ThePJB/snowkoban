@@ -13,7 +13,7 @@ void draw_level(gef_context *gc, grid<tile> terrain, vla<entity> entities, int x
     const auto filler_xo = (xo % px_per_tile) - px_per_tile;
     const auto filler_yo = (yo % px_per_tile) - px_per_tile;
 
-    const SDL_Rect clip_wall = {0, 0, 16, 16};
+    const auto clip_wall = tile_prototype_get(T_WALL).clip;
 
     for (int i = 0; i < n_spaces_x + 2; i++) {
         for (int j = 0; j < n_spaces_y + 2; j++) {
