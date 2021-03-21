@@ -1,12 +1,13 @@
 #include <stdlib.h>
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <unistd.h>
 
 #include "util.hpp"
 #include <stdint.h>
 #include "gef.hpp"
 #include "dankstrings.hpp"
+#include "rect.hpp"
 
 
 
@@ -115,6 +116,12 @@ void gef_draw_rect(gef_context *gc, colour c, int x, int y, int w, int h) {
     SDL_Rect to_rect = (SDL_Rect) {x, y, w, h};
     SDL_SetRenderDrawColor(gc->renderer, c.r, c.g, c.b, c.a);
     SDL_RenderFillRect(gc->renderer, &to_rect);
+}
+
+void gef_draw_rect(gef_context *gc, colour c, rect r) {
+    SDL_SetRenderDrawColor(gc->renderer, c.r, c.g, c.b, c.a);
+    SDL_Rect tmp_r = r.sdl_rect();
+    SDL_RenderFillRect(gc->renderer, &tmp_r);
 }
 
 void gef_present(gef_context *gc) {

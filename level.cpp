@@ -57,7 +57,8 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
     for (int i = 0; i < l->tiles.w; i++) {
         for (int j = 0; j < l->tiles.h; j++) {
             SDL_Rect to_rect = {xo + tsize * i, yo + tsize * j, tsize, tsize};
-            gef_draw_sprite(gc, tile_prototypes[l->tiles.get(i, j)].clip, to_rect);
+            auto tp = tile_prototype_get(l->tiles.get(i, j));
+            gef_draw_sprite(gc, tp.clip, to_rect);
         }
     }
 

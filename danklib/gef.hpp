@@ -1,9 +1,9 @@
 #pragma once
 
 #include <stdio.h>
-#include <SDL.h>
-#include <SDL_ttf.h>
-
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include "rect.hpp"
 
 #define gef_die(G, X) printf("%s %d %s: dying -- %s\n", __FILE__, __LINE__, __func__, X), gef_teardown(G)
 
@@ -67,6 +67,7 @@ void gef_teardown(gef_context *gc);
 // drawing primitives
 void gef_draw_pixel(gef_context *gc, colour c, int x, int y);
 void gef_draw_rect(gef_context *gc, colour c, int x, int y, int w, int h);
+void gef_draw_rect(gef_context *gc, colour c, rect r);
 
 void gef_start_frame(gef_context *gc);
 void gef_end_frame(gef_context *gc);

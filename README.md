@@ -103,3 +103,19 @@
 
  probably just want to find a nice bitmap font
  have function to get layout size as well as to draw
+
+
+
+-------------------------------------------------------------------------
+
+new design,
+levels are grouped into worlds (internally even). Levels can own their preview and progress I suppose
+
+scene has worlds, that is a problem
+
+if scene has worlds, worlds can't have levels
+
+--------------------
+
+ok doing the level prototype thing, i think thats pretty clean.
+TODO tomoz is just worlds init, and the plumbing which hopefully isnt bad cause its still structured the same. game will just take level proto from world instead of char* to do an initialize

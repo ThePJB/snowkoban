@@ -4,8 +4,80 @@
 #include "dankstrings.hpp"
 #include "entity.hpp"
 #include "coolmath.hpp"
+#include "rect.hpp"
 
+struct layout {
+    rect level_rects[10];
+    int num_levels = 0;
 
+    layout(){};
+};
+
+layout get_layout(int xres, int yres, int num_levels) {
+    auto l = layout();
+    l.num_levels = num_levels;
+    
+    int level_s = 0.15 * xres;
+    int level_space = 0.01 * xres;
+
+    int n_bot = num_levels / 2;
+    int n_top = num_levels - n_bot;
+
+    int w_bot = n_bot * level_s + (n_bot - 1) * level_space;
+    int w_top = n_top * level_s + (n_top - 1) * level_space;
+    int top_offset = xres / 2 - w_top / 2;
+    int bot_offset = xres / 2 - w_bot / 2;
+
+    int top_y = yres / 3;
+    int bot_y = 2 * yres / 3;
+
+    for (int i = 0; i < n_top; i++) {
+        l.level_rects[i] = rect(
+            top_offset + i*(level_s + level_space),
+            top_y - level_s/2,
+            level_s,
+            level_s
+        );
+    }
+
+    for (int i = 0; i < n_bot; i++) {
+        l.level_rects[n_top + i] = rect(
+            bot_offset + i*(level_s + level_space),
+            bot_y - level_s/2,
+            level_s,
+            level_s
+        );
+    }
+
+    return l;
+}
+
+void level_menu::draw(shared_data *app_d, double dt) {
+    gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
+    
+    snowflakes_draw(&app_d->gc, app_d->time, app_d->snow_offset_base);
+
+    gef_draw_rect(&app_d->gc, app_d->game_style.pane, rect::centered(
+        app_d->gc.xres/2, 
+        app_d->gc.yres/2, 
+        app_d->gc.xres * 0.8, 
+        app_d->gc.yres * 0.8)
+    );
+
+    layout l = get_layout(app_d->gc.xres, app_d->gc.yres, app_d->current_world()->lps.length);
+
+    for (int i = 0; i < l.num_levels; i++) {
+        if (i == app_d->level_idx) {
+            gef_draw_rect(&app_d->gc, app_d->game_style.highlight, l.level_rects[i].dilate(app_d->game_style.line));
+        }
+        //gef_draw_rect(&app_d->gc, app_d->game_style.btn_colour, l.level_rects[i]);
+        SDL_Rect r = l.level_rects[i].sdl_rect();
+        SDL_RenderCopy(app_d->gc.renderer, app_d->current_world()->lps.items[i].preview, NULL, &r);
+    }
+
+}
+
+/*
 void level_menu::draw(shared_data *app_d, double dt) {
     gef_context *gc = &app_d->gc;
 
@@ -112,6 +184,7 @@ void level_menu::draw(shared_data *app_d, double dt) {
         world_y += world_spacing + world_h;
     }
 }
+*/
 
 void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
         if (e.type == SDL_KEYDOWN) {
@@ -130,7 +203,7 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
         if (left && app_d->level_idx > 0) {
             app_d->level_idx--;
             audio_play(&app_d->a, CS_MENU_MOVE);
-        } else if (right && app_d->level_idx < app_d->worlds[app_d->world_idx].num_levels - 1) {
+        } else if (right && app_d->level_idx < app_d->current_world()->lps.length - 1) {
             app_d->level_idx++;
             audio_play(&app_d->a, CS_MENU_MOVE);
         } else if (up && app_d->world_idx > 0) {

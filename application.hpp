@@ -7,9 +7,6 @@
 #include "settings_menu.hpp"
 #include "game.hpp"
 #include <stdbool.h>
-#include <SDL_mixer.h>
-#include "audio.hpp"
-
 
 #define MAX_SCENES 16;
 

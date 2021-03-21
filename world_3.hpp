@@ -1,4 +1,6 @@
-#include "level_set.hpp"
+#pragma once
+
+#include "world.hpp"
 
 (level_set) {
     .name = "Crate O'Clock",

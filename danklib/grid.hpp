@@ -21,18 +21,18 @@ struct grid {
         items = (T *)malloc(sizeof(T) * w * h);
     }
 
-    bool bounds_check(int x, int y) {
+    bool bounds_check(int x, int y) const {
         return x >= 0 && x < w && y >= 0 && y < h;
     }
 
-    void fatal_bounds_check(int x, int y) {
+    void fatal_bounds_check(int x, int y) const {
         if (!bounds_check(x, y)) {
             printf("failed bounds check %d %d on %d %d\n", x, y, w, h);
             exit(1);
         }
     }
 
-    T get(unsigned int x, unsigned int y) {
+    T get(unsigned int x, unsigned int y) const {
         fatal_bounds_check(x, y);
         return items[y * w + x];
     }
@@ -47,5 +47,11 @@ struct grid {
             free(items);
             items = NULL;
         }
+    }
+
+    grid deep_copy() const {
+        grid g = grid(w, h);
+        memcpy(g.items, items, w*h*sizeof(T));
+        return g;
     }
 };

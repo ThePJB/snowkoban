@@ -1,9 +1,9 @@
 #pragma once
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "gef.hpp"
 #include "audio.hpp"
-#include "level_set.hpp"
+#include "world.hpp"
 #include <stdbool.h>
 
 typedef enum {
@@ -19,6 +19,7 @@ typedef enum {
 // ui style
 struct style {
     colour background = gef_rgb(100, 100, 200);
+    colour pane = gef_rgba(100, 100, 100, 150);
     colour highlight = gef_rgb(255, 255, 0);
     colour btn_colour = gef_rgb(80, 150, 220);
     colour btn_line_colour = gef_rgb(100, 100, 100);
@@ -65,23 +66,21 @@ struct shared_data {
     int level_idx = 0;
 
     // world stuff
-    level_set worlds[5] = {
-        #include "world_1.hpp"
-        ,
-        #include "world_2.hpp"
-        ,
-        #include "world_3.hpp"
-        ,
-        #include "world_4.hpp"
-        ,
-        #include "world_5.hpp"
-        ,
-    };
+    world worlds[5];
 
     shared_data(int xres, int yres, const char *title) {
         gc = gef_init(title, xres, yres);
         gef_load_atlas(&gc, "assets/snowkoban.png");
         game_style = style(&gc);
+        worlds[0] = make_world1(gc.renderer);
+    }
+
+    world *current_world() {
+        return &worlds[world_idx];
+    }
+
+    level_prototype *current_level_proto() {
+        return &current_world()->lps.items[level_idx];
     }
 };
 

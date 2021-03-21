@@ -23,7 +23,7 @@ void settings_menu::draw(shared_data *app_d, double dt) {
     gef_draw_rect(gc, background_colour, 0, 0, gc->xres, gc->yres);
 
     if (app_d->draw_snow) {
-        snowflakes_draw(gc, gc->xres, gc->yres, app_d->interp_time, app_d->snow_offset_base);
+        snowflakes_draw(gc, app_d->interp_time, app_d->snow_offset_base);
     }
     
     int menu_x = screen_center_x - button_w/2;

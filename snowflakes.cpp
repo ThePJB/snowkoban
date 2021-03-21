@@ -21,7 +21,10 @@ void snowflake_draw(gef_context *gc, int x, int y, int s) {
     gef_draw_rect(gc, snowflake_colour, x + s + s, y + s, s, s);
 }
 
-void snowflakes_draw(gef_context *gc, int xres, int yres, float t, int xo) {
+void snowflakes_draw(gef_context *gc, float t, int xo) {
+    const int xres = gc->xres;
+    const int yres = gc->yres;
+    
     const int pixel_size = 4;
     const int spacing = pixel_size * 3;
     const int starting_y = -spacing;

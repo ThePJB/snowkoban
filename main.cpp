@@ -4,6 +4,8 @@
 #include "util.hpp"
 #include "dankstrings.hpp"
 
+#include "tile.hpp"
+
 //#define PROFILE
 
 int main(int argc, char** argv) {

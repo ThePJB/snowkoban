@@ -24,7 +24,7 @@ struct vla {
     }
 
     // to move just assign
-    vla<T> deep_copy() {
+    vla<T> deep_copy() const {
         T * new_items = (T *)malloc(sizeof(T) * backing_size);
         memcpy(new_items, items, sizeof(T) * length);
 

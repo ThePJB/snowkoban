@@ -1,10 +1,8 @@
-#include "level_set.hpp"
+#include <SDL2/SDL.h>
+#include "world.hpp"
 
-(level_set) {
-    .name = "Noice",
-    .background = gef_rgb(30, 30, 200),
-    .highlight = gef_rgb(30, 30, 255),
-    .levels = {
+world make_world1(SDL_Renderer *r) {
+    const char *levels[] = {
         "first level\n"
         "#####\n"
         "## t#\n"
@@ -60,9 +58,6 @@
         "#   b#\n"
         "# t  #\n"
         "######\n",
-    },
-    .completed = {false},
-    .num_levels = 6,
-    .total_presents = 10,
-    .collected_presents = 0,
+    };
+    return world("noice", levels, 6, r);
 }

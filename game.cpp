@@ -121,23 +121,23 @@ void game::draw(shared_data *app_d, double dt) {
     
 
     if (app_d->draw_snow) {
-        snowflakes_draw(gc, gc->xres, gc->yres, app_d->interp_time, app_d->snow_offset_base + app_d->snow_offset_current);
+        snowflakes_draw(gc, app_d->interp_time, app_d->snow_offset_base + app_d->snow_offset_current);
     }
 
     int64_t t_snow = get_us();
 
     char buf[256];
-    sprintf(buf, "%d-%d %s", app_d->world_idx+1, app_d->level_idx+1, m_level.title);
+    sprintf(buf, "%d-%d %s", app_d->world_idx+1, app_d->level_idx+1, app_d->current_level_proto()->title);
 
     int x = gc->xres / 2;
 
     if (m_title_state == TS_FADE_IN) {
         float downness = cm_slow_stop2(title_state_t);
-        int y = downness * 100 - 50;
+        int y = lround(downness * 100.0f - 50.0f);
         gef_draw_bmp_text_centered(gc, app_d->game_style.game_font, app_d->game_style.big, buf, x, y);
     } else if (m_title_state == TS_FADE_OUT) {
         float upness = cm_slow_start2(title_state_t);
-        int y = (1 - upness) * 100 - 50;
+        int y = lround((1.f - upness) * 100.f - 50.f);
         gef_draw_bmp_text_centered(gc, app_d->game_style.game_font, app_d->game_style.big, buf, x, y);
     } else if (m_title_state == TS_SHOW) {
         int y = 50;
@@ -166,18 +166,18 @@ void game::update(shared_data *app_d, double dt) {
         // FADE OUT -> FADE IN
 
         set_state(GS_FADE_IN);
-        level_set *w = &app_d->worlds[app_d->world_idx];
+        world *w = &app_d->worlds[app_d->world_idx];
 
         // tally progress
-        if (! w->completed[app_d->level_idx]) {
-            w->completed[app_d->level_idx] = true;
+        if (!w->lps.items[app_d->level_idx].complete) {
+            w->lps.items[app_d->level_idx].complete = true;
             int n_presents = m_level.entities.acc([](entity e) {return e.et == ET_PRESENT ? 1 : 0;});
         }
 
         app_d->snow_offset_base += app_d->snow_offset_current;
         app_d->snow_offset_current = 0;
         
-        if (app_d->level_idx >= w->num_levels - 1) {
+        if (app_d->level_idx >= w->lps.length - 1) {
             // kick back to the main menu
             app_d->current_scene = SCENE_LEVEL_MENU;
             if (app_d->world_idx < app_d->num_worlds - 1) {
@@ -228,9 +228,7 @@ void game::on_focus(shared_data *app_d) {
     clear_history();
     level_destroy(&m_level);
 
-    const char *level_str = app_d->worlds[app_d->world_idx].levels[app_d->level_idx];
-
-    m_level = level(level_str, app_d);
+    m_level = level(app_d->current_level_proto());
     set_state(GS_FADE_IN);
     set_title_state(TS_FADE_IN);
 }
