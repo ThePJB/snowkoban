@@ -1,12 +1,7 @@
-#pragma once
-
 #include "world.hpp"
 
-(level_set) {
-    .name = "Da Ice Zone",
-    .background = gef_rgb(130, 130, 200),
-    .highlight = gef_rgb(130, 130, 255),
-    .levels = {
+world make_world2(gef_context *gc) {
+    const char *levels[] = {
         "ice to meet you\n"
         "#########\n"
         "######t##\n"
@@ -122,9 +117,6 @@
         "#////////PT/#\n"
         "#############\n",
 
-    },
-    .completed = {false},
-    .num_levels = 10,
-    .total_presents = 21,
-    .collected_presents = 0,
+    };
+    return world("icetown", levels, 10, gc);
 }

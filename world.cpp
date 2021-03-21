@@ -1,6 +1,7 @@
 #include "world.hpp"
+#include "draw_level.hpp"
 
-level_prototype::level_prototype(const char* level_str, SDL_Renderer *r) {
+level_prototype::level_prototype(const char* level_str, gef_context *gc) {
     starting_entities = vla<entity>();
 
     bool parsing_title = true;
@@ -96,24 +97,28 @@ level_prototype::level_prototype(const char* level_str, SDL_Renderer *r) {
         }
         current_pos++;
     }
-    preview = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 400, 400 );
-    SDL_SetRenderTarget(r, preview);
-    SDL_RenderClear(r);
-    SDL_Rect tstrect = {100, 100, 100, 200};
-    SDL_SetRenderDrawColor(r, 255, 0, 0, 255);
-    SDL_RenderDrawRect(r, &tstrect);
-    // draw or whatever
-    SDL_RenderPresent(r);
-    SDL_SetRenderTarget(r, NULL);
+
+    // render preview
+    const auto preview_res = 400;
+
+    preview = SDL_CreateTexture(gc->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, preview_res, preview_res);
+    SDL_SetRenderDrawColor(gc->renderer, 0, 0, 0, 255);
+    SDL_SetRenderTarget(gc->renderer, preview);
+    SDL_RenderClear(gc->renderer);
+
+    draw_level(gc, tiles, starting_entities, preview_res, preview_res, 0, 0);
+
+    SDL_RenderPresent(gc->renderer);
+    SDL_SetRenderTarget(gc->renderer, NULL);
 }
 
 
-world::world(const char *name, const char** level_strs, int n_levels, SDL_Renderer *r) {
+world::world(const char *name, const char** level_strs, int n_levels, gef_context *gc) {
     this->name = name;
     lps = vla<level_prototype>();
 
     for (int i = 0; i < n_levels; i++) {
-        auto new_lp = level_prototype(level_strs[i], r);
+        auto new_lp = level_prototype(level_strs[i], gc);
         total_presents += new_lp.starting_entities.acc([](entity e){return e.et == ET_PRESENT ? 1 : 0;});
         lps.push(new_lp);
     }

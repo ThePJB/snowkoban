@@ -1,7 +1,6 @@
-#include <SDL2/SDL.h>
 #include "world.hpp"
 
-world make_world1(SDL_Renderer *r) {
+world make_world1(gef_context *gc) {
     const char *levels[] = {
         "first level\n"
         "#####\n"
@@ -59,5 +58,5 @@ world make_world1(SDL_Renderer *r) {
         "# t  #\n"
         "######\n",
     };
-    return world("noice", levels, 6, r);
+    return world("noice", levels, 6, gc);
 }

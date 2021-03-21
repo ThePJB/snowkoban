@@ -16,7 +16,7 @@ struct level_prototype {
     SDL_Texture *preview;
     char* title;
 
-    level_prototype(const char* level_str, SDL_Renderer * r);
+    level_prototype(const char* level_str, gef_context *gc);
 };
 
 struct world {
@@ -27,11 +27,11 @@ struct world {
 
     world(){};
 
-    world(const char *name, const char** level_strs, int n_levels, SDL_Renderer * r);
+    world(const char *name, const char** level_strs, int n_levels, gef_context *gc);
 };
 
-world make_world1(SDL_Renderer *r);
-world make_world2(SDL_Renderer *r);
-world make_world3(SDL_Renderer *r);
-world make_world4(SDL_Renderer *r);
-world make_world5(SDL_Renderer *r);
+world make_world1(gef_context *gc);
+world make_world2(gef_context *gc);
+world make_world3(gef_context *gc);
+world make_world4(gef_context *gc);
+world make_world5(gef_context *gc);
