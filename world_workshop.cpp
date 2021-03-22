@@ -111,8 +111,6 @@ world make_workshop(gef_context *gc) {
         "# /     ###\n"
         "###########\n"
         "###########\n",
-
-
     };
     return world("da workshop", levels, sizeof(levels)/sizeof(levels[0]), gc);
 }

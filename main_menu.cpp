@@ -39,7 +39,7 @@ void main_menu::draw(shared_data *app_d, double dt) {
     gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
 
     if (app_d->draw_snow) {
-        snowflakes_draw(&app_d->gc, app_d->interp_time, app_d->snow_offset_base);
+        snowflakes_draw(&app_d->gc, app_d->interp_time, app_d->snow_xo);
     }
 
     const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);

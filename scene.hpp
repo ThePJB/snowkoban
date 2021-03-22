@@ -56,8 +56,7 @@ struct shared_data {
     float time = 0;
     float interp_time = 0;
 
-    float snow_offset_base = 0;
-    float snow_offset_current = 0;
+    float snow_xo = 0;
 
     style game_style;
 

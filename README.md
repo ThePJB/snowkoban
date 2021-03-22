@@ -37,12 +37,10 @@
  - wipe is like really sickness inducing at high res lol
    - maybe i could do a blizzard wipe or something that wouldn't be so chunderific
    - or wipe could be slower
- - snowflakes speed is resolution dependent
- - snowflakes could probably scale with res as well
  - mouse for menus
  - maybe further back music skip would be good
  - audio is a bit quiet on eg sliding ice
- - now i think there is a memory leak
+ - snow scramble just the first time u change level, weird (I think fixed)
 
 ## Required juice
  - nice undos

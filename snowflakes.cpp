@@ -3,16 +3,6 @@
 #include <math.h>
 #include "coolmath.hpp"
 
-/*
-
-How to make procedural snowflakes
-
-takes time variable
-and it needs to make them, have them move down, and delete them
-so they exist over some interval made of noise etc
-
-*/
-
 void snowflake_draw(gef_context *gc, int x, int y, int s) {
     const colour snowflake_colour = gef_rgb(255,255,255);
     gef_draw_rect(gc, snowflake_colour, x + s, y, s, s);
@@ -22,40 +12,31 @@ void snowflake_draw(gef_context *gc, int x, int y, int s) {
 }
 
 void snowflakes_draw(gef_context *gc, float t, int xo) {
-    const int xres = gc->xres;
-    const int yres = gc->yres;
+    const int pixel_size = max(gc->xres / 400, 1); // why const auto doesnt draw snow?
+    const auto spacing = pixel_size * 3;
+    const auto starting_y = -spacing;
+    const auto slowness = 12.f;
+    const auto frequency = 10.f;
+    const auto sin_magnitude = 10.f * (float)gc->xres / (float)2000;
+    const auto vxh_magnitude = 100.f * (float) gc->xres / (float)2000;
+    const auto potential_xmax = sin_magnitude + vxh_magnitude + abs(xo);
     
-    const int pixel_size = 4;
-    const int spacing = pixel_size * 3;
-    const int starting_y = -spacing;
-
-    const float slowness = 10;
-
-    const float frequency = 10;
-    const float sin_magnitude = 10;
-
-    const int vxh_magnitude = 200;
-
-    const int potential_xmax = sin_magnitude + vxh_magnitude + abs(xo);
-    
-    int start_seed = -(potential_xmax/spacing) - 1;
-    int end_seed = (potential_xmax + xres)/spacing + 1;
+    const auto start_seed = (int)-(potential_xmax/spacing) - 1;
+    const auto end_seed = (int)(potential_xmax + gc->xres)/spacing + 1;
     
     for (int seed = start_seed; seed < end_seed; seed++) {
+        const auto phase = hash_floatn(seed, 0, slowness);
+        const auto tprime = (t + phase) / slowness;
+        const auto h = cm_frac(tprime);
+        const auto iteration = cm_floor(tprime);
 
-        float phase = hash_floatn(seed, 0, slowness);
-        
-        float tprime = (t + phase) / slowness;
-        float h = cm_frac(tprime);
-        float iteration = cm_floor(tprime);
+        const auto vxh = hash_floatn(seed + 9853*iteration, -vxh_magnitude, vxh_magnitude);
+        const auto sin_phase = hash_floatn(seed + 1209*iteration, 0, 2*M_PI);
 
-        int vxh = hash_intn(seed + 9853*iteration, -vxh_magnitude, vxh_magnitude);
-        float sin_phase = hash_floatn(seed + 1209*iteration, 0, 2*M_PI);
+        const auto starting_x = seed * spacing;
 
-        int starting_x = seed * spacing;
-
-        int x = lround(starting_x + h * vxh + sin_magnitude * sin(h * frequency + sin_phase) - xo);
-        int y = lround(h * (yres - starting_y) + starting_y);
+        const auto x = lround(starting_x + h * vxh + sin_magnitude * sin(h * frequency + sin_phase) - xo);
+        const auto y = lround(h * (gc->yres - starting_y) + starting_y);
 
         snowflake_draw(gc, x, y, pixel_size);
     }

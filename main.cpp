@@ -12,23 +12,31 @@ int main(int argc, char** argv) {
     const int frame_cap = 60;
     const int frame_us = 1000000 / frame_cap;
 
-    int level_num = 0;
-    bool do_level_start = false;
+    int xres = 1600;
+    int yres = 900;
 
     for (int i = 0; i < argc; i++) {
-        if (strings_equal(argv[i], "--level")) {
-            do_level_start = true;
+        if (strings_equal(argv[i], "--xres")) {
             i++;
             if (i < argc && strings_is_dec_int(argv[i])) {
-                level_num = atoi(argv[i]);
+                xres = atoi(argv[i]);
             } else {
-                printf("need an integer argument for level\n");
+                printf("need an integer argument for xres\n");
+                return 1;
+            }
+        }
+        if (strings_equal(argv[i], "--yres")) {
+            i++;
+            if (i < argc && strings_is_dec_int(argv[i])) {
+                yres = atoi(argv[i]);
+            } else {
+                printf("need an integer argument for yres\n");
                 return 1;
             }
         }
     }
 
-    application app = application(1600, 900);
+    application app = application(xres, yres);
     
     double dt = 0.001;
     while (app.m_shared_data.keep_going) {

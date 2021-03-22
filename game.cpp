@@ -81,19 +81,22 @@ void game::draw(shared_data *app_d, double dt) {
 
     int64_t t_start = get_us();
 
+    float old_wipe_t = (state_t - dt) / wipe_time;
     float wipe_t = state_t / wipe_time;
-    if (state == GS_FADE_OUT) {
+
+    if (state == GS_FADE_OUT) {    
+        old_wipe_t = cm_slow_start2(old_wipe_t);
         wipe_t = cm_slow_start2(wipe_t);
         xo += wipe_t * gc->xres;
-
-        app_d->snow_offset_current = -wipe_t * gc->xres;
-
+        app_d->snow_xo -= -1.f * (float)gc->xres * old_wipe_t;
+        app_d->snow_xo += -1.f * (float)gc->xres * wipe_t;
     } else if (state == GS_FADE_IN) {
+        old_wipe_t = cm_slow_start2(1 - old_wipe_t);
         wipe_t = cm_slow_start2(1 - wipe_t);
+
+        app_d->snow_xo -= 1.f * (float)gc->xres * old_wipe_t;
+        app_d->snow_xo += 1.f * (float)gc->xres * wipe_t;
         xo += -1 * wipe_t * gc->xres;
-
-        app_d->snow_offset_current = wipe_t * gc->xres;
-
     }
 
     int64_t t_fade = get_us();
@@ -121,7 +124,7 @@ void game::draw(shared_data *app_d, double dt) {
     
 
     if (app_d->draw_snow) {
-        snowflakes_draw(gc, app_d->interp_time, app_d->snow_offset_base + app_d->snow_offset_current);
+        snowflakes_draw(gc, app_d->interp_time, app_d->snow_xo);
     }
 
     int64_t t_snow = get_us();
@@ -174,9 +177,6 @@ void game::update(shared_data *app_d, double dt) {
             int n_presents = m_level.entities.acc([](entity e) {return e.et == ET_PRESENT ? 1 : 0;});
             w->num_presents_collected += n_presents;
         }
-
-        app_d->snow_offset_base += app_d->snow_offset_current;
-        app_d->snow_offset_current = 0;
         
         if (app_d->level_idx >= w->lps.length - 1) {
             // kick back to the main menu
