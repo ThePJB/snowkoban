@@ -2,7 +2,6 @@
 #include "util.hpp"
 #include "snowflakes.hpp"
 #include "audio.hpp"
-#include "button.hpp"
 #include <stdbool.h>
 
 void main_menu::handle_input(shared_data *app_d, SDL_Event e) {

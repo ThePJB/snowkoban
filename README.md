@@ -129,3 +129,9 @@ maybe different snow characteristics
 wipe
 travel LR
 kick u back to where u were and u go right to the next levels
+
+
+-----------------------
+todo:
+redo settings menu
+rm buttons file

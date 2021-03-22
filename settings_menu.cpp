@@ -1,48 +1,48 @@
 #include "settings_menu.hpp"
 #include "snowflakes.hpp"
 #include "util.hpp"
-#include "button.hpp"
 
 void settings_menu::draw(shared_data *app_d, double dt) {
-    const int button_w = 600;
-    const int button_h = 100;
-    const int button_spacing = 50;
-    const int highlight_size = 6;
-    const int num_buttons = 6;
-
-    gef_context *gc = &app_d->gc;
-
-
-    // calculations to center the buttons
-    const int screen_center_x = gc->xres/2;
-    const int screen_center_y = gc->yres/2;
-    const int menu_height = num_buttons * button_h + (num_buttons - 1) * button_spacing;
-
-    const colour background_colour = gef_rgb(150, 150, 150);
-
-    gef_draw_rect(gc, background_colour, 0, 0, gc->xres, gc->yres);
+    gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
 
     if (app_d->draw_snow) {
-        snowflakes_draw(gc, app_d->interp_time, app_d->snow_offset_base);
+        snowflakes_draw(&app_d->gc, app_d->interp_time, app_d->snow_offset_base);
     }
+
+    const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
+    gef_draw_rect(&app_d->gc, app_d->game_style.pane, pane_rect);
     
-    int menu_x = screen_center_x - button_w/2;
-    int menu_y = screen_center_y - menu_height/2;
+    const auto n_buttons = 6;
 
-    SDL_Rect btn_rect = {menu_x, menu_y, button_w, button_h};
+    char snow_buf[64] = {0};
+    sprintf(snow_buf, "snow: %s", app_d->draw_snow ? "on" : "off");
+    char scale_buf[64] = {0};
+    sprintf(scale_buf, "max scale: %d", app_d->max_scale);
+    char res_buf[64] = {0};
+    sprintf(res_buf, "resolution: %dx%d", app_d->gc.xres, app_d->gc.yres);
+    char music_vol_buf[64] = {0};
+    sprintf(music_vol_buf, "music volume: %.0f%%", app_d->a.bgm_volume * 100);
+    char sfx_vol_buf[64] = {0};
+    sprintf(sfx_vol_buf, "sfx volume: %.0f%%", app_d->a.sfx_volume * 100);
 
-    int i = 0;
-    button_bool_draw(gc, &app_d->game_style, btn_rect, "Snow", app_d->draw_snow, selection == i++);
-    btn_rect.y += button_h + button_spacing;
-    button_int_draw(gc, &app_d->game_style, btn_rect, "Max Scale", app_d->max_scale, selection == i++);
-    btn_rect.y += button_h + button_spacing;
-    button_generic_draw(gc, &app_d->game_style, btn_rect, "Resolution", selection == i++);
-    btn_rect.y += button_h + button_spacing;
-    button_percent_draw(gc, &app_d->game_style, btn_rect, "Music Volume", app_d->a.bgm_volume, selection == i++);
-    btn_rect.y += button_h + button_spacing;
-    button_percent_draw(gc, &app_d->game_style, btn_rect, "SFX Volume", app_d->a.sfx_volume, selection == i++);
-    btn_rect.y += button_h + button_spacing;
-    button_generic_draw(gc, &app_d->game_style, btn_rect, "Back", selection == i++);
+    const char* text[n_buttons] = {
+        snow_buf,
+        scale_buf,
+        res_buf,
+        music_vol_buf,
+        sfx_vol_buf,
+        "back",
+    };
+    
+    for (int i = 0; i < n_buttons; i++) {
+        const auto r = rect::centered_layout(pane_rect, 0.8*pane_rect.w, 0.1*pane_rect.h, 1,  n_buttons, 0, i);
+        const auto line_colour = selection == i ?
+            app_d->game_style.highlight:
+            app_d->game_style.btn_line_colour;
+        gef_draw_rect(&app_d->gc, line_colour, r.dilate(app_d->game_style.line));
+        gef_draw_rect(&app_d->gc, app_d->game_style.btn_colour, r);
+        gef_draw_bmp_text_centered(&app_d->gc, app_d->game_style.game_font, app_d->game_style.big, text[i], r.center().x, r.center().y);
+    }
 }
 
 void settings_menu::handle_input(shared_data *app_d, SDL_Event e) {
