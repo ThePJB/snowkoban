@@ -146,5 +146,28 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
             app_d->current_scene = SCENE_GAME;
             audio_play(&app_d->a, CS_MENU_SELECT);
         }
+    } else if (e.type == SDL_MOUSEMOTION) {
+        const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
+        layout l = get_layout(pane_rect, app_d->current_world()->lps.length);
+
+        for (int i = 0; i < l.num_levels; i++) {
+            if (l.level_rects[i].contains(e.motion.x, e.motion.y)) {
+                if (app_d->level_idx != i) {
+                    audio_play(&app_d->a, CS_MENU_MOVE);
+                    app_d->level_idx = i;
+                }
+            }
+        }
+    } else if (e.type == SDL_MOUSEBUTTONUP) {
+        const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
+        layout l = get_layout(pane_rect, app_d->current_world()->lps.length);
+
+        for (int i = 0; i < l.num_levels; i++) {
+            if (l.level_rects[i].contains(e.motion.x, e.motion.y)) {
+                audio_play(&app_d->a, CS_MENU_SELECT);
+                app_d->level_idx = i;
+                app_d->current_scene = SCENE_GAME;
+            }
+        }
     }
 }

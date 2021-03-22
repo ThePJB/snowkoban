@@ -37,6 +37,7 @@
  - wipe is like really sickness inducing at high res lol
    - maybe i could do a blizzard wipe or something that wouldn't be so chunderific
    - or wipe could be slower
+ - kick em to the menu every level maybe?
  - mouse for menus
  - maybe further back music skip would be good
  - audio is a bit quiet on eg sliding ice

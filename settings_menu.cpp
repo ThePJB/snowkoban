@@ -2,6 +2,40 @@
 #include "snowflakes.hpp"
 #include "util.hpp"
 
+const int num_buttons = 6;
+
+const std::function<void(shared_data *, bool, bool)> btn_callbacks[] = {
+    [](shared_data *app_d, bool left, bool right){                
+        app_d->draw_snow = !app_d->draw_snow;
+    },
+    [](shared_data *app_d, bool left, bool right){                
+        if (left) {
+            app_d->max_scale = max(app_d->max_scale - 1, 1);
+        } else if (right) {
+            app_d->max_scale = min(app_d->max_scale + 1, 20);
+        }
+    },
+    [](shared_data *app_d, bool left, bool right){
+        // res idk yet
+    },
+    [](shared_data *app_d, bool left, bool right){
+        if (left) {
+            audio_set_bgm_volume(&app_d->a, max(app_d->a.bgm_volume - 0.04, 0));
+        } else if (right) {
+            audio_set_bgm_volume(&app_d->a, min(app_d->a.bgm_volume + 0.04, 1));
+        }
+    },
+    [](shared_data *app_d, bool left, bool right){
+        //sfx volume
+        if (left) {
+            audio_set_sfx_volume(&app_d->a, max(app_d->a.sfx_volume - 0.04, 0));
+        } else if (right) {
+            audio_set_sfx_volume(&app_d->a, min(app_d->a.sfx_volume + 0.04, 1));
+        }
+    },
+    [](shared_data *app_d, bool left, bool right){app_d->current_scene = SCENE_MAIN_MENU;},
+};
+
 void settings_menu::draw(shared_data *app_d, double dt) {
     gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
 
@@ -59,7 +93,6 @@ void settings_menu::handle_input(shared_data *app_d, SDL_Event e) {
         bool down = sym == SDLK_DOWN || sym == SDLK_s || sym == SDLK_j;
         bool select = sym == SDLK_RETURN || sym == SDLK_SPACE;
 
-        const int num_buttons = 6;
 
         if (up) {
             if (selection > 0) {
@@ -73,34 +106,30 @@ void settings_menu::handle_input(shared_data *app_d, SDL_Event e) {
             }
         } else if (select || left || right) {
             audio_play(&app_d->a, CS_MENU_SELECT);
-            if (selection == 0) {
-                app_d->draw_snow = !app_d->draw_snow;
-            } else if (selection == 1) {
-                //max scale
-                if (left) {
-                    app_d->max_scale = max(app_d->max_scale - 1, 1);
-                } else if (right) {
-                    app_d->max_scale = min(app_d->max_scale + 1, 20);
-                }
-            } else if (selection == 2) {
-                // res idk yet
-            } else if (selection == 3) {
-                // music volume
-                if (left) {
-                    audio_set_bgm_volume(&app_d->a, max(app_d->a.bgm_volume - 0.04, 0));
-                } else if (right) {
-                    audio_set_bgm_volume(&app_d->a, min(app_d->a.bgm_volume + 0.04, 1));
-                }
-            } else if (selection == 4) {
-                //sfx volume
-                if (left) {
-                    audio_set_sfx_volume(&app_d->a, max(app_d->a.sfx_volume - 0.04, 0));
-                } else if (right) {
-                    audio_set_sfx_volume(&app_d->a, min(app_d->a.sfx_volume + 0.04, 1));
-                }
-            } else if (selection == 5) {
-                app_d->current_scene = SCENE_MAIN_MENU;
-            }
+            btn_callbacks[selection](app_d, left, right);
         }   
+    } else if (e.type == SDL_MOUSEMOTION) {
+        for (int i = 0; i < num_buttons; i++) {
+            const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
+            const auto r = rect::centered_layout(pane_rect, 0.8*pane_rect.w, 0.2*pane_rect.h, 1,  num_buttons, 0, i);
+            if (r.contains(e.motion.x, e.motion.y)) {
+                if (selection != i) {
+                    audio_play(&app_d->a, CS_MENU_MOVE);
+                    selection = i;
+                }
+            }
+        }
+    } else if (e.type == SDL_MOUSEBUTTONUP) {
+        for (int i = 0; i < num_buttons; i++) {
+            const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
+            const auto r = rect::centered_layout(pane_rect, 0.8*pane_rect.w, 0.2*pane_rect.h, 1,  num_buttons, 0, i);
+            if (r.contains(e.motion.x, e.motion.y)) {
+                bool left = e.motion.x < r.center().x;
+                bool right = !left;
+                selection = i;
+                btn_callbacks[selection](app_d, left, right);
+                audio_play(&app_d->a, CS_MENU_SELECT);
+            }
+        }
     }
 }
