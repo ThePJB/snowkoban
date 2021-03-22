@@ -17,14 +17,20 @@ CFLAGS += -std=c++20
 SRCS += $(wildcard *.cpp)
 SRCS += $(wildcard danklib/*.cpp)
 
-OBJ = $(SRCS:.cpp=.o)
+ODIR := crap
+
+OBJ := $(patsubst %.cpp, $(ODIR)/%.o, ${SRCS})
+#OBJ = $(SRCS:.cpp=.o)
 
 CC = g++
 
 
 .PHONY: all clean
 
-all: snowkoban
+all: dirs snowkoban
+
+dirs:
+	mkdir -p $(ODIR)/danklib
 
 run: all
 	./snowkoban
@@ -32,7 +38,7 @@ run: all
 snowkoban: $(OBJ)
 	$(CC) -o  snowkoban $^ $(LDFLAGS)
 
-%.o: %.cpp
+$(ODIR)/%.o: %.cpp
 	$(CC) -o $@ -c $< $(CFLAGS) $(INCLUDES)
 
 -include $(OBJ:.o=.d)
