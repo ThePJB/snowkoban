@@ -19,6 +19,14 @@ world make_world3(gef_context *gc) {
         "#    c #\n"
         "#      #\n"
         "########\n",
+        
+        "Overshoot\n" 
+        "##########\n"
+        "#        #\n"
+        "# #T    t#\n"
+        "# #b  c B#\n"
+        "#  p     #\n"
+        "##########\n",
 
         "tight\n"
         "##########\n"
@@ -38,16 +46,6 @@ world make_world3(gef_context *gc) {
         "##   ##\n"
         "#######\n",
 
-            "ice gallery\n"
-        "################\n"
-        "#    #    #    #\n"
-        "#t   #T   #t   #\n"
-        "#b   #b   #B   #\n"
-        "#    #    #    #\n"
-        "#p             #\n"
-        "#    c    c    #\n"
-        "#              #\n"
-        "################\n",
 
         "corner\n"
         "############\n"

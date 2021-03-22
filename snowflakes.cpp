@@ -54,8 +54,8 @@ void snowflakes_draw(gef_context *gc, float t, int xo) {
 
         int starting_x = seed * spacing;
 
-        int x = starting_x + h * vxh + sin_magnitude * sin(h * frequency + sin_phase) - xo;
-        int y = h * (yres - starting_y) + starting_y;
+        int x = lround(starting_x + h * vxh + sin_magnitude * sin(h * frequency + sin_phase) - xo);
+        int y = lround(h * (yres - starting_y) + starting_y);
 
         snowflake_draw(gc, x, y, pixel_size);
     }

@@ -82,39 +82,6 @@
 
  ----------------------
 
- better puzzles = more constrained? aka red herrings bad?
-
- ----------------------
-
- style: specify some things and also have a parent (or be created from a parent). is that how CSS?
-
- ----------------------------
- rn we are trying to load some random ass memory for a level. idk why
-
- -------------------------------
-
- compile times defs took a hit, I wonder if its from using <functional>
- might be worth taking it out or doing incremental
-
- ----------------
- its like theres an uninitialized game or something
-
- -----------------
-
- probably just want to find a nice bitmap font
- have function to get layout size as well as to draw
-
-
-
--------------------------------------------------------------------------
-
-new design,
-levels are grouped into worlds (internally even). Levels can own their preview and progress I suppose
-
-scene has worlds, that is a problem
-
-if scene has worlds, worlds can't have levels
-
 --------------------
 
 ok doing the level prototype thing, i think thats pretty clean.
@@ -129,9 +96,3 @@ maybe different snow characteristics
 wipe
 travel LR
 kick u back to where u were and u go right to the next levels
-
-
------------------------
-todo:
-redo settings menu
-rm buttons file

@@ -166,7 +166,7 @@ void game::update(shared_data *app_d, double dt) {
         // FADE OUT -> FADE IN
 
         set_state(GS_FADE_IN);
-        world *w = &app_d->worlds[app_d->world_idx];
+        world *w = app_d->current_world();
 
         // tally progress
         if (!w->lps.items[app_d->level_idx].complete) {
@@ -181,7 +181,7 @@ void game::update(shared_data *app_d, double dt) {
         if (app_d->level_idx >= w->lps.length - 1) {
             // kick back to the main menu
             app_d->current_scene = SCENE_LEVEL_MENU;
-            if (app_d->world_idx < app_d->num_worlds - 1) {
+            if (app_d->world_idx < app_d->worlds.length - 1) {
                 app_d->level_idx = 0;
                 app_d->world_idx++;
             } else {

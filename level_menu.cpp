@@ -67,8 +67,8 @@ void level_menu::draw(shared_data *app_d, double dt) {
         SDL_RenderCopy(app_d->gc.renderer, app_d->current_world()->lps.items[i].preview, NULL, &r);
 
         const auto vignette_colour = app_d->current_world()->lps.items[i].complete ? 
-            gef_rgba(0, 255, 0, 0):
-            gef_rgba(255, 50, 50, 50);
+            gef_rgba(0, 0, 0, 0):
+            gef_rgba(0, 0, 0, 128);
 
         gef_draw_rect(&app_d->gc, vignette_colour, l.level_rects[i]);
         
@@ -137,7 +137,7 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
             app_d->world_idx--;
             app_d->level_idx = 0;
             audio_play(&app_d->a, CS_MENU_MOVE);
-        } else if (down && app_d->world_idx < app_d->num_worlds - 1) {
+        } else if (down && app_d->world_idx < app_d->worlds.length - 1) {
             app_d->world_idx++;
             app_d->level_idx = 0;
             audio_play(&app_d->a, CS_MENU_MOVE);   

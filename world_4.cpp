@@ -38,6 +38,20 @@ world make_world4(gef_context *gc) {
         "#/ /t/ / #\n"
         "##########\n",
 
+        "encircled\n"
+        "############\n"
+        "#//////////#\n"
+        "#/p/ / / //#\n"
+        "#// / / / /#\n"
+        "#/ / /c/ //#\n"
+        "#// /b/ / /#\n"
+        "#/ /b/ / //#\n"
+        "#// / / / /#\n"
+        "#/ / / / //#\n"
+        "#/T / / /t/#\n"
+        "#//////////#\n"
+        "############\n",
+
         // diff grid
         "lattice rules\n"
         "#############\n"
@@ -109,5 +123,5 @@ world make_world4(gef_context *gc) {
         "#t    //////////####\n"
         "####################\n",
     };
-    return world("the good levels", levels, 8, gc);
+    return world("the good levels", levels, sizeof(levels)/sizeof(levels[0]), gc);
 }

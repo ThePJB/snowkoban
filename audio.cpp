@@ -37,7 +37,7 @@ audio audio_init() {
     Mix_VolumeMusic(64);
 
     audio_set_sfx_volume(&a, 0.7);
-    audio_set_bgm_volume(&a, 0.5);
+    audio_set_bgm_volume(&a, 0.0);
 
     return a;
 }

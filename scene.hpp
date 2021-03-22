@@ -62,25 +62,25 @@ struct shared_data {
     style game_style;
 
     int world_idx = 0;
-    int num_worlds = 5;
     int level_idx = 0;
 
     // world stuff
-    world worlds[5];
+    vla<world> worlds;
 
     shared_data(int xres, int yres, const char *title) {
         gc = gef_init(title, xres, yres);
         gef_load_atlas(&gc, "assets/snowkoban.png");
         game_style = style(&gc);
-        worlds[0] = make_world1(&gc);
-        worlds[1] = make_world2(&gc);
-        worlds[2] = make_world3(&gc);
-        worlds[3] = make_world4(&gc);
-        worlds[4] = make_world5(&gc);
+        worlds.push(make_workshop(&gc));
+        worlds.push(make_world1(&gc));
+        worlds.push(make_world2(&gc));
+        worlds.push(make_world3(&gc));
+        worlds.push(make_world4(&gc));
+        worlds.push(make_world5(&gc));
     }
 
     world *current_world() {
-        return &worlds[world_idx];
+        return &worlds.items[world_idx];
     }
 
     level_prototype *current_level_proto() {
