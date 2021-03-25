@@ -4,24 +4,13 @@ world make_world2(gef_context *gc) {
     const char *levels[] = {
         "ice to meet you\n"
         "#########\n"
-        "######t##\n"
-        "###////##\n"
-        "#p ///B/#\n"
-        "# #////##\n"
-        "# #////##\n"
-        "#      ##\n"
+        "######T##\n"
+        "#TB/////#\n"
+        "#P////B/#\n"
+        "#///////#\n"
+        "#///////#\n"
+        "#//////##\n"
         "#########\n",
-
-        "insert ice pun\n"
-        "########\n"
-        "####t###\n"
-        "#//////#\n"
-        "#pb//#/#\n"
-        "#//////#\n"
-        "#////#/#\n"
-        "#/#////#\n"
-        "#//////#\n"
-        "########\n",
         
         "maze 1\n"
         "##############\n"
@@ -88,8 +77,19 @@ world make_world2(gef_context *gc) {
         "#           #\n"
         "#############\n",
 
+        "ringy ding\n"
+        "########\n"
+        "#T/////#\n"
+        "##/ bb/#\n"
+        "##/   T#\n"
+        "##/ b /#\n"
+        "##/ p /#\n"
+        "##/////#\n"
+        "##T#####\n"
+        "########\n",
+
         // this is kinda nasty, maybe the version where theres one in the corne would be easier
-        "dont mess up\n"
+        "ringy dingy\n"
         "########\n"
         "##T#####\n"
         "#T/////#\n"
@@ -100,18 +100,19 @@ world make_world2(gef_context *gc) {
         "##/////#\n"
         "########\n",
 
-        // maybe its not obvious you cant get back to the winning state of the start
-        "rotational symmetry\n"
-        "#############\n"
-        "#########//##\n"
-        "#########/B##\n"
-        "#/T/////////#\n"
-        "#/B///B///BT#\n"
-        "#///////////#\n"
-        "#///////////#\n"
-        "#T///////// #\n"
-        "#////////PT/#\n"
-        "#############\n",
+        "one way street\n"
+        "#################\n"
+        "#    # /////////#\n"
+        "#      /////////#\n"
+        "#    / /////////#\n"
+        "#tt##/##/#//////#\n"
+        "#####/#////////##\n"
+        "#    /#////////##\n"
+        "#  b /b////////##\n"
+        "# p  /#///////###\n"
+        "#    /#///#/////#\n"
+        "#####/###########\n"
+        "#################\n",
     };
     return world("icetown", levels, 10, gc);
 }

@@ -24,39 +24,6 @@ const char *levels[] = {
     "# bt   #\n"
     "########\n",
 
-    "sticky\n"
-    "########\n"
-    "#     p#\n"
-    "#   bb #\n"
-    "#  #####\n"
-    "#     t#\n"
-    "#     t#\n"
-    "########\n",
-
-
-    "sticky 2\n"
-    "##########\n"
-    "#        #\n" // clever its another trap
-    "# t      #\n"
-    "# #### # #\n"
-    "#      # #\n"
-    "# bp # # #\n"
-    "#    #   #\n"
-    "##########\n",
-
-    "sticky 3\n" // basically if its on the wall respect it
-    "######\n"
-    "#    #\n"
-    "# pbt#\n"
-    "#    #\n"
-    "#    #\n"
-    "#    #\n"
-    "#    #\n"
-    "#   b#\n"
-    "# t  #\n"
-    "######\n",
-
-
 
     // world2
 
@@ -178,67 +145,6 @@ const char *levels[] = {
 
 
 
-
-
-
-
-/*
-                _          
-  ___ _ __ __ _| |_ ___  ___ 
- / __| '__/ _` | __/ _ \/ __|
-| (__| | | (_| | ||  __/\__ \
- \___|_|  \__,_|\__\___||___/
-                             
-*/
-
-
-    "crate to meet you\n"
-    "#########\n"
-    "####t####\n"
-    "#   c   #\n"
-    "#    b  #\n"
-    "#  p    #\n"
-    "#########\n",
-
-    // long chains of crates certainly has design space
-    "blockchain\n"
-    "#############\n"
-    "######t #####\n"
-    "# cccccccc  #\n"
-    "#           #\n"
-    "#    pb     #\n"
-    "#           #\n"
-    "#############\n",
-
-
-
-
-
-    "lol\n"
-    "################\n"
-    "#    #    #    #\n"
-    "#t   #T   #t   #\n"
-    "#b   #b   #B   #\n"
-    "#    #    #    #\n"
-    "#p             #\n"
-    "#              #\n"
-    "#              #\n"
-    "################\n",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // might have been broken too
     "hole punch\n"
     "############\n"
@@ -271,24 +177,23 @@ const char *levels[] = {
     "###       ###\n"
     "#############\n",
 
-    
+            // maybe its not obvious you cant get back to the winning state of the start
+        "rotational symmetry\n"
+        "#############\n"
+        "#########//##\n"
+        "#########/B##\n"
+        "#/T/////////#\n"
+        "#/B///B///BT#\n"
+        "#///////////#\n"
+        "#///////////#\n"
+        "#T///////// #\n"
+        "#////////PT/#\n"
+        "#############\n",
 
 
     // how about the present shifta strikes back
 
-    "one way street\n"
-    "#################\n"
-    "#    # /////////#\n"
-    "#      /////////#\n"
-    "#    / /////////#\n"
-    "#tt##/##/#//////#\n"
-    "#####/#////////##\n"
-    "#    /#////////##\n"
-    "#  b /b////////##\n"
-    "# p  /#///////###\n"
-    "#    /#///#/////#\n"
-    "#####/###########\n"
-    "#################\n",
+
 
 
     "a thing\n"
@@ -320,17 +225,5 @@ const char *levels[] = {
     // take a block through 4 quadrants
 
     // try to make a hard level thats highly constrained, e.g. block and target are on the same wall
-
-
-    "winner\n"
-    "ttttttttttttttt\n"
-    "t     ###     t\n"
-    "t     #P#     t\n"
-    "t     ###     t\n"
-    "t             t\n"
-    "t#   # # ##  #t\n"
-    "t# # # # # # #t\n"
-    "t##### # #  ##t\n"
-    "ttttttttttttttt\n",
 
 };

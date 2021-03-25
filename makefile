@@ -2,8 +2,8 @@
 
 #LDFLAGS = -lSDL2 -lSDL2_image -lrt -lasound -ljack -lpthread -lportaudio -lm
 LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm  -fsanitize=address
-INCLUDES = -I/usr/include/SDL2 -Iinc/ -Idanklib/ -I.
-CFLAGS = -Wall -Werror -Wfatal-errors -g -O3 -MMD -pipe
+INCLUDES = -Iinc/ -Idanklib/ -I.
+CFLAGS = -Wall -Werror -Wfatal-errors -g -O3 -MMD -pipe -D_REENTRANT
 
 # Warning exceptions
 CFLAGS += -Wno-unused-variable
@@ -14,6 +14,9 @@ CFLAGS += -Wno-sign-compare
 
 CFLAGS += -std=c++20
 
+LINUX_CFLAGS = -I/usr/include/SDL2
+
+MINGW_DIR = /usr/x86_64-w64-mingw32/bin
 SRCS += $(wildcard *.cpp)
 SRCS += $(wildcard danklib/*.cpp)
 
@@ -24,10 +27,21 @@ OBJ := $(patsubst %.cpp, $(ODIR)/%.o, ${SRCS})
 
 CC = g++
 
+XCC = /usr/bin/x86_64-w64-mingw32-g++
+XOBJ := $(OBJ:.o=.owin)
+XCFLAGS += -I/usr/x86_64-w64-mingw32/include/SDL2 -Dmain=SDL_main
+XLDFLAGS =  -L/usr/x86_64-w64-mingw32/lib -lmingw32 -lSDL2main -lSDL2 -mwindows -Wl,--no-undefined -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -static-libgcc
+XLDFLAGS += -lSDL2_image.dll -lSDL2_ttf.dll -lSDL2_mixer.dll
 
 .PHONY: all clean
 
 all: dirs snowkoban
+
+$(ODIR)/%.owin: %.cpp
+	$(XCC) -o $@ -c $< $(CFLAGS) $(XCFLAGS) $(INCLUDES)
+
+win: $(XOBJ)
+	$(XCC) -o snowkoban.exe $^ $(XLDFLAGS)
 
 dirs:
 	mkdir -p $(ODIR)/danklib
@@ -39,7 +53,7 @@ snowkoban: $(OBJ)
 	$(CC) -o  snowkoban $^ $(LDFLAGS)
 
 $(ODIR)/%.o: %.cpp
-	$(CC) -o $@ -c $< $(CFLAGS) $(INCLUDES)
+	$(CC) -o $@ -c $< $(CFLAGS) $(LINUX_CFLAGS) $(INCLUDES)
 
 -include $(OBJ:.o=.d)
 

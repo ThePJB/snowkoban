@@ -5,7 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include "rect.hpp"
 
-#define gef_die(G, X) printf("%s %d %s: dying -- %s\n", __FILE__, __LINE__, __func__, X), gef_teardown(G)
+#define gef_die(G, X) printf("%s %d %s: dying -- %s (%s)\n", __FILE__, __LINE__, __func__, X, SDL_GetError()), gef_teardown(G)
 
 typedef struct { 
     SDL_Renderer *renderer;
