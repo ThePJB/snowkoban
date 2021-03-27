@@ -5,10 +5,11 @@
 #include "snowflakes.hpp"
 #include "level.hpp"
 #include "dankstrings.hpp"
+#include "rewind.hpp"
+
 //#define DEBUG_HISTORY
 
 const float step_time = 0.1;
-const float wipe_time = 1.2;
 
 void game::set_state(game_state gs) {
     state_t = 0;
@@ -81,10 +82,10 @@ void game::draw(shared_data *app_d, double dt) {
 
     int64_t t_start = get_us();
 
-    float old_wipe_t = (state_t - dt) / wipe_time;
-    float wipe_t = state_t / wipe_time;
+    float old_wipe_t = (state_t - dt) / app_d->game_style.wipe_time;
+    float wipe_t = state_t / app_d->game_style.wipe_time;
 
-    if (state == GS_FADE_OUT) {    
+    if (state == GS_FADE_OUT) {
         old_wipe_t = cm_slow_start2(old_wipe_t);
         wipe_t = cm_slow_start2(wipe_t);
         xo += wipe_t * gc->xres;
@@ -129,6 +130,12 @@ void game::draw(shared_data *app_d, double dt) {
 
     int64_t t_snow = get_us();
 
+
+    if (state == GS_REWIND) {
+        rewind_effect(gc, app_d->abs_time);
+    }
+
+
     char buf[256];
     sprintf(buf, "%d-%d %s", app_d->world_idx+1, app_d->level_idx+1, app_d->current_level_proto()->title);
 
@@ -165,7 +172,7 @@ void game::update(shared_data *app_d, double dt) {
 
     state_t += dt;
 
-    if (state == GS_FADE_OUT && state_t > wipe_time) {
+    if (state == GS_FADE_OUT && state_t > app_d->game_style.wipe_time) {
         // FADE OUT -> FADE IN
 
         set_state(GS_FADE_IN);
@@ -177,7 +184,10 @@ void game::update(shared_data *app_d, double dt) {
             int n_presents = m_level.entities.acc([](entity e) {return e.et == ET_PRESENT ? 1 : 0;});
             w->num_presents_collected += n_presents;
         }
-        
+
+        // kick back to main menu (every level)
+        app_d->current_scene = SCENE_LEVEL_MENU;
+        /*
         if (app_d->level_idx >= w->lps.length - 1) {
             // kick back to the main menu
             app_d->current_scene = SCENE_LEVEL_MENU;
@@ -192,8 +202,9 @@ void game::update(shared_data *app_d, double dt) {
             app_d->level_idx++;
             on_focus(app_d);    
         }
+        */
 
-    } else if (state == GS_FADE_IN && state_t > wipe_time) {
+    } else if (state == GS_FADE_IN && state_t > app_d->game_style.wipe_time) {
         // FADE IN -> NORMAL
         
         set_state(GS_NORMAL);
@@ -217,10 +228,20 @@ void game::update(shared_data *app_d, double dt) {
             buffered_move_dy = 0;
             
             // gets set to animate in game_move_player...
+            
         } else {
             // ANIMATE -> NORMAL
 
             set_state(GS_NORMAL);
+        }
+    } else if (state == GS_REWIND) {
+        const auto rewind_interval = 0.1;
+        if (state_t > rewind_interval) {
+            if (!undo(app_d)) {
+                set_state(GS_NORMAL);
+            } else {
+                set_state(GS_REWIND);
+            }
         }
     }
 }
@@ -276,8 +297,9 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
             }
 
         } else if (reset) {
-            on_focus(app_d);
+            //on_focus(app_d);
             audio_play(&app_d->a, CS_LOSE);
+            set_state(GS_REWIND);
         } else if (sym == SDLK_u) {
             undo(app_d);
         }
@@ -296,9 +318,9 @@ void game::append_current_state_to_history(float time) {
     });
 }
 
-void game::undo(shared_data *shared_data) {
+bool game::undo(shared_data *shared_data) {
     if (history.length == 0) {
-        return;
+        return false;
     }
 
     history_record r = history.pop_back();
@@ -310,4 +332,5 @@ void game::undo(shared_data *shared_data) {
     Mix_SetMusicPosition(shared_data->time);
 
     audio_play(&shared_data->a, CS_UNDO);
+    return true;
 }

@@ -16,6 +16,7 @@ void application::update(double dt) {
     }
 
     m_shared_data.time += dt;
+    m_shared_data.abs_time += dt;
     m_shared_data.interp_time += dt;
     m_shared_data.interp_time += min(2*dt, 0.1 * (m_shared_data.time - m_shared_data.interp_time));
     

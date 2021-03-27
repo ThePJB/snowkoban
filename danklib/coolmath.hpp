@@ -1,6 +1,7 @@
 #pragma once
-
-#define M_PI 3.14159265358979323846264338327950288
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846264338327950288
+#endif
 
 float cm_floor(float x);
 float cm_abs(float x);

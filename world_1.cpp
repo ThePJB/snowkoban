@@ -58,5 +58,5 @@ world make_world1(gef_context *gc) {
         "# t  #\n"
         "######\n",
     };
-    return world("noice", levels, 6, gc);
+    return world("noice", levels, 6, gc, gef_rgba(100, 255, 100, 100));
 }

@@ -113,8 +113,9 @@ level_prototype::level_prototype(const char* level_str, gef_context *gc) {
 }
 
 
-world::world(const char *name, const char** level_strs, int n_levels, gef_context *gc) {
+world::world(const char *name, const char** level_strs, int n_levels, gef_context *gc, colour pane_colour) {
     this->name = name;
+    this->pane_colour = pane_colour;
     lps = vla<level_prototype>();
 
     for (int i = 0; i < n_levels; i++) {

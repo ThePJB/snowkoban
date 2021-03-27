@@ -62,6 +62,7 @@ world make_world2(gef_context *gc) {
         "#########\n",
 
         // people get really stuck on this, i wonder if its presentation
+        /*
         "I\n"
         "#############\n"
         "#          t#\n"
@@ -75,6 +76,22 @@ world make_world2(gef_context *gc) {
         "##/###/######\n"
         "# b         #\n"
         "#           #\n"
+        "#############\n",
+*/
+        "I\n"
+        "#############\n"
+        "######t######\n"
+        "###### ######\n"
+        "######/######\n"
+        "######/######\n"
+        "#   ##/######\n"
+        "# b //P//  t#\n"
+        "# # ##/######\n"
+        "# / ##/######\n"
+        "##/###/######\n"
+        "#       #####\n"
+        "#     b #####\n"
+        "#       #####\n"
         "#############\n",
 
         "ringy ding\n"
@@ -114,5 +131,5 @@ world make_world2(gef_context *gc) {
         "#####/###########\n"
         "#################\n",
     };
-    return world("icetown", levels, 10, gc);
+    return world("icetown", levels, 10, gc, gef_rgba(100, 100, 255, 100));
 }

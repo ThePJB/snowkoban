@@ -124,5 +124,5 @@ world make_workshop(gef_context *gc) {
         "###########\n"
         "###########\n",
     };
-    return world("da workshop", levels, sizeof(levels)/sizeof(levels[0]), gc);
+    return world("da workshop", levels, sizeof(levels)/sizeof(levels[0]), gc, gef_rgba(255, 255, 255, 100));
 }

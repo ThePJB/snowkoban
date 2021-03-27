@@ -42,5 +42,5 @@ world make_world5(gef_context *gc) {
         "####   #\n"
         "########\n",
     };
-    return world("nightmare zone", levels, sizeof(levels)/sizeof(levels[0]), gc);
+    return world("nightmare zone", levels, sizeof(levels)/sizeof(levels[0]), gc, gef_rgba(0, 0, 0, 100));
 }

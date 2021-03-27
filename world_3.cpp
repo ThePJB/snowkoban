@@ -110,5 +110,5 @@ world make_world3(gef_context *gc) {
         "###############\n",
 
     };   
-    return world("crate o'clock", levels, 9, gc);
+    return world("crate o'clock", levels, 9, gc, gef_rgba(255, 255, 100, 100));
 }

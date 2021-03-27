@@ -24,6 +24,8 @@ struct style {
     colour btn_colour = gef_rgb(80, 150, 220);
     colour btn_line_colour = gef_rgb(0, 255, 255);
 
+    float wipe_time = 1.2;
+
     int line = 6;
 
     bmp_font game_font;
@@ -41,6 +43,9 @@ struct style {
     }
 };
 
+enum level_menu_state {LMS_NORMAL, LMS_FADE_OUT_LEVEL, LMS_FADE_IN_LEVEL, LMS_FADE_OUT_WORLD, LMS_FADE_IN_WORLD};
+enum wipe_dir {WD_LEFT, WD_RIGHT};
+
 struct shared_data {
     // subsystems (also settings in here)
     gef_context gc;
@@ -54,6 +59,7 @@ struct shared_data {
     scene_index current_scene = SCENE_MAIN_MENU;
     
     float time = 0;
+    float abs_time = 0;
     float interp_time = 0;
 
     float snow_xo = 0;
@@ -62,6 +68,9 @@ struct shared_data {
 
     int world_idx = 0;
     int level_idx = 0;
+
+    level_menu_state lms = LMS_FADE_IN_WORLD;
+    wipe_dir wd = WD_RIGHT;
 
     // world stuff
     vla<world> worlds;

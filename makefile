@@ -30,7 +30,7 @@ CC = g++
 XCC = /usr/bin/x86_64-w64-mingw32-g++
 XOBJ := $(OBJ:.o=.owin)
 XCFLAGS += -I/usr/x86_64-w64-mingw32/include/SDL2 -Dmain=SDL_main
-XLDFLAGS =  -L/usr/x86_64-w64-mingw32/lib -lmingw32 -lSDL2main -lSDL2 -mwindows -Wl,--no-undefined -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -static-libgcc
+XLDFLAGS = -L/usr/x86_64-w64-mingw32/lib -lmingw32 -lSDL2main -lSDL2 -mwindows -Wl,--no-undefined -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -static-libgcc
 XLDFLAGS += -lSDL2_image.dll -lSDL2_ttf.dll -lSDL2_mixer.dll
 
 .PHONY: all clean

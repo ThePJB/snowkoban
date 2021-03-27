@@ -25,9 +25,11 @@ struct world {
     int total_presents = 0;
     int num_presents_collected = 0;
 
+    colour pane_colour;
+
     world(){};
 
-    world(const char *name, const char** level_strs, int n_levels, gef_context *gc);
+    world(const char *name, const char** level_strs, int n_levels, gef_context *gc, colour pane_colour);
 };
 
 world make_world1(gef_context *gc);

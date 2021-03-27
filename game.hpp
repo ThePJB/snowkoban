@@ -26,9 +26,9 @@ struct game : scene {
     vla<history_record> history = vla<history_record>();
     void clear_history();
     void append_current_state_to_history(float time);
-    void undo(shared_data *shared_data);
+    bool undo(shared_data *shared_data);
     
-    enum game_state {GS_NORMAL, GS_FADE_OUT, GS_FADE_IN, GS_ANIMATE};
+    enum game_state {GS_NORMAL, GS_FADE_OUT, GS_FADE_IN, GS_ANIMATE, GS_REWIND};
     game_state state = GS_NORMAL;
     void set_state(game_state gs);
 

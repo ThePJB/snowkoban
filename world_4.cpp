@@ -123,5 +123,5 @@ world make_world4(gef_context *gc) {
         "#t    //////////####\n"
         "####################\n",
     };
-    return world("the good levels", levels, sizeof(levels)/sizeof(levels[0]), gc);
+    return world("the good levels", levels, sizeof(levels)/sizeof(levels[0]), gc, gef_rgba(255, 100, 100, 100));
 }

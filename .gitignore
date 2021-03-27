@@ -6,6 +6,7 @@
 *.ko
 *.obj
 *.elf
+*.owin
 
 # Linker output
 *.ilk
@@ -23,7 +24,7 @@
 *.lo
 
 # Shared objects (inc. Windows DLLs)
-*.dll
+# *.dll
 *.so
 *.so.*
 *.dylib

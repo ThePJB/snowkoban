@@ -36,7 +36,75 @@ layout get_layout(rect container, int num_levels) {
     return l;
 }
 
+void level_menu::set_state(shared_data *app_d, level_menu_state s) {
+    const char *state_desc[] = {
+        "normal",
+        "out (level)",
+        "in (level)",        
+        "out (world)",
+        "in (world)",
+    };
+    state_t = 0;
+    app_d->lms = s;
+    printf("set level menu state %s\n", state_desc[s]);
+}
+
+void level_menu::update(shared_data *app_d, double dt) {
+    state_t += dt;
+
+    if ((app_d->lms == LMS_FADE_IN_LEVEL || app_d->lms == LMS_FADE_IN_WORLD) &&
+            state_t > app_d->game_style.wipe_time) {
+        set_state(app_d, LMS_NORMAL);
+    }
+
+    if (app_d->lms == LMS_FADE_OUT_LEVEL && state_t > app_d->game_style.wipe_time) {
+        set_state(app_d, LMS_NORMAL);
+        printf("set scene game\n");
+        app_d->current_scene = SCENE_GAME;
+    }
+    
+    if (app_d->lms == LMS_FADE_OUT_WORLD && state_t > app_d->game_style.wipe_time) {
+        if (app_d->wd == WD_LEFT) {
+            app_d->world_idx--;
+            app_d->level_idx = app_d->current_world()->lps.length - 1;
+        } else {
+            app_d->world_idx++;
+            app_d->level_idx = 0;
+        }
+        set_state(app_d, LMS_FADE_IN_WORLD);
+    }
+    
+    if (app_d->lms == LMS_FADE_IN_WORLD && state_t > app_d->game_style.wipe_time) {
+        set_state(app_d, LMS_NORMAL);
+    }
+}
+
+void level_menu::on_focus(shared_data *app_d) {
+    printf("on focus\n");
+    set_state(app_d, LMS_FADE_IN_LEVEL);
+}
+
 void level_menu::draw(shared_data *app_d, double dt) {
+    const auto wipe_t = state_t / app_d->game_style.wipe_time;
+    const auto old_wipe_t = (state_t - dt) / app_d->game_style.wipe_time;
+
+    const auto dir_coeff = app_d->wd == WD_LEFT ? 1 : -1;
+
+    const auto xo = app_d->lms == LMS_NORMAL ? 0 :
+        ((app_d->lms == LMS_FADE_IN_LEVEL) || (app_d->lms == LMS_FADE_IN_WORLD)) ?
+            dir_coeff * (cm_slow_stop2(wipe_t)-1) * app_d->gc.xres :
+            // LMS_FADE_OUT
+            dir_coeff * (cm_slow_start2(wipe_t)) * app_d->gc.xres;
+    
+    const auto old_xo = app_d->lms == LMS_NORMAL ? 0 :
+        ((app_d->lms == LMS_FADE_IN_LEVEL) || (app_d->lms == LMS_FADE_IN_WORLD)) ?
+            dir_coeff * (cm_slow_stop2(old_wipe_t)-1) * app_d->gc.xres :
+            // LMS_FADE_OUT
+            dir_coeff * (cm_slow_start2(old_wipe_t)) * app_d->gc.xres;
+
+    app_d->snow_xo -= -1 * old_xo;
+    app_d->snow_xo += -1 * xo;
+
     gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
     
     if (app_d->draw_snow) {
@@ -44,13 +112,13 @@ void level_menu::draw(shared_data *app_d, double dt) {
     }
 
     const auto pane_rect = rect::centered(
-        app_d->gc.xres/2, 
+        app_d->gc.xres/2 + xo, 
         app_d->gc.yres/2, 
         app_d->gc.xres * 0.8, 
         app_d->gc.yres * 0.8
     );
 
-    gef_draw_rect(&app_d->gc, app_d->game_style.pane, pane_rect);
+    gef_draw_rect(&app_d->gc, app_d->current_world()->pane_colour, pane_rect);
 
     gef_draw_bmp_text_centered(&app_d->gc, app_d->game_style.game_font, app_d->game_style.big, app_d->current_world()->name, app_d->gc.xres / 2, app_d->gc.yres * 0.05);
 
@@ -61,7 +129,9 @@ void level_menu::draw(shared_data *app_d, double dt) {
     for (int i = 0; i < l.num_levels; i++) {
         const auto line_colour = app_d->level_idx == i ?
             app_d->game_style.highlight:
-            app_d->game_style.btn_line_colour;
+            app_d->current_world()->lps.items[i].complete ?
+                gef_rgb(0, 255, 0):
+                app_d->game_style.btn_line_colour;
         gef_draw_rect(&app_d->gc, line_colour, l.level_rects[i].dilate(app_d->game_style.line));
         SDL_Rect r = l.level_rects[i].sdl_rect();
         SDL_RenderCopy(app_d->gc.renderer, app_d->current_world()->lps.items[i].preview, NULL, &r);
@@ -117,6 +187,10 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
         if (e.type == SDL_KEYDOWN) {
         SDL_Keycode sym = e.key.keysym.sym;
 
+        if (app_d->lms == LMS_FADE_OUT_LEVEL || app_d->lms == LMS_FADE_OUT_WORLD) {
+            return;
+        }
+
         if (sym == SDLK_ESCAPE) {
             app_d->current_scene = SCENE_MAIN_MENU;
         }
@@ -126,24 +200,27 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
         bool right = sym == SDLK_RIGHT || sym == SDLK_d || sym == SDLK_l;
         bool down = sym == SDLK_DOWN || sym == SDLK_s || sym == SDLK_j;
         bool select = sym == SDLK_RETURN || sym == SDLK_SPACE;
-
-        if (left && app_d->level_idx > 0) {
-            app_d->level_idx--;
-            audio_play(&app_d->a, CS_MENU_MOVE);
-        } else if (right && app_d->level_idx < app_d->current_world()->lps.length - 1) {
-            app_d->level_idx++;
-            audio_play(&app_d->a, CS_MENU_MOVE);
-        } else if (up && app_d->world_idx > 0) {
-            app_d->world_idx--;
-            app_d->level_idx = 0;
-            audio_play(&app_d->a, CS_MENU_MOVE);
-        } else if (down && app_d->world_idx < app_d->worlds.length - 1) {
-            app_d->world_idx++;
-            app_d->level_idx = 0;
-            audio_play(&app_d->a, CS_MENU_MOVE);   
+        if (left) {
+            if (app_d->level_idx > 0) {
+                app_d->level_idx--;
+                audio_play(&app_d->a, CS_MENU_MOVE);                
+            } else if (app_d->world_idx > 0) {
+                set_state(app_d, LMS_FADE_OUT_WORLD);
+                app_d->wd = WD_LEFT;
+                printf("wd left\n");
+            }
+        } else if (right) {
+            if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
+                app_d->level_idx++;
+                audio_play(&app_d->a, CS_MENU_MOVE);                
+            } else if (app_d->world_idx < app_d->worlds.length - 1) {
+                set_state(app_d, LMS_FADE_OUT_WORLD);
+                app_d->wd = WD_RIGHT;
+                printf("wd right\n");
+            }
         }
         if (select) {
-            app_d->current_scene = SCENE_GAME;
+            set_state(app_d, LMS_FADE_OUT_LEVEL);
             audio_play(&app_d->a, CS_MENU_SELECT);
         }
     } else if (e.type == SDL_MOUSEMOTION) {

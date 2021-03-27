@@ -30,6 +30,17 @@
  - mobile
  - full screen
  - level select preview
+ - tutorial
+ - seek first incomplete level
+
+ // how to communicate state? maybe just write it to shared data tbh. simplest solution
+
+
+## Menu annoing
+ - sound shrill
+ - sliders
+
+
 
 ## Bugs
  - record undo points from just running at a wall
@@ -42,17 +53,21 @@
  - maybe further back music skip would be good
  - audio is a bit quiet on eg sliding ice
  - snow scramble just the first time u change level, weird (I think fixed)
+ - buffer input only for taps
 
 ## Required juice
- - nice undos
-   - ok this was fun to make but i dont keep enough information about entity positions etc and undo logic is bad enough
- - nicer resets would be good though, pop through the undos quickly
+ - nice reset
  - better sounds
+ - jame music
  - nicer font
+ - big font for titles too
  - steam banner
  - snow particles when u walk
- - tilt player when sliding
+ - tilt player when sliding?
  - at the end presents hoover into ur total
+ - nice transitions
+ - maybe just back to level menu after each level
+ - nicer level done - green border, tick sprite
 
  ## Level menu stuff
  - maybe just one world at a time on screen, like how super meat boy does
@@ -79,13 +94,6 @@
  - welcome to boxes
  - pushing things onto ice
 
- ----------------------
-
---------------------
-
-ok doing the level prototype thing, i think thats pretty clean.
-TODO tomoz is just worlds init, and the plumbing which hopefully isnt bad cause its still structured the same. game will just take level proto from world instead of char* to do an initialize
-
 ----------------------------
 
 LEVEL MENU looking dope. todo:
@@ -95,3 +103,11 @@ maybe different snow characteristics
 wipe
 travel LR
 kick u back to where u were and u go right to the next levels
+
+
+---------------
+
+fucking level menu getting entered every time u go left or right. fix
+
+ok level menu working, a bit slow for going between worlds
+could make it have level textures, would that look good? could have a drawing of a level, backgrounds
