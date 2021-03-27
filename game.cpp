@@ -123,18 +123,15 @@ void game::draw(shared_data *app_d, double dt) {
 
     int64_t t_level = get_us();
     
-
     if (app_d->draw_snow) {
         snowflakes_draw(gc, app_d->interp_time, app_d->snow_xo);
     }
 
     int64_t t_snow = get_us();
 
-
     if (state == GS_REWIND) {
         rewind_effect(gc, app_d->abs_time);
     }
-
 
     char buf[256];
     sprintf(buf, "%d-%d %s", app_d->world_idx+1, app_d->level_idx+1, app_d->current_level_proto()->title);

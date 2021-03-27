@@ -181,6 +181,25 @@ void level_menu::draw(shared_data *app_d, double dt) {
         .h = entity_size,
     };
     gef_draw_sprite(&app_d->gc, present_clip, present_to_rect2);
+
+    // draw next / prev level arrows
+    if (app_d->world_idx > 0) {
+        // left arrow
+        const auto from_rect = (SDL_Rect) {0, 32, 16, 32};
+        const auto to_rect = rect::centered(app_d->gc.xres * 0.1, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
+        gef_draw_sprite_ex(&app_d->gc, from_rect, to_rect.sdl_rect(), 0, SDL_FLIP_HORIZONTAL);
+
+        // need cursor coords in here for highlighting
+        // what if u select a button and it like fills with colour at an angle and flashes down, and like when u rollover, make it splash with some cool easing function
+    }
+    if (app_d->world_idx < app_d->worlds.length - 1) {
+        // right arrow
+        const auto from_rect = (SDL_Rect) {0, 32, 16, 32};
+        const auto to_rect = rect::centered(app_d->gc.xres * 0.9, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
+        gef_draw_sprite_ex(&app_d->gc, from_rect, to_rect.sdl_rect(), 0, SDL_FLIP_NONE);
+
+    }
+
 }
 
 void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
