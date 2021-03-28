@@ -182,21 +182,34 @@ void level_menu::draw(shared_data *app_d, double dt) {
     };
     gef_draw_sprite(&app_d->gc, present_clip, present_to_rect2);
 
+    int mouse_x;
+    int mouse_y;
+    SDL_GetMouseState(&mouse_x, &mouse_y);
+
+
     // draw next / prev level arrows
+    const auto arrow_clip = (SDL_Rect) {0, 32, 16, 32};
+    const auto arrow_highlight_clip = (SDL_Rect) {16, 32, 16, 32};
     if (app_d->world_idx > 0) {
         // left arrow
-        const auto from_rect = (SDL_Rect) {0, 32, 16, 32};
         const auto to_rect = rect::centered(app_d->gc.xres * 0.1, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
-        gef_draw_sprite_ex(&app_d->gc, from_rect, to_rect.sdl_rect(), 0, SDL_FLIP_HORIZONTAL);
+        if (to_rect.contains(mouse_x, mouse_y)) {
+            gef_draw_sprite_ex(&app_d->gc, arrow_highlight_clip, to_rect.sdl_rect(), 0, SDL_FLIP_HORIZONTAL);
+        } else {
+            gef_draw_sprite_ex(&app_d->gc, arrow_clip, to_rect.sdl_rect(), 0, SDL_FLIP_HORIZONTAL);
+        }
 
         // need cursor coords in here for highlighting
         // what if u select a button and it like fills with colour at an angle and flashes down, and like when u rollover, make it splash with some cool easing function
     }
     if (app_d->world_idx < app_d->worlds.length - 1) {
         // right arrow
-        const auto from_rect = (SDL_Rect) {0, 32, 16, 32};
         const auto to_rect = rect::centered(app_d->gc.xres * 0.9, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
-        gef_draw_sprite_ex(&app_d->gc, from_rect, to_rect.sdl_rect(), 0, SDL_FLIP_NONE);
+        if (to_rect.contains(mouse_x, mouse_y)) {
+            gef_draw_sprite_ex(&app_d->gc, arrow_highlight_clip, to_rect.sdl_rect(), 0, SDL_FLIP_NONE);
+        } else {
+            gef_draw_sprite_ex(&app_d->gc, arrow_clip, to_rect.sdl_rect(), 0, SDL_FLIP_NONE);
+        }
 
     }
 
@@ -257,6 +270,19 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
     } else if (e.type == SDL_MOUSEBUTTONUP) {
         const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
         layout l = get_layout(pane_rect, app_d->current_world()->lps.length);
+        const auto entity_size = 64;
+        const auto arrow_left = rect::centered(app_d->gc.xres * 0.1, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
+        if (arrow_left.contains(e.motion.x, e.motion.y) && app_d->world_idx > 0) {
+            set_state(app_d, LMS_FADE_OUT_WORLD);
+            app_d->wd = WD_LEFT;
+            printf("wd left\n");
+        }
+        const auto arrow_right = rect::centered(app_d->gc.xres * 0.9, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
+        if (arrow_right.contains(e.motion.x, e.motion.y) && app_d->world_idx < app_d->worlds.length - 1) {
+            set_state(app_d, LMS_FADE_OUT_WORLD);
+            app_d->wd = WD_RIGHT;
+            printf("wd right\n");
+        }
 
         for (int i = 0; i < l.num_levels; i++) {
             if (l.level_rects[i].contains(e.motion.x, e.motion.y)) {
@@ -266,4 +292,7 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
             }
         }
     }
+
+
+
 }
