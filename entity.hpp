@@ -32,6 +32,7 @@ typedef struct {
     int dy;
     int previous_dx;
     int previous_dy;
+    bool is_sunk = false;
 } entity;
 
 entity_prototype entity_prototype_get(entity_type et);

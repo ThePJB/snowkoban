@@ -40,6 +40,9 @@ all: dirs snowkoban
 $(ODIR)/%.owin: %.cpp
 	$(XCC) -o $@ -c $< $(CFLAGS) $(XCFLAGS) $(INCLUDES)
 
+windist: win
+	zip windist.zip *.dll assets/* snowkoban.exe
+
 win: $(XOBJ)
 	$(XCC) -o snowkoban.exe $^ $(XLDFLAGS)
 

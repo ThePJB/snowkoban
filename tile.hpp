@@ -9,6 +9,7 @@ typedef enum {
     T_ICE,
     T_HOLE,
     T_WALL,
+    T_WATER,
     NUM_TT,
 } tile;
 

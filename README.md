@@ -148,3 +148,5 @@ scene_stack.push(transition(renderfunc))
 or just call em yourself I guess
 
 could also add some new mechanics like the water one
+
+imagining like a custom grid ish level, think identity matrix thoughts have /  \ parts etc

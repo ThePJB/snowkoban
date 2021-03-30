@@ -16,22 +16,41 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
     const int tsize = spritesheet_size * pxsize;
     const float reflection_aspect_ratio = 1;
     const SDL_Rect ice_bg_clip = {32, 0, 16, 16};
+    const SDL_Rect water_bg_clip = {128, 0, 16, 16};
 
     int player_frame = cm_frac(time) > 0.5;
 
-    // first draw ice background
+    // first draw transparent backgrounds
     for (int i = 0; i < l->tiles.w; i++) {
         for (int j = 0; j < l->tiles.h; j++) {
-            if (l->tiles.get(i, j) == T_ICE) {
+            const auto t = l->tiles.get(i,j);
+            if (t == T_ICE) {
                 SDL_Rect to_rect = {xo + tsize * i, yo + tsize * j, tsize, tsize};
                 gef_draw_sprite(gc, ice_bg_clip, to_rect);
+            } else if (t == T_WATER) {
+                SDL_Rect to_rect = {xo + tsize * i, yo + tsize * j, tsize, tsize};
+                gef_draw_sprite(gc, water_bg_clip, to_rect);
             }
+        }
+    }
+    // then draw sunk entities
+    for (int i = 0; i < l->entities.length; i++) {
+        entity *e = &l->entities.items[i];
+        if (e->is_sunk) {
+            SDL_Rect to_rect = {
+                lround(xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t)),
+                lround(yo + tsize * cm_lerp(e->y - e->previous_dy, e->y, t)),
+                tsize, tsize
+            };
+            SDL_Rect from_rect = entity_prototype_get(e->et).clip;
+            gef_draw_sprite_ex(gc, from_rect, to_rect, 0, SDL_FLIP_NONE);
         }
     }
 
     // then draw entity reflections
     for (int i = 0; i < l->entities.length; i++) {
         entity *e = &l->entities.items[i];
+        if (e->is_sunk) continue;
         if (e->et != ET_TARGET && e->et != ET_NONE) {
 
             int reflection_offset = tsize - (2*pxsize*entity_prototype_get(e->et).base_h);
@@ -81,6 +100,7 @@ void level_draw(level *l, gef_context *gc, int xo, int yo, int pxsize, float t, 
     // then draw other entity types
     for (int i = 0; i < l->entities.length; i++) {
         entity *e = &l->entities.items[i];
+        if (e->is_sunk) continue;
         if (e->et != ET_TARGET && e->et != ET_NONE) {
             SDL_Rect to_rect = {
                 lround(xo + tsize * cm_lerp(e->x - e->previous_dx, e->x, t)),
@@ -133,7 +153,7 @@ bool level_check_victory(level *l) {
 int level_get_movable_entity_index_at(level *l, int x, int y) {
     for (int i = 0; i < l->entities.length; i++) {
         entity *e = &l->entities.items[i];
-        if (e->et != ET_TARGET && e->x == x && e->y == y) {
+        if (e->et != ET_TARGET && !e->is_sunk && e->x == x && e->y == y) {
             return i;
         }
     }
@@ -142,6 +162,7 @@ int level_get_movable_entity_index_at(level *l, int x, int y) {
 
 bool level_can_move_entity(level *l, int entity_idx, int dx, int dy) {
     entity *e = &l->entities.items[entity_idx];
+    if (e->is_sunk) return false;
     int dest_x = e->x + dx;
     int dest_y = e->y + dy;
     tile t = l->tiles.get(dest_x, dest_y);
@@ -188,16 +209,32 @@ bool level_move_entity(level *l, int entity_idx, int dx, int dy, audio *a) {
 }
 
 void level_step(level *l) {
-     l->entities.for_each_mut([](entity *e) {
+    for (int i = 0; i < l->entities.length; i++) {
+        entity *e = &l->entities.items[i];
+     
         e->x += e->dx;
         e->y += e->dy;
+
+        if (l->tiles.get(e->x, e->y) == T_WATER) {
+            bool sunk_entity_here_already = false;
+            for (int j = 0; j < l->entities.length; j++) {
+                entity *e2 = &l->entities.items[j];
+                if (e2->x == e->x && e2->y == e->y && e2->is_sunk) {
+                    sunk_entity_here_already = true;
+                }
+            }
+
+            if (!sunk_entity_here_already) {
+                e->is_sunk = true;
+            }
+        }
 
         e->previous_dx = e->dx;
         e->previous_dy = e->dy;
 
         e->dx = 0;
         e->dy = 0;
-    });
+    };
 }
 
 bool level_do_ice(level *l, audio *a) {
