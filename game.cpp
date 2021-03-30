@@ -88,16 +88,16 @@ void game::draw(shared_data *app_d, double dt) {
     if (state == GS_FADE_OUT) {
         old_wipe_t = cm_slow_start2(old_wipe_t);
         wipe_t = cm_slow_start2(wipe_t);
-        xo += wipe_t * gc->xres;
-        app_d->snow_xo -= -1.f * (float)gc->xres * old_wipe_t;
-        app_d->snow_xo += -1.f * (float)gc->xres * wipe_t;
+        xo -= wipe_t * gc->xres;
+        app_d->snow_xo -= (float)gc->xres * old_wipe_t;
+        app_d->snow_xo += (float)gc->xres * wipe_t;
     } else if (state == GS_FADE_IN) {
         old_wipe_t = cm_slow_start2(1 - old_wipe_t);
         wipe_t = cm_slow_start2(1 - wipe_t);
 
-        app_d->snow_xo -= 1.f * (float)gc->xres * old_wipe_t;
-        app_d->snow_xo += 1.f * (float)gc->xres * wipe_t;
-        xo += -1 * wipe_t * gc->xres;
+        app_d->snow_xo -= -1.f * (float)gc->xres * old_wipe_t;
+        app_d->snow_xo += -1.f * (float)gc->xres * wipe_t;
+        xo += wipe_t * gc->xres;
     }
 
     int64_t t_fade = get_us();
@@ -183,24 +183,10 @@ void game::update(shared_data *app_d, double dt) {
         }
 
         // kick back to main menu (every level)
-        app_d->current_scene = SCENE_LEVEL_MENU;
-        /*
-        if (app_d->level_idx >= w->lps.length - 1) {
-            // kick back to the main menu
-            app_d->current_scene = SCENE_LEVEL_MENU;
-            if (app_d->world_idx < app_d->worlds.length - 1) {
-                app_d->level_idx = 0;
-                app_d->world_idx++;
-            } else {
-                // you finished da game
-            }
-        } else {
-            // next level
+        app_d->set_scene(SCENE_LEVEL_MENU);
+        if (app_d->level_idx < w->lps.length - 1) {
             app_d->level_idx++;
-            on_focus(app_d);    
         }
-        */
-
     } else if (state == GS_FADE_IN && state_t > app_d->game_style.wipe_time) {
         // FADE IN -> NORMAL
         
@@ -216,6 +202,7 @@ void game::update(shared_data *app_d, double dt) {
             // ANIMATE -> VICTORY FADE OUT
 
             audio_play(&app_d->a, CS_WIN);
+            
             set_state(GS_FADE_OUT);
         } else if (buffered_move_dx != 0 || buffered_move_dy != 0) {
             // ANIMATE -> MORE ANIMATE
@@ -259,7 +246,7 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
         SDL_Keycode sym = e.key.keysym.sym;
 
         if (sym == SDLK_ESCAPE) {
-            app_d->current_scene = SCENE_LEVEL_MENU;
+            app_d->set_scene(SCENE_LEVEL_MENU);
             return;
         }
 

@@ -10,11 +10,11 @@ application::application(int xres, int yres) : m_shared_data{shared_data(xres, y
 }
 
 void application::update(double dt) {
-    if (previous_scene != m_shared_data.current_scene) {
-        previous_scene = m_shared_data.current_scene;
+    if (m_shared_data.next_scene != SCENE_NONE) {
+        m_shared_data.current_scene = m_shared_data.next_scene;
+        m_shared_data.next_scene = SCENE_NONE;
         scenes[m_shared_data.current_scene]->on_focus(&m_shared_data);
     }
-
     m_shared_data.time += dt;
     m_shared_data.abs_time += dt;
     m_shared_data.interp_time += dt;

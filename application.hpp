@@ -14,8 +14,6 @@
 struct application {
     scene *scenes[NUM_SCENES];
     
-    scene_index previous_scene = (scene_index)-1;
-
     shared_data m_shared_data;
 
     application(int xres, int yres);

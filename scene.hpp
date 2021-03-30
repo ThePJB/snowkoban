@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 typedef enum {
+    SCENE_NONE,
     SCENE_MAIN_MENU,
     SCENE_LEVEL_MENU,
     SCENE_SETTINGS_MENU,
@@ -24,7 +25,7 @@ struct style {
     colour btn_colour = gef_rgb(80, 150, 220);
     colour btn_line_colour = gef_rgb(0, 255, 255);
 
-    float wipe_time = 1.2;
+    float wipe_time = 0.8;
 
     int line = 6;
 
@@ -57,6 +58,7 @@ struct shared_data {
 
     bool keep_going = true;
     scene_index current_scene = SCENE_MAIN_MENU;
+    scene_index next_scene = SCENE_NONE;
     
     float time = 0;
     float abs_time = 0;
@@ -93,6 +95,10 @@ struct shared_data {
 
     level_prototype *current_level_proto() {
         return &current_world()->lps.items[level_idx];
+    }
+
+    void set_scene(scene_index s) {
+        this->next_scene = s;
     }
 };
 

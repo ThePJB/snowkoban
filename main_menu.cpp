@@ -7,8 +7,8 @@
 
 const auto num_buttons = 3;
 const std::function<void(shared_data *)> btn_callbacks[] = {
-    [](shared_data *app_d){app_d->current_scene = SCENE_LEVEL_MENU;},
-    [](shared_data *app_d){app_d->current_scene = SCENE_SETTINGS_MENU;},
+    [](shared_data *app_d){app_d->set_scene(SCENE_LEVEL_MENU);},
+    [](shared_data *app_d){app_d->set_scene(SCENE_SETTINGS_MENU);},
     [](shared_data *app_d){app_d->keep_going = false;},
 };
 

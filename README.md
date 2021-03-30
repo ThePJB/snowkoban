@@ -111,3 +111,40 @@ fucking level menu getting entered every time u go left or right. fix
 
 ok level menu working, a bit slow for going between worlds
 could make it have level textures, would that look good? could have a drawing of a level, backgrounds
+
+---------------------
+
+sound design continues to be hard, and menus hard. well we will persevere. always ingame menus holy shit
+
+double play of present dopamine sound is really annoying to fix lol because we play in movt logic but win sound comes at a different point and doesnt have the information of what presents are in place, so i can add state to keep track of that.....
+be good if the sounds played off each other well and double play was good
+
+
+--------------
+
+loot box presents
+it can look different and be a meme
+
+both ends is dumb
+
+snow rewind annoying
+
+level menu wipe too slow
+level menu kinda pointless
+level menu left/right bug
+
+-------------------
+
+cool transition: render to texture and replace
+plus it need not know about the underlayer
+so it could be like
+```
+scene_mgr.switch_to_level(10);
+
+and scene_mgr calls 
+scene_stack.push(level(10))
+scene_stack.push(transition(renderfunc))
+
+or just call em yourself I guess
+
+could also add some new mechanics like the water one

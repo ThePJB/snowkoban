@@ -175,17 +175,20 @@ bool level_move_entity(level *l, int entity_idx, int dx, int dy, audio *a) {
         return false;
     }
     int dest_entity_idx = level_get_movable_entity_index_at(l, dest_x, dest_y);
-    if (dest_entity_idx == -1 || level_move_entity(l, dest_entity_idx, dx, dy, a)) {
-        // no entity or its able to move
-        // todo play sound as well, sound goes in tile prototype
-        // todo ice
+    // ordering matters for these
+    if (dest_entity_idx != -1 && level_move_entity(l, dest_entity_idx, dx, dy, a)) { // entity thats able to be moved
         return true;
     }
+    if (e->et == ET_PRESENT && 
+            l->entities.any([dest_x, dest_y](entity e) {return e.x == dest_x && e.y == dest_y && e.et == ET_TARGET;})) {
+        audio_play(a, CS_MOVEFINAL);
+    }
+    if (dest_entity_idx == -1) return true; // empty
     return false;
 }
 
 void level_step(level *l) {
-    l->entities.for_each_mut([](entity *e) {
+     l->entities.for_each_mut([](entity *e) {
         e->x += e->dx;
         e->y += e->dy;
 

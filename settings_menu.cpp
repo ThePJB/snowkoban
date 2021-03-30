@@ -33,7 +33,7 @@ const std::function<void(shared_data *, bool, bool)> btn_callbacks[] = {
             audio_set_sfx_volume(&app_d->a, min(app_d->a.sfx_volume + 0.04, 1));
         }
     },
-    [](shared_data *app_d, bool left, bool right){app_d->current_scene = SCENE_MAIN_MENU;},
+    [](shared_data *app_d, bool left, bool right){app_d->set_scene(SCENE_MAIN_MENU);},
 };
 
 void settings_menu::draw(shared_data *app_d, double dt) {
@@ -84,7 +84,7 @@ void settings_menu::handle_input(shared_data *app_d, SDL_Event e) {
         SDL_Keycode sym = e.key.keysym.sym;
 
         if (sym == SDLK_ESCAPE) {
-            app_d->current_scene = SCENE_MAIN_MENU;
+            app_d->set_scene(SCENE_MAIN_MENU);
         }
 
         bool up = sym == SDLK_UP || sym == SDLK_w || sym == SDLK_k;

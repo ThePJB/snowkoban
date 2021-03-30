@@ -1,5 +1,23 @@
 #include "draw_level.hpp"
 
+void fill_background(gef_context *gc, int xres, int yres, int px_per_tile, int xo, int yo) {
+    // Wall filler
+    const auto n_spaces_x = ceil(xres / px_per_tile);
+    const auto n_spaces_y = ceil(yres / px_per_tile);
+
+    const auto filler_xo = (xo % px_per_tile) - px_per_tile;
+    const auto filler_yo = (yo % px_per_tile) - px_per_tile;
+
+    const auto clip_wall = tile_prototype_get(T_WALL).clip;
+
+    for (int i = 0; i < n_spaces_x + 2; i++) {
+        for (int j = 0; j < n_spaces_y + 2; j++) {
+            const SDL_Rect to_rect = {filler_xo + i*px_per_tile, filler_yo + j*px_per_tile, px_per_tile, px_per_tile};
+            gef_draw_sprite(gc, clip_wall, to_rect);
+        }
+    }    
+}
+
 void draw_level(gef_context *gc, grid<tile> terrain, vla<entity> entities, int xres, int yres, int xo, int yo) {
     const auto px_per_tile = min(
         xres / terrain.w,

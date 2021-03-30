@@ -22,13 +22,15 @@ audio audio_init() {
     a.sounds[CS_WIN] = Mix_LoadWAV("assets/win.ogg");
     a.sounds[CS_MOVEFINAL] = Mix_LoadWAV("assets/movefinal.ogg");
     a.sounds[CS_MENU_MOVE] = Mix_LoadWAV("assets/menu-move.wav");
-    a.sounds[CS_MENU_SELECT] = Mix_LoadWAV("assets/menu-select.wav");
+    //a.sounds[CS_MENU_MOVE] = Mix_LoadWAV("assets/tick_002-shorter.ogg");
+    a.sounds[CS_MENU_SELECT] = Mix_LoadWAV("assets/double-pling-select.wav");
 
-    a.relative_volume[CS_WIN] = 0.5;
-    a.relative_volume[CS_MOVEFINAL] = 0.4;
-    a.relative_volume[CS_MENU_MOVE] = 0.4;
-    a.relative_volume[CS_MENU_SELECT] = 0.4;
-    a.relative_volume[CS_LOSE] = 0.4;
+    a.relative_volume[CS_WIN] = 0.3;
+    a.relative_volume[CS_MOVEFINAL] = 0.3;
+    a.relative_volume[CS_MENU_MOVE] = 0.3;
+    a.relative_volume[CS_MENU_SELECT] = 0.3;
+    a.relative_volume[CS_LOSE] = 0.3;
+    a.relative_volume[CS_UNDO] = 0.5;
     a.relative_volume[CS_SNOW_FOOTSTEP] = 0.8;
     
     Mix_AllocateChannels(NUM_CS);

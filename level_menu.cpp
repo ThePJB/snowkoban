@@ -5,6 +5,7 @@
 #include "entity.hpp"
 #include "coolmath.hpp"
 #include "rect.hpp"
+#include "draw_level.hpp"
 
 struct layout {
     rect level_rects[10];
@@ -58,9 +59,8 @@ void level_menu::update(shared_data *app_d, double dt) {
     }
 
     if (app_d->lms == LMS_FADE_OUT_LEVEL && state_t > app_d->game_style.wipe_time) {
-        set_state(app_d, LMS_NORMAL);
-        printf("set scene game\n");
-        app_d->current_scene = SCENE_GAME;
+        //set_state(app_d, LMS_NORMAL); // this makes it draw a frame of the level menu halfway thru the wipe
+        app_d->set_scene(SCENE_GAME);
     }
     
     if (app_d->lms == LMS_FADE_OUT_WORLD && state_t > app_d->game_style.wipe_time) {
@@ -85,6 +85,7 @@ void level_menu::on_focus(shared_data *app_d) {
 }
 
 void level_menu::draw(shared_data *app_d, double dt) {
+    const auto entity_size = 64;
     const auto wipe_t = state_t / app_d->game_style.wipe_time;
     const auto old_wipe_t = (state_t - dt) / app_d->game_style.wipe_time;
 
@@ -105,7 +106,8 @@ void level_menu::draw(shared_data *app_d, double dt) {
     app_d->snow_xo -= -1 * old_xo;
     app_d->snow_xo += -1 * xo;
 
-    gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
+    //gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
+    fill_background(&app_d->gc, app_d->gc.xres, app_d->gc.yres, entity_size, xo, 0);
     
     if (app_d->draw_snow) {
         snowflakes_draw(&app_d->gc, app_d->time, app_d->snow_xo);
@@ -124,7 +126,6 @@ void level_menu::draw(shared_data *app_d, double dt) {
 
     layout l = get_layout(pane_rect, app_d->current_world()->lps.length);
 
-    const auto entity_size = 64;
 
     for (int i = 0; i < l.num_levels; i++) {
         const auto line_colour = app_d->level_idx == i ?
@@ -224,7 +225,7 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
         }
 
         if (sym == SDLK_ESCAPE) {
-            app_d->current_scene = SCENE_MAIN_MENU;
+            app_d->set_scene(SCENE_MAIN_MENU);
         }
 
         bool up = sym == SDLK_UP || sym == SDLK_w || sym == SDLK_k;
@@ -252,6 +253,7 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
             }
         }
         if (select) {
+            app_d->wd = WD_RIGHT;
             set_state(app_d, LMS_FADE_OUT_LEVEL);
             audio_play(&app_d->a, CS_MENU_SELECT);
         }
@@ -288,11 +290,8 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
             if (l.level_rects[i].contains(e.motion.x, e.motion.y)) {
                 audio_play(&app_d->a, CS_MENU_SELECT);
                 app_d->level_idx = i;
-                app_d->current_scene = SCENE_GAME;
+                app_d->set_scene(SCENE_GAME);
             }
         }
     }
-
-
-
 }
