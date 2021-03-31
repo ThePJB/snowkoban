@@ -150,3 +150,6 @@ or just call em yourself I guess
 could also add some new mechanics like the water one
 
 imagining like a custom grid ish level, think identity matrix thoughts have /  \ parts etc
+
+--------
+can u make a very expressive state machine object?

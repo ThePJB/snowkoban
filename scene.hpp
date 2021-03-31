@@ -8,6 +8,7 @@
 
 typedef enum {
     SCENE_NONE,
+    SCENE_INSTRUCTIONS,
     SCENE_MAIN_MENU,
     SCENE_LEVEL_MENU,
     SCENE_SETTINGS_MENU,
@@ -57,7 +58,7 @@ struct shared_data {
     int max_scale = 8;
 
     bool keep_going = true;
-    scene_index current_scene = SCENE_MAIN_MENU;
+    scene_index current_scene = SCENE_INSTRUCTIONS;
     scene_index next_scene = SCENE_NONE;
     
     float time = 0;

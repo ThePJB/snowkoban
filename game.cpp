@@ -219,8 +219,8 @@ void game::update(shared_data *app_d, double dt) {
             set_state(GS_NORMAL);
         }
     } else if (state == GS_REWIND) {
-        const auto rewind_interval = 0.1;
-        if (state_t > rewind_interval) {
+        // do i need a separate timer to make it sped up
+        if (state_t > 1.0 / undos_per_second++) {
             if (!undo(app_d)) {
                 set_state(GS_NORMAL);
             } else {
@@ -284,6 +284,7 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
             //on_focus(app_d);
             audio_play(&app_d->a, CS_LOSE);
             set_state(GS_REWIND);
+            undos_per_second = undos_per_second_initial;
         } else if (sym == SDLK_u) {
             undo(app_d);
         }

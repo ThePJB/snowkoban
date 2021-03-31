@@ -61,4 +61,4 @@ $(ODIR)/%.o: %.cpp
 -include $(OBJ:.o=.d)
 
 clean: all
-	rm -f snowkoban $(ODIR)/*.o $(ODIR)/*.d
+	rm -f snowkoban $(ODIR)/*.o $(ODIR)/*.d $(ODIR)/*.owin

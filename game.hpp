@@ -21,6 +21,9 @@ struct game : scene {
     int buffered_move_dx = 0;
     int buffered_move_dy = 0;
 
+    const int undos_per_second_initial = 10;
+    int undos_per_second = undos_per_second_initial;
+
     game() {};
 
     vla<history_record> history = vla<history_record>();

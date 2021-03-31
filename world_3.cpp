@@ -49,7 +49,7 @@ world make_world3(gef_context *gc) {
         "both ends\n"
         "##########\n"
         "###T   b #\n"
-        "#  /     #\n"
+        "###/     #\n"
         "###/######\n"
         "#  /######\n"
         "# bCc    #\n"
@@ -110,5 +110,5 @@ world make_world3(gef_context *gc) {
         "###############\n",
 
     };   
-    return world("crate o'clock", levels, 9, gc, gef_rgba(255, 255, 100, 100));
+    return world("crate o'clock", levels, sizeof(levels) / sizeof(levels[0]), gc, gef_rgba(255, 255, 100, 100));
 }
