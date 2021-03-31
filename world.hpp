@@ -38,3 +38,4 @@ world make_world3(gef_context *gc);
 world make_world4(gef_context *gc);
 world make_world5(gef_context *gc);
 world make_workshop(gef_context *gc);
+world make_world_mp(gef_context *gc);
