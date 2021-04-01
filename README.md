@@ -153,3 +153,23 @@ imagining like a custom grid ish level, think identity matrix thoughts have /  \
 
 --------
 can u make a very expressive state machine object?
+
+template of enum
+get state, state_t, maybe different_state_t
+
+maybe a callback or maybe an interface with virtual methods...
+
+ - pure state transition function: state, t -> state
+ - on_enter function: new_state, old_state -> ()
+  - basically switch (new_state) and switch(old_state), probably looks like old update function
+
+should make transitions really explicit though
+
+or
+
+ - table of callbacks for each state variable. could return new state
+  - callbacks[STATE_REWIND] = [&game](){return state_t > 1 ? STATE_REWIND : STATE_NONE}
+    kind of nice
+
+--------
+lift world level limits: figure out what layout maximizes individual size (number of rows etc)
