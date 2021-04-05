@@ -12,6 +12,7 @@ void snowflake_draw(gef_context *gc, int x, int y, int s) {
 }
 
 void snowflakes_draw(gef_context *gc, float t, int xo) {
+    printf("snowflakes xo %d\n", xo);
     const int pixel_size = max(gc->xres / 400, 1); // why const auto doesnt draw snow?
     const auto spacing = pixel_size * 3;
     const auto starting_y = -spacing;
@@ -19,10 +20,10 @@ void snowflakes_draw(gef_context *gc, float t, int xo) {
     const auto frequency = 10.f;
     const auto sin_magnitude = 10.f * (float)gc->xres / (float)2000;
     const auto vxh_magnitude = 100.f * (float) gc->xres / (float)2000;
-    const auto potential_xmax = sin_magnitude + vxh_magnitude + abs(xo);
+    const auto potential_xmax = sin_magnitude + vxh_magnitude;
     
-    const auto start_seed = (int)-(potential_xmax/spacing) - 1;
-    const auto end_seed = (int)(potential_xmax + gc->xres)/spacing + 1;
+    const auto start_seed = (int)-(potential_xmax/spacing) - 1 + (xo / spacing);
+    const auto end_seed = (int)(potential_xmax + gc->xres)/spacing + 1 + (xo / spacing);
     
     for (int seed = start_seed; seed < end_seed; seed++) {
         const auto phase = hash_floatn(seed, 0, slowness);
