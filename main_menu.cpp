@@ -59,6 +59,7 @@ void main_menu::handle_input(shared_data *app_d, SDL_Event e) {
 }
 
 void main_menu::draw(shared_data *app_d, double dt) {
+    // this fucntioin draws the main  menu
     gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
 
     if (app_d->draw_snow) {
