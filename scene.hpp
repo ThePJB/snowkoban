@@ -4,6 +4,7 @@
 #include "gef.hpp"
 #include "audio.hpp"
 #include "world.hpp"
+#include "world_definitions.hpp"
 #include <stdbool.h>
 
 typedef enum {
@@ -20,7 +21,7 @@ typedef enum {
 
 // ui style
 struct style {
-    colour background = gef_rgb(160, 160, 160);
+    colour background = gef_rgb(64, 64, 64);
     colour pane = gef_rgba(100, 100, 200, 150);
     colour highlight = gef_rgb(255, 255, 0);
     colour btn_colour = gef_rgb(80, 150, 220);
@@ -82,14 +83,7 @@ struct shared_data {
         gc = gef_init(title, xres, yres);
         gef_load_atlas(&gc, "assets/snowkoban.png");
         game_style = style(&gc);
-        worlds.push(make_world1(&gc));
-        worlds.push(make_world2(&gc));
-        worlds.push(make_world3(&gc));
-        worlds.push(make_world4(&gc));
-        worlds.push(make_world5(&gc));
-        worlds.push(make_workshop(&gc));
-        worlds.push(make_world_mp2(&gc));
-        worlds.push(make_world_mp(&gc));
+        worlds = make_worlds(&gc); // leak first worlds whatever
     }
 
     world *current_world() {

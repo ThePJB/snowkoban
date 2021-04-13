@@ -107,7 +107,12 @@ new level menu
  - if it animated more smoothly
  - prob no kick back every level
  - smooth transitions
+    - maybe just save a texture and do transitions in application or something. e.g. save texture and do a cool wipe. or like the screen shoots off spinning
  - bigger levels?
  - get rid of side pane and just float title above the level
 
 thing is theres heaps of small levels so youve got a lot to organize. You can make a lot nicer ones if you just show off one (or a handful) at a time
+
+good isnt it amazing what you can get done if you actually sit down and focus
+
+res scaling

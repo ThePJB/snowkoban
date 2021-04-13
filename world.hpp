@@ -29,14 +29,5 @@ struct world {
 
     world(){};
 
-    world(const char *name, const char** level_strs, int n_levels, gef_context *gc, colour pane_colour);
+    world(const char *name, const char** level_strs, int n_levels, gef_context *gc);
 };
-
-world make_world1(gef_context *gc);
-world make_world2(gef_context *gc);
-world make_world3(gef_context *gc);
-world make_world4(gef_context *gc);
-world make_world5(gef_context *gc);
-world make_workshop(gef_context *gc);
-world make_world_mp(gef_context *gc);
-world make_world_mp2(gef_context *gc);

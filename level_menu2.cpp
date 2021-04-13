@@ -21,30 +21,30 @@ void level_menu2::draw(shared_data *app_d, double dt) {
     // could just put always in the middle
 
     const auto btn_space_x = 20;
-    const auto btn_space_y = 50;
+    const auto btn_space_y = 70;
     const auto side = 200;
     
-    const auto bg_colour = gef_rgb(64, 64, 64);
-    gef_draw_rect(&app_d->gc, bg_colour, gef_screen_rect(&app_d->gc));
-    const auto title_pane_colour = app_d->game_style.background;
+    gef_draw_rect(&app_d->gc, app_d->game_style.background, gef_screen_rect(&app_d->gc));
     
     const auto num_levels_x = app_d->worlds.max([](world w){return w.lps.length;});
     const auto num_levels_y = app_d->worlds.length;
-    const auto x_offset = app_d->gc.xres * 0.2 + btn_space_x - cm_clamp(0, app_d->level_idx - 3, num_levels_x - 5)*(btn_space_x + side);
-    const auto y_offset = app_d->gc.yres * 0.2 - side/2 - cm_clamp(0, app_d->world_idx - 1, num_levels_y - 2) *(btn_space_y + side);
+    const auto x_offset = app_d->gc.xres * 0.05 + btn_space_x - cm_clamp(0, app_d->level_idx - 3, num_levels_x - 5)*(btn_space_x + side);
+    const auto y_offset = app_d->gc.yres * 0.2 - side/2 - cm_clamp(0, app_d->world_idx - 1, num_levels_y - 3) *(btn_space_y + side);
 
     if (app_d->draw_snow) {
         snowflakes_draw(&app_d->gc, app_d->time, app_d->snow_xo);
     }
 
     for (int i = 0; i < app_d->worlds.length; i++) {
+        gef_draw_bmp_text(&app_d->gc, app_d->game_style.game_font, app_d->game_style.small, app_d->worlds.items[i].name, 5 + app_d->gc.xres * 0.05, y_offset + (btn_space_y+side) * i - 35);
+
         for (int j = 0; j < app_d->worlds.items[i].lps.length; j++) {
             const auto btn_rect = rect(x_offset + (btn_space_x+side) * j, y_offset + (btn_space_y+side) * i, side, side);
             const auto border_rect = btn_rect.dilate(app_d->game_style.line);
             const auto border_colour = app_d->world_idx == i && app_d->level_idx == j ? 
                 app_d->game_style.highlight :
                 app_d->worlds.items[i].lps.items[j].complete ?
-                    gef_rgb(0, 255, 0) :
+                    gef_rgb(0, 200, 0) :
                     app_d->game_style.btn_line_colour;
 
             gef_draw_rect(&app_d->gc, border_colour, border_rect);
@@ -53,21 +53,13 @@ void level_menu2::draw(shared_data *app_d, double dt) {
 
             const auto vignette_colour = app_d->worlds.items[i].lps.items[j].complete ?
                 gef_rgba(0, 0, 0, 0) :
-                gef_rgba(0, 0, 0, 80);
+                gef_rgba(0, 0, 0, 128);
 
             gef_draw_rect(&app_d->gc, vignette_colour, btn_rect);
-
-            //char buf[64];
-            //sprintf(buf, "%02d", j+1);
-            //gef_draw_bmp_text_centered(&app_d->gc, app_d->game_style.game_font, app_d->game_style.small, buf, btn_rect.center().x, btn_rect.center().y);
         }
     }
 
-
-    gef_draw_rect(&app_d->gc, title_pane_colour, 0, 0, app_d->gc.xres * 0.2, app_d->gc.yres);
-    
     for (int i = 0; i < app_d->worlds.length; i++) {
-        gef_draw_bmp_text_centered(&app_d->gc, app_d->game_style.game_font, app_d->game_style.small, app_d->worlds.items[i].name, app_d->gc.xres * 0.1, side/2 + y_offset + (btn_space_y+side) * i);
     }
 
 
