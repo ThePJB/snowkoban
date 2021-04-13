@@ -24,6 +24,10 @@ void application::update(double dt) {
     
     scenes[m_shared_data.current_scene]->update(&m_shared_data, dt);
 
+    if (!Mix_PlayingMusic()) {
+        m_shared_data.a.play_next_music();
+    }
+
     return;
 }
 

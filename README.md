@@ -2,6 +2,9 @@
  - Snowman balls where you push them and they grow (its a different puzzle game)
  - snow -> water tile
  - 2x1 presents
+ - water -> ice?
+ - evil twin (purple and does opposite movt to you)
+   - what if u move into the same square lol
 
 ## Juice List (unimplemented)
  - movt particles
@@ -116,3 +119,7 @@ thing is theres heaps of small levels so youve got a lot to organize. You can ma
 good isnt it amazing what you can get done if you actually sit down and focus
 
 res scaling
+
+the ones with just 4 or 5 levels look pleasing
+
+could maybe indicate difficulty with skulls or something and let em ramp, do it parallel like. if they can understand the difficulty increasing

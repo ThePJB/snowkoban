@@ -60,6 +60,18 @@ vla<world> make_worlds(gef_context *gc) {
         "#   b#\n"
         "# t  #\n"
         "######\n",
+
+R"(three chambers
+###############
+#t  #pb  t#   #
+#       #   b #
+#   #     ##  #
+#   #      #  #
+# b          t#
+###############
+)",
+
+
     };
     world_vla.push(world(
         "noice",

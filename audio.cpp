@@ -3,7 +3,7 @@
 
 audio audio_init() {
     printf("initializing audio...\n");
-    audio a = (audio) {0};
+    audio a = audio();
 
     for (int i = 0; i < NUM_CS; i++) {
         a.relative_volume[i] = 1.0;
@@ -14,7 +14,8 @@ audio audio_init() {
         exit(1);
     }
 
-    a.bgm = Mix_LoadMUS("assets/shades-of-spring.mp3");
+    a.playlist.push(Mix_LoadMUS("assets/Tune_4.ogg"));
+    a.playlist.push(Mix_LoadMUS("assets/Tune_5.ogg"));
     a.sounds[CS_LOSE] = Mix_LoadWAV("assets/lose.ogg");
     a.sounds[CS_SLIP] = Mix_LoadWAV("assets/slide.wav");
     a.sounds[CS_SNOW_FOOTSTEP] = Mix_LoadWAV("assets/snow-footstep-01.wav");
@@ -35,13 +36,18 @@ audio audio_init() {
     
     Mix_AllocateChannels(NUM_CS);
 
-    Mix_PlayMusic(a.bgm, -1);
+    a.play_next_music();
     Mix_VolumeMusic(64);
 
     audio_set_sfx_volume(&a, 0.7);
     audio_set_bgm_volume(&a, 0.4);
 
     return a;
+}
+
+void audio::play_next_music() {
+    curr_music = (curr_music + 1) % playlist.length;
+    Mix_PlayMusic(playlist.items[curr_music], 0);
 }
 
 void audio_play(audio *a, channel_sound s) {

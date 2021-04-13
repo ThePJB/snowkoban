@@ -320,9 +320,6 @@ bool game::undo(shared_data *shared_data) {
     m_level.entities = r.v;
     shared_data->time = r.time;
 
-    Mix_RewindMusic();
-    Mix_SetMusicPosition(shared_data->time);
-
     audio_play(&shared_data->a, CS_UNDO);
     return true;
 }
