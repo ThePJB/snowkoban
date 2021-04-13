@@ -111,12 +111,12 @@ R"(prison break
 #tbw           #
 ####           #
 #              #
-#          #####
-#          #www#
-#        #c  p #
-#  p       #   #
-#    /     #   #
-#          #####
+#              #
+#         wwwww#
+#         cw p #
+#  p       w   #
+#    /     w   #
+#          wwww#
 ################
 )",
 R"(pp world

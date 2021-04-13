@@ -2,12 +2,13 @@
 #include "levels.hpp"
 #include "util.hpp"
 #include "instructions.hpp"
+#include "level_menu2.hpp"
 
 application::application(int xres, int yres) : m_shared_data{shared_data(xres, yres, "Snowkoban!")} {
     scenes[SCENE_INSTRUCTIONS] = new instructions();
     scenes[SCENE_MAIN_MENU] = new main_menu();
     scenes[SCENE_SETTINGS_MENU] = new settings_menu();
-    scenes[SCENE_LEVEL_MENU] = new level_menu();
+    scenes[SCENE_LEVEL_MENU] = new level_menu2();
     scenes[SCENE_GAME] = new game();
 }
 

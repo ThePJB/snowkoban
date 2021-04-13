@@ -108,7 +108,7 @@ level_prototype::level_prototype(const char* level_str, gef_context *gc) {
 
     draw_level(gc, tiles, starting_entities, preview_res, preview_res, 0, 0);
 
-    SDL_RenderPresent(gc->renderer);
+    //SDL_RenderPresent(gc->renderer);
     SDL_SetRenderTarget(gc->renderer, NULL);
 }
 

@@ -193,6 +193,7 @@ void game::update(shared_data *app_d, double dt) {
         set_state(GS_NORMAL);
 
     } else if (state == GS_ANIMATE && state_t > step_time) {
+
         if (level_do_ice(&m_level, &app_d->a)) {
             // ANIMATE -> MORE ANIMATE
 
@@ -250,6 +251,12 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
             return;
         }
 
+        if (sym == SDLK_u) {
+            undo(app_d);
+        }
+
+        const auto do_buffering = (e.key.repeat == 0);
+
         bool up = sym == SDLK_UP || sym == SDLK_w || sym == SDLK_k;
         bool down = sym == SDLK_DOWN || sym == SDLK_s || sym == SDLK_j;
         bool left = sym == SDLK_LEFT || sym == SDLK_a || sym == SDLK_h;
@@ -274,8 +281,10 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
             }
 
             if (state == GS_ANIMATE) {
-                buffered_move_dx = dx;
-                buffered_move_dy = dy;
+                if (do_buffering) {
+                    buffered_move_dx = dx;
+                    buffered_move_dy = dy;
+                }
             } else {
                 game_move_player(this, dx, dy, app_d->time, &app_d->a);
             }
@@ -285,8 +294,6 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
             audio_play(&app_d->a, CS_LOSE);
             set_state(GS_REWIND);
             undos_per_second = undos_per_second_initial;
-        } else if (sym == SDLK_u) {
-            undo(app_d);
         }
     }
 }

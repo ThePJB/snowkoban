@@ -82,14 +82,14 @@ struct shared_data {
         gc = gef_init(title, xres, yres);
         gef_load_atlas(&gc, "assets/snowkoban.png");
         game_style = style(&gc);
-        worlds.push(make_world_mp2(&gc));
-        worlds.push(make_world_mp(&gc));
-        worlds.push(make_workshop(&gc));
         worlds.push(make_world1(&gc));
         worlds.push(make_world2(&gc));
         worlds.push(make_world3(&gc));
         worlds.push(make_world4(&gc));
         worlds.push(make_world5(&gc));
+        worlds.push(make_workshop(&gc));
+        worlds.push(make_world_mp2(&gc));
+        worlds.push(make_world_mp(&gc));
     }
 
     world *current_world() {

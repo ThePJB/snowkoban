@@ -57,6 +57,7 @@ typedef struct {
 colour gef_rgb(int r, int g, int b);
 colour gef_rgba(int r, int g, int b, int a);
 
+rect gef_screen_rect(gef_context *gc);
 
 gef_context gef_init(const char *name, int xres, int yres);
 void gef_load_atlas(gef_context *gc, const char *path);

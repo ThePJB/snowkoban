@@ -1,7 +1,7 @@
 # -j4
 
 #LDFLAGS = -lSDL2 -lSDL2_image -lrt -lasound -ljack -lpthread -lportaudio -lm
-LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm  -fsanitize=address
+LDFLAGS = -fsanitize=address -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm
 INCLUDES = -Iinc/ -Idanklib/ -I.
 CFLAGS = -Wall -Werror -Wfatal-errors -g -O3 -MMD -pipe -D_REENTRANT
 

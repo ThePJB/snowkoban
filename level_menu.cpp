@@ -38,16 +38,8 @@ layout get_layout(rect container, int num_levels) {
 }
 
 void level_menu::set_state(shared_data *app_d, level_menu_state s) {
-    const char *state_desc[] = {
-        "normal",
-        "out (level)",
-        "in (level)",        
-        "out (world)",
-        "in (world)",
-    };
     state_t = 0;
     app_d->lms = s;
-    printf("set level menu state %s\n", state_desc[s]);
 }
 
 void level_menu::update(shared_data *app_d, double dt) {
@@ -59,7 +51,6 @@ void level_menu::update(shared_data *app_d, double dt) {
     }
 
     if (app_d->lms == LMS_FADE_OUT_LEVEL && state_t > app_d->game_style.wipe_time) {
-        //set_state(app_d, LMS_NORMAL); // this makes it draw a frame of the level menu halfway thru the wipe
         app_d->set_scene(SCENE_GAME);
     }
     
@@ -80,7 +71,6 @@ void level_menu::update(shared_data *app_d, double dt) {
 }
 
 void level_menu::on_focus(shared_data *app_d) {
-    printf("on focus\n");
     set_state(app_d, LMS_FADE_IN_LEVEL);
 }
 

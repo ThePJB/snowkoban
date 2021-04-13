@@ -1,5 +1,17 @@
 #include "coolmath.hpp"
 
+int cm_clamp(int lower, int x, int upper) {
+    if (x < lower) return lower;
+    if (x > upper) return upper;
+    return x;
+}
+
+float cm_clamp(float lower, float x, float upper) {
+    if (x < lower) return lower;
+    if (x > upper) return upper;
+    return x;
+}
+
 float cm_floor(float x) {
     if (x > 0) {
         return (int)x;

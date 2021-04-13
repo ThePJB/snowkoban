@@ -82,6 +82,19 @@ struct vla {
         return true;
     }
 
+    int max(std::function<int (T)> f) {
+        int max_idx = 0;
+        int curr_max = f(items[0]);
+        for (int i = 1; i < length; i++) {
+            const auto curr_val = f(items[i]);
+            if (curr_val > curr_max) {
+                max_idx = i;
+                curr_max = curr_val;
+            }
+        }
+        return curr_max;
+    }
+
     int acc(std::function<int(T)> f) {
         int count = 0;
         for (int i = 0; i < length; i++) {

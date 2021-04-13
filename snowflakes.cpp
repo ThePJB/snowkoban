@@ -12,7 +12,6 @@ void snowflake_draw(gef_context *gc, int x, int y, int s) {
 }
 
 void snowflakes_draw(gef_context *gc, float t, int xo) {
-    printf("snowflakes xo %d\n", xo);
     const int pixel_size = max(gc->xres / 400, 1); // why const auto doesnt draw snow?
     const auto spacing = pixel_size * 3;
     const auto starting_y = -spacing;

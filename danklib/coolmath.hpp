@@ -3,6 +3,9 @@
     #define M_PI 3.14159265358979323846264338327950288
 #endif
 
+int cm_clamp(int lower, int x, int upper);
+float cm_clamp(float lower, float x, float upper);
+
 float cm_floor(float x);
 float cm_abs(float x);
 float cm_frac(float x);

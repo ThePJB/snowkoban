@@ -190,6 +190,9 @@ colour gef_rgba(int r, int g, int b, int a) {
     return (colour) {r, g, b, a};
 }
 
+rect gef_screen_rect(gef_context *gc) {
+    return rect(0, 0, gc->xres, gc->yres);
+}
 
 void gef_teardown(gef_context *gc) {
     SDL_DestroyRenderer(gc->renderer);
