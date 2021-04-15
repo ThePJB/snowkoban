@@ -7,14 +7,19 @@
 
 const auto num_buttons = 3;
 const std::function<void(shared_data *)> btn_callbacks[] = {
-    [](shared_data *app_d){app_d->set_scene(SCENE_LEVEL_MENU);},
-    [](shared_data *app_d){app_d->set_scene(SCENE_SETTINGS_MENU);},
+    [](shared_data *app_d){app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_RIGHT, trans_wipe_time);},
+    [](shared_data *app_d){app_d->set_scene(SCENE_SETTINGS_MENU, TRANS_WIPE_RIGHT, trans_wipe_time);},
     [](shared_data *app_d){app_d->keep_going = false;},
 };
 
 void main_menu::handle_input(shared_data *app_d, SDL_Event e) {
     if (e.type == SDL_KEYDOWN) {
         SDL_Keycode sym = e.key.keysym.sym;
+
+        if (sym == SDLK_ESCAPE) {
+            app_d->keep_going = false;
+            return;
+        }
 
         bool up = sym == SDLK_UP || sym == SDLK_w || sym == SDLK_k;
         bool down = sym == SDLK_DOWN || sym == SDLK_s || sym == SDLK_j;
@@ -67,7 +72,6 @@ void main_menu::draw(shared_data *app_d, double dt) {
     }
 
     const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
-    gef_draw_rect(&app_d->gc, app_d->game_style.pane, pane_rect);
 
     for (int i = 0; i < num_buttons; i++) {
         const auto r = rect::centered_layout(pane_rect, 0.8*pane_rect.w, 0.2*pane_rect.h, 1,  num_buttons, 0, i);

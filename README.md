@@ -123,3 +123,33 @@ res scaling
 the ones with just 4 or 5 levels look pleasing
 
 could maybe indicate difficulty with skulls or something and let em ramp, do it parallel like. if they can understand the difficulty increasing
+
+-------------------------------------
+
+Design stuff:
+ - gradients potentially good eg https://uigradients.com/#DarkOcean
+ - HSV good
+ - probably not hard to visualize or make a colour scheme picker etc
+ - some palette techniques
+  - greyscale with one accent colour
+  - 5colours, brightest 95% and darkest 20%
+  - slight blue to greys if u like
+  - analagous schemes - primary, secondary and some dark boys (dark boys same hue as secondary)
+    - primary, secondary not that different. alternet saturation and brightness
+  - complementary - as analagous but opposites like ikea - kinda cringe
+  - triad hard lol
+OK well I jacked a scheme from that post. its not like the closest match up ever but at least it looks nice lol.
+a bit dark and spooky
+
+probably wouldnt kill to match it up with the assets. 
+the bow on the present kind of matches
+blue of ice?
+grey of wall? defs make cooler
+green with his suit
+also the wheat colour of the crate
+
+definitely chilling out the wall looks good
+
+
+-------------
+maybe dont allow key repeats over scene transitions hey

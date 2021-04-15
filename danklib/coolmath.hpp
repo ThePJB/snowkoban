@@ -20,3 +20,5 @@ float cm_slow_start2(float t);
 float cm_slow_stop2(float t);
 float cm_slow_start_stop(float t);
 float cm_slow_start_stop2(float t);
+float cm_slow_start_stop3(float t);
+float cm_slow_start_stop4(float t);

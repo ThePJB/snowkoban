@@ -11,6 +11,6 @@ void instructions::draw(shared_data *app_d, double dt) {
 
 void instructions::handle_input(shared_data *app_d, SDL_Event e) {
     if (e.type == SDL_KEYUP) {
-        app_d->set_scene(SCENE_MAIN_MENU);
+        app_d->set_scene(SCENE_MAIN_MENU, TRANS_NONE, 0);
     }
 }

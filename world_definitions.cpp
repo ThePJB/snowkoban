@@ -571,6 +571,30 @@ R"(nice to sea you
 #wwwwwww#
 #########
 )",
+R"(special delivery
+#########
+#     Tww
+#   b /ww
+#     /ww
+#  p  /ww
+#     /w#
+#     /ww
+# c   /ww
+# c   /ww
+#     /##
+#########
+)",
+R"(hole punch
+##################
+#  w#            #
+#  b#            #
+#  t ////////////#
+#    ////////////#
+#####wwwcwwcwwcww#
+#####            #
+#####p           #
+##################
+)",
 R"(quadrant
 #############
 #tt   w     #
@@ -678,6 +702,32 @@ R"(level name
         "#             #\n"
         "#tb    #    bt#\n"
         "###############\n",
+
+R"(lock
+###########
+# #t# #w# #
+#t#b#w# # #
+#b# # # # #
+#p#p#p#p#p#
+#w# #b#b# #
+# # #t#t#b#
+# # # # #t#
+###########
+)",
+
+R"(doublelock
+#############
+#  #  #  #  #
+#b #  # t# t#
+#t #  # b# b#
+#w #  #  #  #
+#w #  #  #  #
+#p #p #p #pw#
+#  #  #  # ##
+#  # b#ww#  #
+#  # t#ww#  #
+#############
+)",
 
 // no need to keep alive
 // immediately kill still good

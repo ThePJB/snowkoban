@@ -10,8 +10,12 @@ struct level_menu : scene {
     void on_focus(shared_data *app_d);
     void handle_input(shared_data *app_d, SDL_Event e);
 
-    void set_state(shared_data *app_d, level_menu_state s);
+    double target_x_offset = 0;
+    double current_x_offset = 0;
 
-    level_menu_state lms = LMS_NORMAL;
-    float state_t = 0;
+    double target_y_offset = 0;
+    double current_y_offset = 0;
+    
+    int x_viewport_offset(int x, int xmax, int xres);
+    int y_viewport_offset(int y, int ymax, int yres);
 };

@@ -8,6 +8,7 @@
 #include "gef.hpp"
 #include "dankstrings.hpp"
 #include "rect.hpp"
+#include "coolmath.hpp"
 
 
 

@@ -1,221 +1,128 @@
 #include "level_menu.hpp"
-#include "util.hpp"
-#include "snowflakes.hpp"
-#include "dankstrings.hpp"
-#include "entity.hpp"
 #include "coolmath.hpp"
-#include "rect.hpp"
-#include "draw_level.hpp"
+#include "snowflakes.hpp"
 
-struct layout {
-    rect level_rects[10];
-    int num_levels = 0;
+#define util_min(A,B) (A < B ? A : B)
+#define util_max(A,B) (A > B ? A : B)
 
-    layout(){};
-};
-
-layout get_layout(rect container, int num_levels) {
-    auto l = layout();
-    l.num_levels = num_levels;
-    
-    const auto n_bot = num_levels / 2;
-    const auto n_top = num_levels - n_bot;
-
-    const auto level_s = min(
-        0.8 * container.w / n_top,
-        0.8 * container.h / 2
-    );
-
-    for (int i = 0; i < n_top; i++) {
-        l.level_rects[i] = rect::centered_layout(container, level_s, level_s, n_top, 2, i, 0);
-    }
-
-    for (int i = 0; i < n_bot; i++) {
-        l.level_rects[n_top + i] = rect::centered_layout(container, level_s, level_s, n_bot, 2, i, 1);
-    }
-
-    return l;
-}
-
-void level_menu::set_state(shared_data *app_d, level_menu_state s) {
-    state_t = 0;
-    app_d->lms = s;
-}
 
 void level_menu::update(shared_data *app_d, double dt) {
-    state_t += dt;
+    const auto snappiness = 8;
+    current_x_offset += (target_x_offset - current_x_offset) * dt * snappiness;
+    current_y_offset += (target_y_offset - current_y_offset) * dt * snappiness;
+}
 
-    if ((app_d->lms == LMS_FADE_IN_LEVEL || app_d->lms == LMS_FADE_IN_WORLD) &&
-            state_t > app_d->game_style.wipe_time) {
-        set_state(app_d, LMS_NORMAL);
-    }
+int level_menu::x_viewport_offset(int x, int xmax, int xres) {
+    const auto btn_space_x = 20;
+    const auto side = 200;
 
-    if (app_d->lms == LMS_FADE_OUT_LEVEL && state_t > app_d->game_style.wipe_time) {
-        app_d->set_scene(SCENE_GAME);
-    }
-    
-    if (app_d->lms == LMS_FADE_OUT_WORLD && state_t > app_d->game_style.wipe_time) {
-        if (app_d->wd == WD_LEFT) {
-            app_d->world_idx--;
-            app_d->level_idx = app_d->current_world()->lps.length - 1;
-        } else {
-            app_d->world_idx++;
-            app_d->level_idx = 0;
-        }
-        set_state(app_d, LMS_FADE_IN_WORLD);
-    }
-    
-    if (app_d->lms == LMS_FADE_IN_WORLD && state_t > app_d->game_style.wipe_time) {
-        set_state(app_d, LMS_NORMAL);
-    }
+    return xres * 0.05 + btn_space_x - cm_clamp(0, x - 3, xmax - 5)*(btn_space_x + side);
+}
+
+int level_menu::y_viewport_offset(int y, int ymax, int yres) {
+    const auto btn_space_y = 70;
+    const auto side = 200;
+
+    return yres * 0.2 - side/2 - cm_clamp(0, y - 1, ymax - 3) *(btn_space_y + side);
 }
 
 void level_menu::on_focus(shared_data *app_d) {
-    set_state(app_d, LMS_FADE_IN_LEVEL);
+
+    const auto num_levels_x = app_d->worlds.max([](world w){return w.lps.length;});
+    const auto num_levels_y = app_d->worlds.length;
+
+    const auto xo = x_viewport_offset(app_d->level_idx, num_levels_x, app_d->gc.xres);
+    const auto yo = y_viewport_offset(app_d->world_idx, num_levels_y, app_d->gc.yres);
+
+    target_x_offset = xo;
+    current_x_offset = xo;
+    target_y_offset = yo;
+    current_y_offset = yo;
 }
 
 void level_menu::draw(shared_data *app_d, double dt) {
-    const auto entity_size = 64;
-    const auto wipe_t = state_t / app_d->game_style.wipe_time;
-    const auto old_wipe_t = (state_t - dt) / app_d->game_style.wipe_time;
-
-    const auto dir_coeff = app_d->wd == WD_LEFT ? 1 : -1;
-
-    const auto xo = app_d->lms == LMS_NORMAL ? 0 :
-        ((app_d->lms == LMS_FADE_IN_LEVEL) || (app_d->lms == LMS_FADE_IN_WORLD)) ?
-            dir_coeff * (cm_slow_stop2(wipe_t)-1) * app_d->gc.xres :
-            // LMS_FADE_OUT
-            dir_coeff * (cm_slow_start2(wipe_t)) * app_d->gc.xres;
+    const auto btn_space_x = 20;
+    const auto btn_space_y = 70;
+    const auto side = 200;
     
-    const auto old_xo = app_d->lms == LMS_NORMAL ? 0 :
-        ((app_d->lms == LMS_FADE_IN_LEVEL) || (app_d->lms == LMS_FADE_IN_WORLD)) ?
-            dir_coeff * (cm_slow_stop2(old_wipe_t)-1) * app_d->gc.xres :
-            // LMS_FADE_OUT
-            dir_coeff * (cm_slow_start2(old_wipe_t)) * app_d->gc.xres;
-
-    app_d->snow_xo -= -1 * old_xo;
-    app_d->snow_xo += -1 * xo;
-
-    //gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
-    fill_background(&app_d->gc, app_d->gc.xres, app_d->gc.yres, entity_size, xo, 0);
+    gef_draw_rect(&app_d->gc, app_d->game_style.background, gef_screen_rect(&app_d->gc));
     
+    const auto num_levels_x = app_d->worlds.max([](world w){return w.lps.length;});
+    const auto num_levels_y = app_d->worlds.length;
+    
+    target_x_offset = x_viewport_offset(app_d->level_idx, num_levels_x, app_d->gc.xres);
+    target_y_offset = y_viewport_offset(app_d->world_idx, num_levels_y, app_d->gc.yres);
+
     if (app_d->draw_snow) {
-        snowflakes_draw(&app_d->gc, app_d->time, app_d->snow_xo);
+        snowflakes_draw(&app_d->gc, app_d->time, app_d->snow_xo - current_x_offset);
     }
 
-    const auto pane_rect = rect::centered(
-        app_d->gc.xres/2 + xo, 
-        app_d->gc.yres/2, 
-        app_d->gc.xres * 0.8, 
-        app_d->gc.yres * 0.8
-    );
+    for (int i = 0; i < app_d->worlds.length; i++) {
+        gef_draw_bmp_text(&app_d->gc, app_d->game_style.game_font, app_d->game_style.small, app_d->worlds.items[i].name, 5 + app_d->gc.xres * 0.05, current_y_offset + (btn_space_y+side) * i - 35);
 
-    gef_draw_rect(&app_d->gc, app_d->current_world()->pane_colour, pane_rect);
+        for (int j = 0; j < app_d->worlds.items[i].lps.length; j++) {
+            const auto btn_rect = rect(current_x_offset + (btn_space_x+side) * j, current_y_offset + (btn_space_y+side) * i, side, side);
+            const auto border_rect = btn_rect.dilate(app_d->game_style.line);
+            const auto border_colour = app_d->world_idx == i && app_d->level_idx == j ? 
+                app_d->game_style.highlight :
+                app_d->worlds.items[i].lps.items[j].complete ?
+                    app_d->game_style.secondary :
+                    app_d->game_style.btn_line_colour;
 
-    gef_draw_bmp_text_centered(&app_d->gc, app_d->game_style.game_font, app_d->game_style.big, app_d->current_world()->name, app_d->gc.xres / 2, app_d->gc.yres * 0.05);
+            gef_draw_rect(&app_d->gc, border_colour, border_rect);
+            const auto r = btn_rect.sdl_rect();
+            SDL_RenderCopy(app_d->gc.renderer, app_d->worlds.items[i].lps.items[j].preview, NULL, &r);
 
-    layout l = get_layout(pane_rect, app_d->current_world()->lps.length);
+            const auto vignette_colour = app_d->worlds.items[i].lps.items[j].complete ?
+                gef_rgba(0, 0, 0, 0) :
+                gef_rgba(0, 0, 0, 128);
 
-
-    for (int i = 0; i < l.num_levels; i++) {
-        const auto line_colour = app_d->level_idx == i ?
-            app_d->game_style.highlight:
-            app_d->current_world()->lps.items[i].complete ?
-                gef_rgb(0, 255, 0):
-                app_d->game_style.btn_line_colour;
-        gef_draw_rect(&app_d->gc, line_colour, l.level_rects[i].dilate(app_d->game_style.line));
-        SDL_Rect r = l.level_rects[i].sdl_rect();
-        SDL_RenderCopy(app_d->gc.renderer, app_d->current_world()->lps.items[i].preview, NULL, &r);
-
-        const auto vignette_colour = app_d->current_world()->lps.items[i].complete ? 
-            gef_rgba(0, 0, 0, 0):
-            gef_rgba(0, 0, 0, 128);
-
-        gef_draw_rect(&app_d->gc, vignette_colour, l.level_rects[i]);
-        
-        if (i == app_d->level_idx) {
-            auto player_clip = entity_prototype_get(ET_PLAYER).clip;
-            // bop animation
-            if (cm_frac(app_d->time) > 0.5) {
-                player_clip.y += 16;
-            }
-
-            auto to_rect = (SDL_Rect) {
-                l.level_rects[i].x - entity_size/2,
-                l.level_rects[i].y + l.level_rects[i].h/2 - entity_size/2,
-                entity_size,
-                entity_size,
-            };
-
-            gef_draw_sprite_ex(&app_d->gc, player_clip, to_rect, 0, SDL_FLIP_HORIZONTAL);
+            gef_draw_rect(&app_d->gc, vignette_colour, btn_rect);
         }
     }
+}
 
-    // Draw present counter
-    char buf[64] = {0};
-    sprintf(buf, "%d/%d", app_d->current_world()->num_presents_collected, app_d->current_world()->total_presents);
-    const auto present_text_dimensions = gef_bmp_font_size(app_d->game_style.game_font, app_d->game_style.big, strings_length(buf));
-    gef_draw_bmp_text_centered(&app_d->gc, app_d->game_style.game_font, app_d->game_style.big, buf, app_d->gc.xres * 0.5, app_d->gc.yres * 0.95);
-
-    const auto present_clip = entity_prototype_get(ET_PRESENT).clip;
-    const auto present_to_rect = (SDL_Rect) {
-        .x = app_d->gc.xres * 0.5 - entity_size - present_text_dimensions.x/2, 
-        .y = app_d->gc.yres * 0.95 - entity_size/2,
-        .w = entity_size,
-        .h = entity_size,
-    };
-    gef_draw_sprite(&app_d->gc, present_clip, present_to_rect);
-    const auto present_to_rect2 = (SDL_Rect) {
-        .x = app_d->gc.xres * 0.5 + present_text_dimensions.x/2, 
-        .y = app_d->gc.yres * 0.95 - entity_size/2,
-        .w = entity_size,
-        .h = entity_size,
-    };
-    gef_draw_sprite(&app_d->gc, present_clip, present_to_rect2);
-
-    int mouse_x;
-    int mouse_y;
-    SDL_GetMouseState(&mouse_x, &mouse_y);
-
-
-    // draw next / prev level arrows
-    const auto arrow_clip = (SDL_Rect) {0, 32, 16, 32};
-    const auto arrow_highlight_clip = (SDL_Rect) {16, 32, 16, 32};
+bool previous_world(shared_data *app_d) {
     if (app_d->world_idx > 0) {
-        // left arrow
-        const auto to_rect = rect::centered(app_d->gc.xres * 0.1, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
-        if (to_rect.contains(mouse_x, mouse_y)) {
-            gef_draw_sprite_ex(&app_d->gc, arrow_highlight_clip, to_rect.sdl_rect(), 0, SDL_FLIP_HORIZONTAL);
-        } else {
-            gef_draw_sprite_ex(&app_d->gc, arrow_clip, to_rect.sdl_rect(), 0, SDL_FLIP_HORIZONTAL);
-        }
-
-        // need cursor coords in here for highlighting
-        // what if u select a button and it like fills with colour at an angle and flashes down, and like when u rollover, make it splash with some cool easing function
+        app_d->world_idx--;
+        app_d->level_idx = util_min(app_d->level_idx, app_d->current_world()->lps.length - 1);
+        return true;
     }
+    return false;
+}
+
+bool next_world(shared_data *app_d) {
     if (app_d->world_idx < app_d->worlds.length - 1) {
-        // right arrow
-        const auto to_rect = rect::centered(app_d->gc.xres * 0.9, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
-        if (to_rect.contains(mouse_x, mouse_y)) {
-            gef_draw_sprite_ex(&app_d->gc, arrow_highlight_clip, to_rect.sdl_rect(), 0, SDL_FLIP_NONE);
-        } else {
-            gef_draw_sprite_ex(&app_d->gc, arrow_clip, to_rect.sdl_rect(), 0, SDL_FLIP_NONE);
-        }
-
+        app_d->world_idx++;
+        app_d->level_idx = util_min(app_d->level_idx, app_d->current_world()->lps.length - 1);
+        return true;
     }
+    return false;
+}
 
+bool previous_level(shared_data *app_d) {
+    if (app_d->level_idx > 0) {
+        app_d->level_idx--;
+        return true;
+    }
+    return false;
+}
+
+bool next_level(shared_data *app_d) {
+    if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
+        app_d->level_idx++;
+        return true;
+    }
+    return false;
 }
 
 void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
-        if (e.type == SDL_KEYDOWN) {
+    // move selected world and level and maybe scroll
+    if (e.type == SDL_KEYDOWN) {
         SDL_Keycode sym = e.key.keysym.sym;
 
-        if (app_d->lms == LMS_FADE_OUT_LEVEL || app_d->lms == LMS_FADE_OUT_WORLD) {
-            return;
-        }
-
         if (sym == SDLK_ESCAPE) {
-            app_d->set_scene(SCENE_MAIN_MENU);
+            app_d->set_scene(SCENE_MAIN_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
         }
 
         bool up = sym == SDLK_UP || sym == SDLK_w || sym == SDLK_k;
@@ -223,65 +130,27 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
         bool right = sym == SDLK_RIGHT || sym == SDLK_d || sym == SDLK_l;
         bool down = sym == SDLK_DOWN || sym == SDLK_s || sym == SDLK_j;
         bool select = sym == SDLK_RETURN || sym == SDLK_SPACE;
+
         if (left) {
-            if (app_d->level_idx > 0) {
-                app_d->level_idx--;
-                audio_play(&app_d->a, CS_MENU_MOVE);                
-            } else if (app_d->world_idx > 0) {
-                set_state(app_d, LMS_FADE_OUT_WORLD);
-                app_d->wd = WD_LEFT;
-                printf("wd left\n");
+            if (previous_level(app_d)) {
+                audio_play(&app_d->a, CS_MENU_MOVE);
             }
         } else if (right) {
-            if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
-                app_d->level_idx++;
-                audio_play(&app_d->a, CS_MENU_MOVE);                
-            } else if (app_d->world_idx < app_d->worlds.length - 1) {
-                set_state(app_d, LMS_FADE_OUT_WORLD);
-                app_d->wd = WD_RIGHT;
-                printf("wd right\n");
+            if (next_level(app_d)) {
+                audio_play(&app_d->a, CS_MENU_MOVE);
+            }
+        } else if (up) {
+            if (previous_world(app_d)) {
+                audio_play(&app_d->a, CS_MENU_MOVE);
+            }
+        } else if (down) {
+            if (next_world(app_d)) {
+                audio_play(&app_d->a, CS_MENU_MOVE);
             }
         }
         if (select) {
-            app_d->wd = WD_RIGHT;
-            set_state(app_d, LMS_FADE_OUT_LEVEL);
             audio_play(&app_d->a, CS_MENU_SELECT);
-        }
-    } else if (e.type == SDL_MOUSEMOTION) {
-        const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
-        layout l = get_layout(pane_rect, app_d->current_world()->lps.length);
-
-        for (int i = 0; i < l.num_levels; i++) {
-            if (l.level_rects[i].contains(e.motion.x, e.motion.y)) {
-                if (app_d->level_idx != i) {
-                    audio_play(&app_d->a, CS_MENU_MOVE);
-                    app_d->level_idx = i;
-                }
-            }
-        }
-    } else if (e.type == SDL_MOUSEBUTTONUP) {
-        const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
-        layout l = get_layout(pane_rect, app_d->current_world()->lps.length);
-        const auto entity_size = 64;
-        const auto arrow_left = rect::centered(app_d->gc.xres * 0.1, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
-        if (arrow_left.contains(e.motion.x, e.motion.y) && app_d->world_idx > 0) {
-            set_state(app_d, LMS_FADE_OUT_WORLD);
-            app_d->wd = WD_LEFT;
-            printf("wd left\n");
-        }
-        const auto arrow_right = rect::centered(app_d->gc.xres * 0.9, app_d->gc.yres * 0.5, entity_size, 2*entity_size);
-        if (arrow_right.contains(e.motion.x, e.motion.y) && app_d->world_idx < app_d->worlds.length - 1) {
-            set_state(app_d, LMS_FADE_OUT_WORLD);
-            app_d->wd = WD_RIGHT;
-            printf("wd right\n");
-        }
-
-        for (int i = 0; i < l.num_levels; i++) {
-            if (l.level_rects[i].contains(e.motion.x, e.motion.y)) {
-                audio_play(&app_d->a, CS_MENU_SELECT);
-                app_d->level_idx = i;
-                app_d->set_scene(SCENE_GAME);
-            }
+            app_d->set_scene(SCENE_GAME, TRANS_WIPE_RIGHT, trans_wipe_time);
         }
     }
 }

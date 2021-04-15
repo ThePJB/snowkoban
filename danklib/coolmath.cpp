@@ -69,3 +69,11 @@ float cm_slow_start_stop(float t) {
 float cm_slow_start_stop2(float t) {
     return cm_slow_start_stop(cm_slow_start_stop(t));
 }
+
+float cm_slow_start_stop3(float t) {
+    return cm_slow_start_stop(cm_slow_start_stop(cm_slow_start_stop(t)));
+}
+
+float cm_slow_start_stop4(float t) {
+    return cm_slow_start_stop(cm_slow_start_stop(cm_slow_start_stop(cm_slow_start_stop(t))));
+}

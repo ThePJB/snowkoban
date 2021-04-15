@@ -21,12 +21,6 @@ struct game : scene {
     int buffered_move_dx = 0;
     int buffered_move_dy = 0;
 
-    // player controller maybe SM
-    // key is pressed - ok thats our dir
-    // another key is pressed - ok thats the new dir
-    // old key released - ignore
-    // current key released - ok buffering enabled now. maybe if old still held it can buffer again. rather dont buffer but if run out do
-
     const int undos_per_second_initial = 10;
     int undos_per_second = undos_per_second_initial;
 
@@ -37,7 +31,7 @@ struct game : scene {
     void append_current_state_to_history(float time);
     bool undo(shared_data *shared_data);
     
-    enum game_state {GS_NORMAL, GS_FADE_OUT, GS_FADE_IN, GS_ANIMATE, GS_REWIND};
+    enum game_state {GS_NORMAL, GS_ANIMATE, GS_REWIND};
     game_state state = GS_NORMAL;
     void set_state(game_state gs);
 

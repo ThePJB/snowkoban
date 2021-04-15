@@ -82,24 +82,6 @@ void game::draw(shared_data *app_d, double dt) {
 
     int64_t t_start = get_us();
 
-    float old_wipe_t = (state_t - dt) / app_d->game_style.wipe_time;
-    float wipe_t = state_t / app_d->game_style.wipe_time;
-
-    if (state == GS_FADE_OUT) {
-        old_wipe_t = cm_slow_start2(old_wipe_t);
-        wipe_t = cm_slow_start2(wipe_t);
-        xo -= wipe_t * gc->xres;
-        app_d->snow_xo -= (float)gc->xres * old_wipe_t;
-        app_d->snow_xo += (float)gc->xres * wipe_t;
-    } else if (state == GS_FADE_IN) {
-        old_wipe_t = cm_slow_start2(1 - old_wipe_t);
-        wipe_t = cm_slow_start2(1 - wipe_t);
-
-        app_d->snow_xo -= -1.f * (float)gc->xres * old_wipe_t;
-        app_d->snow_xo += -1.f * (float)gc->xres * wipe_t;
-        xo += wipe_t * gc->xres;
-    }
-
     int64_t t_fade = get_us();
 
     SDL_Rect clip_wall = {0, 0, 16, 16};
@@ -169,30 +151,7 @@ void game::update(shared_data *app_d, double dt) {
 
     state_t += dt;
 
-    if (state == GS_FADE_OUT && state_t > app_d->game_style.wipe_time) {
-        // FADE OUT -> FADE IN
-
-        set_state(GS_FADE_IN);
-        world *w = app_d->current_world();
-
-        // tally progress
-        if (!w->lps.items[app_d->level_idx].complete) {
-            w->lps.items[app_d->level_idx].complete = true;
-            int n_presents = m_level.entities.acc([](entity e) {return e.et == ET_PRESENT ? 1 : 0;});
-            w->num_presents_collected += n_presents;
-        }
-
-        // kick back to main menu (every level)
-        app_d->set_scene(SCENE_LEVEL_MENU);
-        if (app_d->level_idx < w->lps.length - 1) {
-            app_d->level_idx++;
-        }
-    } else if (state == GS_FADE_IN && state_t > app_d->game_style.wipe_time) {
-        // FADE IN -> NORMAL
-        
-        set_state(GS_NORMAL);
-
-    } else if (state == GS_ANIMATE && state_t > step_time) {
+    if (state == GS_ANIMATE && state_t > step_time) {
 
         if (level_do_ice(&m_level, &app_d->a)) {
             // ANIMATE -> MORE ANIMATE
@@ -200,11 +159,17 @@ void game::update(shared_data *app_d, double dt) {
             set_state(GS_ANIMATE);
             level_step(&m_level);
         } else if(level_check_victory(&m_level)) {
-            // ANIMATE -> VICTORY FADE OUT
+            // ANIMATE -> VICTORY
 
             audio_play(&app_d->a, CS_WIN);
-            
-            set_state(GS_FADE_OUT);
+
+            // kick back to main menu (every level) // todo make it go to next level
+            // why level menu doesnt insta update? oh its the scrolly thing
+            if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
+                app_d->level_idx++;
+            }
+            app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
+            set_state(GS_NORMAL); // maybe make a GS victory with fireworks etc
         } else if (buffered_move_dx != 0 || buffered_move_dy != 0) {
             // ANIMATE -> MORE ANIMATE
             
@@ -236,18 +201,16 @@ void game::on_focus(shared_data *app_d) {
     level_destroy(&m_level);
 
     m_level = level(app_d->current_level_proto());
-    set_state(GS_FADE_IN);
+    set_state(GS_NORMAL);
     set_title_state(TS_FADE_IN);
 }
 
 void game::handle_input(shared_data *app_d, SDL_Event e) {
-    if (state == GS_FADE_OUT) return;
-
     if (e.type  == SDL_KEYDOWN) {
         SDL_Keycode sym = e.key.keysym.sym;
 
         if (sym == SDLK_ESCAPE) {
-            app_d->set_scene(SCENE_LEVEL_MENU);
+            app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
             return;
         }
 
