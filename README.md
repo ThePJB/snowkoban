@@ -181,3 +181,20 @@ flash title of next level
 maybe wrong next level at some point
 
 bugs make you hate your game. like jbp on that dont let your children resent you
+
+recolouring assets
+- better green on the dude
+- colder walls
+- redo water
+
+maybe seeing save progress
+- platform independent way of deciding where to save
+  - can you just save in game folder? that would be best
+  - is steam opinionated about it
+- just write a file of 0s and 1s maybe. do you want to obfuscate it?
+- maybe write int64s but with a reversible bit swap done or something even if u watned. or parity
+- maybe write it in some base64 or something
+- lut of characters
+"0123456789qwertyuiopasdfghjklzxcvbnmABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+"
+
+ofuscate? clear? they can just rm the file if they want

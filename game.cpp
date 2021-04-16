@@ -171,6 +171,8 @@ void game::update(shared_data *app_d, double dt) {
             }
             app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
             set_state(GS_NORMAL); // maybe make a GS victory with fireworks etc
+            app_d->save();
+
         } else if (buffered_move_dx != 0 || buffered_move_dy != 0) {
             // ANIMATE -> MORE ANIMATE
             

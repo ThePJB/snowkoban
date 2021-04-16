@@ -6,6 +6,7 @@
 #include "world.hpp"
 #include "world_definitions.hpp"
 #include <stdbool.h>
+#include "util.hpp"
 
 typedef enum {
     SCENE_NONE,
@@ -89,6 +90,7 @@ struct shared_data {
         gef_load_atlas(&gc, "assets/snowkoban.png");
         game_style = style(&gc);
         worlds = make_worlds(&gc); // leak first worlds whatever
+        load();
     }
 
     world *current_world() {
@@ -108,6 +110,56 @@ struct shared_data {
         this->trans_t_current = 0;
         this->transition = trans_type;
         this->do_on_focus = true;
+    }
+
+    const char* save_path = "./save.file";
+    const char save_lut[64] = "1234567890-=!@#$%^&*()_+qwertyuiop[]QWERTYUIOP{}asdfghjkl;ASDFG";
+
+    void save() {
+        FILE *file_ptr = fopen(save_path, "wb");
+        if (file_ptr == NULL) {
+            printf("couldn't open %s for saving\n", save_path);
+            return;
+        }
+        const int num_levels = worlds.acc([](world w){return w.lps.length;});
+        int level_num = 0;
+        int world_num = 0;
+
+        int i = 0;
+        printf("saving ");
+        for (world *w = worlds.begin(); worlds.is_next(); w = worlds.next()) {
+            for (level_prototype *l = w->lps.begin(); w->lps.is_next(); l = w->lps.next()) {
+                printf("saving progress for %s\n", l->title);
+                printf("%c", l->complete ? '1' : '0');
+                fprintf(file_ptr, "%c", l->complete ? '1' : '0');
+                i++;
+            }
+        }
+        printf("\n");
+        fclose(file_ptr);
+    }
+
+
+    void load() {
+        char *save_data;
+        if (!check_slurp(save_path, &save_data)) {
+            printf("no save file %s\n", save_path);
+            return;
+        }
+        printf("found save file %s, loaded %s\n", save_path, save_data);
+
+        int i = 0;
+        for (world *w = worlds.begin(); worlds.is_next(); w = worlds.next()) {
+            for (level_prototype *l = w->lps.begin(); w->lps.is_next(); l = w->lps.next()) {
+                printf("i = %d\n", i);
+                if (save_data[i] == '1') {
+                    printf("its completed\n");
+                    l->complete = true;
+                }
+                i++;
+            }
+        }
+        free(save_data);
     }
 };
 

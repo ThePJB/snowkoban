@@ -11,6 +11,8 @@ struct vla {
     int backing_size;
     int length;
 
+    int iter_pos = 0;
+
     vla() {
         items = (T *)malloc(sizeof(T) * default_backing_size);
         backing_size = default_backing_size;
@@ -101,5 +103,19 @@ struct vla {
             count += f(items[i]);
         }
         return count;
+    }
+
+    T *begin() {
+        iter_pos = 0;
+        return &items[iter_pos];
+    }
+
+    bool is_next() {
+        return iter_pos < length - 1;
+    }
+
+    T *next() {
+        iter_pos++;
+        return &items[iter_pos];
     }
 };

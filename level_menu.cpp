@@ -136,10 +136,16 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
         if (left) {
             if (previous_level(app_d)) {
                 audio_play(&app_d->a, CS_MENU_MOVE);
+            } else if (previous_world(app_d)) {
+                app_d->level_idx = app_d->current_world()->lps.length - 1;
+                audio_play(&app_d->a, CS_MENU_MOVE);
             }
         } else if (right) {
             if (next_level(app_d)) {
                 audio_play(&app_d->a, CS_MENU_MOVE);
+            } else if (next_world(app_d)) {
+                audio_play(&app_d->a, CS_MENU_MOVE);
+                app_d->level_idx = 0;
             }
         } else if (up) {
             if (previous_world(app_d)) {
