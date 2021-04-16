@@ -2,6 +2,7 @@
 #include "util.hpp"
 #include "snowflakes.hpp"
 #include "audio.hpp"
+#include "draw_level.hpp"
 #include <stdbool.h>
 #include <functional>
 
@@ -65,8 +66,9 @@ void main_menu::handle_input(shared_data *app_d, SDL_Event e) {
 
 void main_menu::draw(shared_data *app_d, double dt) {
     // this fucntioin draws the main  menu
-    gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
-
+    const auto px_per_tile = 16*8;
+    fill_background(&app_d->gc, app_d->gc.xres, app_d->gc.yres, px_per_tile, 0, 0);
+    
     if (app_d->draw_snow) {
         snowflakes_draw(&app_d->gc, app_d->interp_time, app_d->snow_xo);
     }

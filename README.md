@@ -153,3 +153,31 @@ definitely chilling out the wall looks good
 
 -------------
 maybe dont allow key repeats over scene transitions hey
+
+rounding errors in some of the level previews? what can be done
+
+>> stop double exiting
+
+paint background
+
+pulse animate all the levels in the level menu when you finish a world, and play a sound
+animate worlds turning to done would be a good idea
+
+paint bg in main menu
+stop kicking out of levels. that will be a big polish. its getting pretty polished atm mmmm
+
+im pretty glad i made this bitmap font for my tower defence game lol. how many px is super crate box?
+
+can you get an SDL context faster or wot?
+i do decide what to do in a kind of haphazard way lol
+
+snow state - I could just make it 
+
+animate on rollover/highlight. that would look awesome lol
+
+levels arent completed
+
+flash title of next level
+maybe wrong next level at some point
+
+bugs make you hate your game. like jbp on that dont let your children resent you

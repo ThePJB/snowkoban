@@ -100,6 +100,9 @@ struct shared_data {
     }
 
     void set_scene(scene_index s, transition_type trans_type, float trans_time) {
+        if (this->next_scene != SCENE_NONE) {
+            this->current_scene = this->next_scene;
+        }
         this->next_scene = s;
         this->trans_t_max = trans_time;
         this->trans_t_current = 0;

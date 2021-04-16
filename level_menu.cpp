@@ -1,6 +1,7 @@
 #include "level_menu.hpp"
 #include "coolmath.hpp"
 #include "snowflakes.hpp"
+#include "draw_level.hpp"
 
 #define util_min(A,B) (A < B ? A : B)
 #define util_max(A,B) (A > B ? A : B)
@@ -45,7 +46,8 @@ void level_menu::draw(shared_data *app_d, double dt) {
     const auto btn_space_y = 70;
     const auto side = 200;
     
-    gef_draw_rect(&app_d->gc, app_d->game_style.background, gef_screen_rect(&app_d->gc));
+    const auto px_per_tile = 16*8;
+    fill_background(&app_d->gc, app_d->gc.xres, app_d->gc.yres, px_per_tile, 0, 0);
     
     const auto num_levels_x = app_d->worlds.max([](world w){return w.lps.length;});
     const auto num_levels_y = app_d->worlds.length;

@@ -2,6 +2,11 @@
 #include "snowflakes.hpp"
 #include "util.hpp"
 
+#define len(X) (sizeof(X) / sizeof(X[0]))
+
+#define min(A,B) (A < B ? A : B)
+#define max(A,B) (A > B ? A : B)
+
 const int num_buttons = 6;
 
 const std::function<void(shared_data *, bool, bool)> btn_callbacks[] = {

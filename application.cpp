@@ -3,6 +3,10 @@
 #include "instructions.hpp"
 #include "level_menu.hpp"
 #include "coolmath.hpp"
+#define len(X) (sizeof(X) / sizeof(X[0]))
+
+#define min(A,B) (A < B ? A : B)
+#define max(A,B) (A > B ? A : B)
 
 application::application(int xres, int yres) : m_shared_data{shared_data(xres, yres, "Snowkoban!")} {
     scenes[SCENE_INSTRUCTIONS] = new instructions();

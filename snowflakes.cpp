@@ -3,6 +3,8 @@
 #include <math.h>
 #include "coolmath.hpp"
 
+#define max(A,B) (A > B ? A : B)
+
 void snowflake_draw(gef_context *gc, int x, int y, int s) {
     const colour snowflake_colour = gef_rgb(255,255,255);
     gef_draw_rect(gc, snowflake_colour, x + s, y, s, s);

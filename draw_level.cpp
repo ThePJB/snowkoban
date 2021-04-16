@@ -1,4 +1,7 @@
 #include "draw_level.hpp"
+#define len(X) (sizeof(X) / sizeof(X[0]))
+#define min(A,B) (A < B ? A : B)
+#define max(A,B) (A > B ? A : B)
 
 void fill_background(gef_context *gc, int xres, int yres, int px_per_tile, int xo, int yo) {
     // Wall filler

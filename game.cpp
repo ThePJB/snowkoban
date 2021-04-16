@@ -163,6 +163,7 @@ void game::update(shared_data *app_d, double dt) {
 
             audio_play(&app_d->a, CS_WIN);
 
+            app_d->current_level_proto()->complete = true;
             // kick back to main menu (every level) // todo make it go to next level
             // why level menu doesnt insta update? oh its the scrolly thing
             if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
