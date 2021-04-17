@@ -125,23 +125,21 @@ struct shared_data {
         }
 
         auto half_bytes = bools_to_half_bytes(level_bools);
-        mangle_bytes(half_bytes);
-        check_dump(save_path, half_bytes.items, half_bytes.length);
+        mangle_bytes(&half_bytes);
+        if (!check_dump(save_path, half_bytes.items, half_bytes.length)) {
+            printf("failed saving %s\n", save_path);
+        }
 
         half_bytes.destroy();
         level_bools.destroy();
     }
 
     void load() {
-        printf("begin load\n");
-
         char *scrambled_bytes;
         if (!check_slurp(save_path, &scrambled_bytes)) {
             printf("failed loading %s\n", save_path);
             return;
         }
-
-        printf("loaded %s\n", scrambled_bytes);
 
         auto half_bytes = vla<char>();
         int i = 0;
@@ -149,8 +147,10 @@ struct shared_data {
             half_bytes.push(scrambled_bytes[i]);
             i++;
         }
-
-        unmangle_bytes(half_bytes);
+        if (!unmangle_bytes(&half_bytes)) {
+            printf("failed loading %s: save file corrupt\n", save_path);
+            return;
+        }
 
         auto bools = half_bytes_to_bools(half_bytes);
 

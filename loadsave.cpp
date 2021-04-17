@@ -7,13 +7,40 @@
 //const char save_lut[64] = "1234567890-=!@#$%^&*()_+qwertyuiop[]QWERTYUIOP{}asdfghjkl;ASDFG";
 const char save_lut[64] = ")!(@*#&$^%}Q{WPEORITUYA:SLDKFJGHghfjdkls;azMxNcBvBbVnCmX,Z.<>?/";
 
-void mangle_bytes(vla<char> bytes) {
-    for (int i = 0; i < bytes.length; i++) {
-        if (bytes.items[i] > len(save_lut)) {
+void add_parity(vla<char> *bytes) {
+    // sum of mangled I guess and then also mangle
+    uint8_t tot = 0;
+    for (int i = 0; i < bytes->length; i++) {
+        tot ^= bytes->items[i];
+    }
+    const auto xor_val = (uint8_t)hash_intn(2349023457, 0, 63);
+    const auto parity_mangled = tot ^ xor_val;
+    bytes->push(parity_mangled);
+}
+
+bool check_parity(vla<char> *bytes) {
+    const auto tot_mangled = bytes->pop_back();
+    const auto xor_val = (uint8_t)hash_intn(2349023457, 0, 63);
+    const auto tot_should_be = tot_mangled ^ xor_val;
+    uint8_t tot = 0;
+    for (int i = 0; i < bytes->length; i++) {
+        tot ^= bytes->items[i];
+    }
+    if (tot != tot_should_be) {
+        return false;
+    }
+    return true;
+}
+
+void mangle_bytes(vla<char> *bytes) {
+    for (int i = 0; i < bytes->length; i++) {
+        if (bytes->items[i] > len(save_lut)) {
             printf("too big\n");
         }
-        bytes.items[i] = save_lut[(uint8_t)bytes.items[i]];
+        const auto xor_val = (uint8_t)hash_intn(i, 0, 63);
+        bytes->items[i] = save_lut[(uint8_t)bytes->items[i] ^ xor_val];
     }
+    add_parity(bytes);
 }
 
 uint8_t loadsave_pos(char c) {
@@ -27,10 +54,16 @@ uint8_t loadsave_pos(char c) {
     return 255;
 }
 
-void unmangle_bytes(vla<char> bytes) {
-    for (int i = 0; i < bytes.length; i++) {
-        bytes.items[i] = loadsave_pos(bytes.items[i]);
+bool unmangle_bytes(vla<char> *bytes) {
+    if (!check_parity(bytes)) {
+        return false;
     }
+    for (int i = 0; i < bytes->length; i++) {
+        const auto xor_val = (uint8_t)hash_intn(i, 0, 63);
+
+        bytes->items[i] = loadsave_pos(bytes->items[i]) ^ xor_val;
+    }
+    return true;
 }
 
 void test_hbb() {

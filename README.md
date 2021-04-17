@@ -200,3 +200,6 @@ maybe seeing save progress
 ofuscate? clear? they can just rm the file if they want
 
 improving the code to load/save levels: basically just need a map function
+
+---------------------------
+step up the mangling. probably have some parity checks and maybe add in the position (or the hash of the position) or xor with

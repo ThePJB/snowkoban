@@ -38,7 +38,7 @@ float hash_floatn(int position, float min, float max) {
     return ((double)hash(position)/U32_MAX) * (max - min) + min;
 }
 
-float hash_intn(int position, int min, int max) {
+int hash_intn(int position, int min, int max) {
     return (hash(position)%(max - min)) + min;
 }
 
