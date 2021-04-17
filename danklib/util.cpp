@@ -87,3 +87,14 @@ bool check_slurp(const char *path, char **str) {
     *str = buffer;   
     return true;
 }
+
+bool check_dump(const char *path, const char *data, int nbytes) {
+    FILE *f = fopen(path, "wb");
+
+    if (!f) return false;
+
+    fwrite(data, sizeof(char), nbytes, f);
+    fclose(f);
+
+    return true;
+}

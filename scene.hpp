@@ -7,6 +7,7 @@
 #include "world_definitions.hpp"
 #include <stdbool.h>
 #include "util.hpp"
+#include "loadsave.hpp"
 
 typedef enum {
     SCENE_NONE,
@@ -113,53 +114,52 @@ struct shared_data {
     }
 
     const char* save_path = "./save.file";
-    const char save_lut[64] = "1234567890-=!@#$%^&*()_+qwertyuiop[]QWERTYUIOP{}asdfghjkl;ASDFG";
 
     void save() {
-        FILE *file_ptr = fopen(save_path, "wb");
-        if (file_ptr == NULL) {
-            printf("couldn't open %s for saving\n", save_path);
-            return;
-        }
-        const int num_levels = worlds.acc([](world w){return w.lps.length;});
-        int level_num = 0;
-        int world_num = 0;
-
-        int i = 0;
-        printf("saving ");
+        auto level_bools = vla<bool>();
         for (world *w = worlds.begin(); worlds.is_next(); w = worlds.next()) {
-            for (level_prototype *l = w->lps.begin(); w->lps.is_next(); l = w->lps.next()) {
-                printf("saving progress for %s\n", l->title);
-                printf("%c", l->complete ? '1' : '0');
-                fprintf(file_ptr, "%c", l->complete ? '1' : '0');
-                i++;
-            }
+            // i guess could just loop through and append manually lol
+            auto this_world_bools = w->lps.map<bool>([](level_prototype l){return l.complete;});
+            level_bools.push(this_world_bools);
+            this_world_bools.destroy();
         }
-        printf("\n");
-        fclose(file_ptr);
+
+        auto half_bytes = bools_to_half_bytes(level_bools);
+        mangle_bytes(half_bytes);
+        check_dump(save_path, half_bytes.items, half_bytes.length);
+
+        half_bytes.destroy();
+        level_bools.destroy();
     }
 
-
     void load() {
-        char *save_data;
-        if (!check_slurp(save_path, &save_data)) {
-            printf("no save file %s\n", save_path);
+        printf("begin load\n");
+
+        char *scrambled_bytes;
+        if (!check_slurp(save_path, &scrambled_bytes)) {
+            printf("failed loading %s\n", save_path);
             return;
         }
-        printf("found save file %s, loaded %s\n", save_path, save_data);
 
+        printf("loaded %s\n", scrambled_bytes);
+
+        auto half_bytes = vla<char>();
         int i = 0;
+        while (scrambled_bytes[i] != '\0') {
+            half_bytes.push(scrambled_bytes[i]);
+            i++;
+        }
+
+        unmangle_bytes(half_bytes);
+
+        auto bools = half_bytes_to_bools(half_bytes);
+
+        i = 0;
         for (world *w = worlds.begin(); worlds.is_next(); w = worlds.next()) {
             for (level_prototype *l = w->lps.begin(); w->lps.is_next(); l = w->lps.next()) {
-                printf("i = %d\n", i);
-                if (save_data[i] == '1') {
-                    printf("its completed\n");
-                    l->complete = true;
-                }
-                i++;
+                l->complete = bools.items[i++];
             }
         }
-        free(save_data);
     }
 };
 

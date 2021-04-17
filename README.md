@@ -198,3 +198,5 @@ maybe seeing save progress
 "0123456789qwertyuiopasdfghjklzxcvbnmABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+"
 
 ofuscate? clear? they can just rm the file if they want
+
+improving the code to load/save levels: basically just need a map function

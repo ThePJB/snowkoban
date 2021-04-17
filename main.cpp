@@ -6,9 +6,40 @@
 
 #include "tile.hpp"
 
+#include "vla.hpp"
+
+#include "loadsave.hpp"
+
 //#define PROFILE
 
 int main(int argc, char** argv) {
+    //test_hbb();
+    //return 0;
+    /*
+    auto b1 = vla<char>();
+    for (int i = 0; i < 64; i++) {
+        b1.push(i);
+    }
+    for (int i = 0; i < 64; i++) {
+        printf(" %d ", b1.items[i]);
+    }
+    printf("\n");
+    mangle_bytes(b1);
+    for (int i = 0; i < 64; i++) {
+        //printf("%c", b1.items[i]);
+        printf(" %d ", b1.items[i]);
+    }
+    printf("\n");
+    unmangle_bytes(b1);
+    for (int i = 0; i < 64; i++) {
+        //printf("%c", b1.items[i]);
+        printf(" %d ", b1.items[i]);
+    }
+    printf("\n");
+    return 0;
+    */
+
+
     const int frame_cap = 60;
     const int frame_us = 1000000 / frame_cap;
 

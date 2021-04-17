@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <functional>
+#include <stdio.h>
 
 template<typename T>
 struct vla {
@@ -47,6 +48,12 @@ struct vla {
         }
 
         items[length++] = item;
+    }
+
+    void push(vla<T> items) {
+        for (int i = 0; i < items.length; i++) {
+            push(items.items[i]);
+        }
     }
 
     T pop_back() {
@@ -110,12 +117,21 @@ struct vla {
         return &items[iter_pos];
     }
 
-    bool is_next() {
-        return iter_pos < length - 1;
+    bool is_next() const {
+        return iter_pos < length;
     }
 
     T *next() {
         iter_pos++;
         return &items[iter_pos];
+    }
+
+    template<typename MAP_TARGET>
+    vla<MAP_TARGET> map(std::function<MAP_TARGET(const T)> f) {
+        auto dest_vla = vla<MAP_TARGET>();
+        for (T *elem_ptr = begin(); is_next(); elem_ptr = next()) {
+            dest_vla.push(f(*elem_ptr));
+        }
+        return dest_vla;
     }
 };
