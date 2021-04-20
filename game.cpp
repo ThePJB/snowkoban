@@ -11,6 +11,8 @@
 
 const float step_time = 0.1;
 
+const float celebrate_t_max = 1.0;
+
 void game::set_state(game_state gs) {
     state_t = 0;
     state = gs;
@@ -133,6 +135,35 @@ void game::draw(shared_data *app_d, double dt) {
         gef_draw_bmp_text_centered(gc, app_d->game_style.game_font, app_d->game_style.big, buf, x, y);
     }
 
+    if (state == GS_CELEBRATE) {
+
+        const auto fs = gef_bmp_font_size(app_d->game_style.game_font, app_d->game_style.big, 6);
+        // render to texture, have it grow and spin, that sounds like fun
+        const auto winner_texture = SDL_CreateTexture(app_d->gc.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, fs.x, fs.y);
+        SDL_SetTextureBlendMode(winner_texture, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(app_d->gc.renderer, 0, 0, 0, 0);
+        SDL_SetRenderTarget(app_d->gc.renderer, winner_texture);
+        SDL_RenderClear(app_d->gc.renderer);
+        const auto normalized_time = state_t / celebrate_t_max;
+        gef_draw_bmp_text(gc, app_d->game_style.game_font, app_d->game_style.big, "winner", 0, 0);
+        SDL_SetRenderTarget(app_d->gc.renderer, NULL);
+        // dilate with t!
+        // deterministicc startx/y
+        const auto tss = cm_slow_stop2(normalized_time);
+
+        const auto start_x = hash_floatn(victories, 0, app_d->gc.xres);
+        const auto start_y = hash_floatn(victories, 0, app_d->gc.yres);
+        const auto curr_x = cm_lerp(start_x, gc->xres/2, tss);
+        const auto curr_y = cm_lerp(start_y, gc->yres/2, tss);
+
+        const auto scale_coeff = 2;
+        
+        const auto dest_rect = rect::centered(curr_x, curr_y, fs.x * tss * scale_coeff, fs.y * tss * scale_coeff).sdl_rect();
+        const auto angle = tss * 360 * 2;
+        SDL_RenderCopyEx(app_d->gc.renderer, winner_texture, NULL, &dest_rect, angle, NULL, SDL_FLIP_NONE);
+        SDL_DestroyTexture(winner_texture);
+    }
+
     int64_t t_text = get_us();
 
     #ifdef PROFILE
@@ -159,21 +190,17 @@ void game::update(shared_data *app_d, double dt) {
             set_state(GS_ANIMATE);
             level_step(&m_level);
         } else if(level_check_victory(&m_level)) {
-            // ANIMATE -> VICTORY
-
+            // ANIMATE -> CELEBRATE
+            set_state(GS_CELEBRATE);
+            victories++; // just used to make a unique hash
+            
             audio_play(&app_d->a, CS_WIN);
 
             app_d->current_level_proto()->complete = true;
-            // kick back to main menu (every level) // todo make it go to next level
-            // why level menu doesnt insta update? oh its the scrolly thing
-            if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
-                app_d->level_idx++;
-            }
-            app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
-            set_state(GS_NORMAL); // maybe make a GS victory with fireworks etc
             app_d->save();
 
-        } else if (buffered_move_dx != 0 || buffered_move_dy != 0) {
+
+        } else if ((buffered_move_dx != 0 || buffered_move_dy != 0) && get_us() - buffered_when < buffer_window) {
             // ANIMATE -> MORE ANIMATE
             
             game_move_player(this, buffered_move_dx, buffered_move_dy, app_d->time, &app_d->a);
@@ -196,6 +223,17 @@ void game::update(shared_data *app_d, double dt) {
                 set_state(GS_REWIND);
             }
         }
+    } else if (state == GS_CELEBRATE) {
+        // CELEBRATE -> YOU WIN BACK TO LEVEL MENU
+        if (state_t > celebrate_t_max) {
+            // kick back to main menu (every level) // todo make it go to next level
+            // why level menu doesnt insta update? oh its the scrolly thing
+            if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
+                app_d->level_idx++;
+            }
+            app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
+            set_state(GS_NORMAL); // maybe make a GS victory with fireworks etc
+        }
     }
 }
 
@@ -214,6 +252,10 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
 
         if (sym == SDLK_ESCAPE) {
             app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
+            return;
+        }
+
+        if (state == GS_CELEBRATE) {
             return;
         }
 
@@ -250,13 +292,13 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
                 if (do_buffering) {
                     buffered_move_dx = dx;
                     buffered_move_dy = dy;
+                    buffered_when = get_us();
                 }
             } else {
                 game_move_player(this, dx, dy, app_d->time, &app_d->a);
             }
 
         } else if (reset) {
-            //on_focus(app_d);
             audio_play(&app_d->a, CS_LOSE);
             set_state(GS_REWIND);
             undos_per_second = undos_per_second_initial;

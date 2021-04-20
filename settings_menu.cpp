@@ -1,6 +1,7 @@
 #include "settings_menu.hpp"
 #include "snowflakes.hpp"
 #include "util.hpp"
+#include "draw_level.hpp"
 
 #define len(X) (sizeof(X) / sizeof(X[0]))
 
@@ -42,8 +43,9 @@ const std::function<void(shared_data *, bool, bool)> btn_callbacks[] = {
 };
 
 void settings_menu::draw(shared_data *app_d, double dt) {
-    gef_draw_rect(&app_d->gc, app_d->game_style.background, 0, 0, app_d->gc.xres, app_d->gc.yres);
-
+    const auto px_per_tile = 16*8;
+    fill_background(&app_d->gc, app_d->gc.xres, app_d->gc.yres, px_per_tile, 0, 0);
+    
     if (app_d->draw_snow) {
         snowflakes_draw(&app_d->gc, app_d->interp_time, app_d->snow_xo);
     }

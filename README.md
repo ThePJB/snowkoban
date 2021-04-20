@@ -50,7 +50,6 @@
    - res - text input (also depend scene stack)
    - slider
    - full screen
- - write save to disk
 
 double play of present dopamine sound is really annoying to fix
 be good if the sounds played off each other well and double play was good
@@ -187,19 +186,26 @@ recolouring assets
 - colder walls
 - redo water
 
-maybe seeing save progress
-- platform independent way of deciding where to save
-  - can you just save in game folder? that would be best
-  - is steam opinionated about it
-- just write a file of 0s and 1s maybe. do you want to obfuscate it?
-- maybe write int64s but with a reversible bit swap done or something even if u watned. or parity
-- maybe write it in some base64 or something
-- lut of characters
-"0123456789qwertyuiopasdfghjklzxcvbnmABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+"
-
-ofuscate? clear? they can just rm the file if they want
-
-improving the code to load/save levels: basically just need a map function
-
 ---------------------------
-step up the mangling. probably have some parity checks and maybe add in the position (or the hash of the position) or xor with
+
+what now?
+
+ - prune shitty levels - i can do that
+ - game->game transitions - double buffering games i guess lol. maybe that fix the title flashing thing as well.
+ - just have another scene and update carefully
+  - should i refactor some shit to be like progress_mgr? nah that sounds gay
+ - flash title of next level - idk how to fix really, maybe just stop displaying title instantly
+ - keys over scene boundaries - idk
+ - let player move, speed of light? sounds hard tho
+
+
+ ---------------
+ make level pop out, unvignette on highlight
+
+ victory state
+ "YOU WIN!"
+ "WINNER!
+ spin in lol
+ * probably should have it fade out by the end of CELEBRATE
+
+ Do like a victory screen roundup lol

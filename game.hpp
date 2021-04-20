@@ -18,11 +18,15 @@ struct game : scene {
     
     level m_level;
 
+    const uint64_t buffer_window = 1000 * 100 * 1000; // 100ms // actually maybe infinite is nicer
+    uint64_t buffered_when = 0;
     int buffered_move_dx = 0;
     int buffered_move_dy = 0;
 
     const int undos_per_second_initial = 10;
     int undos_per_second = undos_per_second_initial;
+
+    int victories = 0;
 
     game() {};
 
@@ -31,7 +35,7 @@ struct game : scene {
     void append_current_state_to_history(float time);
     bool undo(shared_data *shared_data);
     
-    enum game_state {GS_NORMAL, GS_ANIMATE, GS_REWIND};
+    enum game_state {GS_NORMAL, GS_ANIMATE, GS_REWIND, GS_CELEBRATE};
     game_state state = GS_NORMAL;
     void set_state(game_state gs);
 
