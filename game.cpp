@@ -145,6 +145,8 @@ void game::draw(shared_data *app_d, double dt) {
         rewind_effect(gc, app_d->abs_time);
     }
 
+    fw.draw(app_d);
+
     //char buf[256];
     //sprintf(buf, "%d-%d %s", app_d->world_idx+1, app_d->level_idx+1, level->title);
     const auto buf = m_level.title;
@@ -185,7 +187,15 @@ void game::draw(shared_data *app_d, double dt) {
 }
 
 void game::update(shared_data *app_d, double dt) {
+    static float time_since_firework = 0;
+    time_since_firework += dt;
     title_sm_update(dt);
+    const auto firework_interval = 0.3;
+    if (time_since_firework > firework_interval) {
+        fw.spawn_primary();
+        time_since_firework -= firework_interval;
+    }
+    fw.update(dt);
 
     state_t += dt;
 
@@ -252,7 +262,6 @@ void game::on_focus(shared_data *app_d) {
 void game::on_finish_transition(shared_data *app_d) {
     if (state == GS_VICTORY_FADEOUT) {
 
-        // ah how to set tss on the scene menu, well it could live in app_d i suppose lol.
         const auto on_move_success = [&](){
             audio_play(&app_d->a, CS_MENU_MOVE);
             app_d->time_since_select = 0;

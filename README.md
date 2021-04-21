@@ -219,8 +219,11 @@ better to have less mutability maybe
 
 functions and expressions should be your bread and butter. i guess in that way its declerative, lambda calculus instead of turing machine which is like doing a sequence of things (aka what computer does). computability, mmm.
 
+struct just be a function where scope is retained, size is known. And have types just be a normal argument? then it changes the size lol but you could have the compiler gloss that over. is that good or should itr be a special type of argument. probably yes. compile time arguments
+what do you do about if statements? they are expressions? yeah i mean the scope disappears anyway so it shouldnt really be a problem
+
 decoupling things in time is like necessarily disgusting lol or is it? probs. I usually just write the algorithm to do it instead
-of relying on somem flaky sketchy async shit
+of relying on somem flaky sketchy async shit. well the thing from my thesis was ok
 
 CHANGE THE RENDER TARGET BACK
 this is why they use a stack lol

@@ -5,6 +5,7 @@
 #include "audio.hpp"
 #include "entity.hpp"
 #include "level.hpp"
+#include "fireworks.hpp"
 
 typedef struct {
     vla<entity> v;
@@ -27,6 +28,8 @@ struct game : scene {
     int undos_per_second = undos_per_second_initial;
 
     int victories = 0;
+
+    fireworks fw = fireworks();
 
     game() {};
 
