@@ -83,6 +83,8 @@ struct shared_data {
     int world_idx = 0;
     int level_idx = 0;
 
+    float time_since_select = 1; // for level menu
+
     // world stuff
     vla<world> worlds;
 

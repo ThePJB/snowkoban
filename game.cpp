@@ -251,8 +251,20 @@ void game::on_focus(shared_data *app_d) {
 // hopefully it will do a noticeable scroll in level menu and not be a confusing
 void game::on_finish_transition(shared_data *app_d) {
     if (state == GS_VICTORY_FADEOUT) {
+
+        // ah how to set tss on the scene menu, well it could live in app_d i suppose lol.
+        const auto on_move_success = [&](){
+            audio_play(&app_d->a, CS_MENU_MOVE);
+            app_d->time_since_select = 0;
+        };
+
         if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
             app_d->level_idx++;
+            on_move_success();
+        } else {
+            app_d->world_idx++;
+            app_d->level_idx = 0;
+            on_move_success();
         }
     }
 }

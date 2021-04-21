@@ -12,7 +12,7 @@ void level_menu::update(shared_data *app_d, double dt) {
     current_x_offset += (target_x_offset - current_x_offset) * dt * snappiness;
     current_y_offset += (target_y_offset - current_y_offset) * dt * snappiness;
 
-    time_since_select += dt;
+    app_d->time_since_select += dt;
 }
 
 int level_menu::x_viewport_offset(int x, int xmax, int xres) {
@@ -96,7 +96,7 @@ void level_menu::draw(shared_data *app_d, double dt) {
         for (int j = 0; j < app_d->worlds.items[i].lps.length; j++) {
             if (app_d->level_idx != j) continue;
 
-            const auto dilate_amt = cm_slow_stop2(util_min(time_since_select/pop_time, 1)) * 20;
+            const auto dilate_amt = cm_slow_stop2(util_min(app_d->time_since_select/pop_time, 1)) * 20;
             const auto btn_rect = rect(
                 current_x_offset + (btn_space_x+side) * j, 
                 current_y_offset + (btn_space_y+side) * i, 
@@ -171,7 +171,7 @@ void level_menu::handle_input(shared_data *app_d, SDL_Event e) {
 
         const auto on_move_success = [&](){
             audio_play(&app_d->a, CS_MENU_MOVE);
-            time_since_select = 0;
+            app_d->time_since_select = 0;
         };
 
         if (left) {
