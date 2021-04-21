@@ -36,10 +36,12 @@ struct fireworks_particle {
     float age;
     float t_child1;
     float t_child2;
+    float lifetime;
     
     unsigned int seed;
     unsigned int nchildren;
 
+    float normalized_t() {return age / lifetime;}
     fireworks_particle spawn_child(fireworks_particle_state child_state);
 };
 
@@ -54,4 +56,5 @@ struct fireworks {
     void draw(shared_data *app_d);
     
     void spawn_primary();
+    void reset();
 };

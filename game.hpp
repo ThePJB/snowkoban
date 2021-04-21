@@ -38,7 +38,7 @@ struct game : scene {
     void append_current_state_to_history(float time);
     bool undo(shared_data *shared_data);
     
-    enum game_state {GS_NORMAL, GS_ANIMATE, GS_REWIND, GS_CELEBRATE, GS_VICTORY_FADEOUT};
+    enum game_state {GS_NORMAL, GS_ANIMATE, GS_REWIND, GS_CELEBRATE, GS_GLOAT};
     game_state state = GS_NORMAL;
     void set_state(game_state gs);
 

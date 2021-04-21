@@ -7,8 +7,6 @@
 #include "dankstrings.hpp"
 #include "rewind.hpp"
 
-//#define DEBUG_HISTORY
-
 const float step_time = 0.1;
 
 const float celebrate_t_max = 1.0;
@@ -145,7 +143,6 @@ void game::draw(shared_data *app_d, double dt) {
         rewind_effect(gc, app_d->abs_time);
     }
 
-    fw.draw(app_d);
 
     //char buf[256];
     //sprintf(buf, "%d-%d %s", app_d->world_idx+1, app_d->level_idx+1, level->title);
@@ -167,9 +164,11 @@ void game::draw(shared_data *app_d, double dt) {
     }
 
     if (state == GS_CELEBRATE) {
+        fw.draw(app_d);
         const auto normalized_time = state_t / celebrate_t_max;
         draw_victory_juice(app_d, cm_slow_stop2(normalized_time));
-    } else if (state == GS_VICTORY_FADEOUT) {
+    } else if (state == GS_GLOAT) {
+        fw.draw(app_d);
         draw_victory_juice(app_d, 1.0);
     }
 
@@ -187,15 +186,19 @@ void game::draw(shared_data *app_d, double dt) {
 }
 
 void game::update(shared_data *app_d, double dt) {
-    static float time_since_firework = 0;
-    time_since_firework += dt;
-    title_sm_update(dt);
-    const auto firework_interval = 0.3;
-    if (time_since_firework > firework_interval) {
-        fw.spawn_primary();
-        time_since_firework -= firework_interval;
+
+    if (state == GS_CELEBRATE || state == GS_GLOAT) {
+        static float time_since_firework = 0;
+        time_since_firework += dt;
+        const auto firework_interval = 0.3;
+        if (time_since_firework > firework_interval) {
+            fw.spawn_primary();
+            time_since_firework -= firework_interval;
+        }
+        fw.update(dt);
     }
-    fw.update(dt);
+
+    title_sm_update(dt);
 
     state_t += dt;
 
@@ -243,13 +246,13 @@ void game::update(shared_data *app_d, double dt) {
     } else if (state == GS_CELEBRATE) {
         // CELEBRATE -> YOU WIN BACK TO LEVEL MENU
         if (state_t > celebrate_t_max) {
-            set_state(GS_VICTORY_FADEOUT);
-            app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
+            set_state(GS_GLOAT);
         }
     }
 }
 
 void game::on_focus(shared_data *app_d) {
+    fw.reset();
     clear_history();
     level_destroy(&m_level);
 
@@ -260,7 +263,7 @@ void game::on_focus(shared_data *app_d) {
 
 // hopefully it will do a noticeable scroll in level menu and not be a confusing
 void game::on_finish_transition(shared_data *app_d) {
-    if (state == GS_VICTORY_FADEOUT) {
+    if (state == GS_GLOAT) {
 
         const auto on_move_success = [&](){
             audio_play(&app_d->a, CS_MENU_MOVE);
@@ -271,9 +274,11 @@ void game::on_finish_transition(shared_data *app_d) {
             app_d->level_idx++;
             on_move_success();
         } else {
-            app_d->world_idx++;
-            app_d->level_idx = 0;
-            on_move_success();
+            if (app_d->world_idx < app_d->worlds.length - 1) {
+                app_d->world_idx++;
+                app_d->level_idx = 0;
+                on_move_success();
+            }
         }
     }
 }
@@ -289,6 +294,13 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
 
         if (state == GS_CELEBRATE) {
             return;
+        }
+
+        if (state == GS_GLOAT) {
+            // maybe buffer this if its done in celebrate
+            if (app_d->next_scene == SCENE_NONE) {
+                app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
+            }
         }
 
         if (sym == SDLK_u) {

@@ -63,8 +63,6 @@ void level_menu::draw(shared_data *app_d, double dt) {
 
     // draw normal levels
     for (int i = 0; i < app_d->worlds.length; i++) {
-        gef_draw_bmp_text(&app_d->gc, app_d->game_style.game_font, app_d->game_style.small, app_d->worlds.items[i].name, 5 + app_d->gc.xres * 0.05, current_y_offset + (btn_space_y+side) * i - 35);
-
         for (int j = 0; j < app_d->worlds.items[i].lps.length; j++) {
             const auto btn_rect = rect(
                 current_x_offset + (btn_space_x+side) * j, 
@@ -116,6 +114,11 @@ void level_menu::draw(shared_data *app_d, double dt) {
 
             gef_draw_rect(&app_d->gc, vignette_colour, btn_rect);
         }
+    }
+
+    // draw world titles
+    for (int i = 0; i < app_d->worlds.length; i++) {
+        gef_draw_bmp_text(&app_d->gc, app_d->game_style.game_font, app_d->game_style.small, app_d->worlds.items[i].name, 5 + app_d->gc.xres * 0.05, current_y_offset + (btn_space_y+side) * i - 35);
     }
 }
 

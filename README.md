@@ -229,3 +229,21 @@ CHANGE THE RENDER TARGET BACK
 this is why they use a stack lol
 is it time to finally abstract this shit properly lol. dont do it lmao. with that being said rect abstraction is good.
 well this time i can work around it with SDL_GetRenderTarget
+
+
+
+draw titles above selected level
+  eh, doesnt look that good, maybe just dont allow it to overlap
+level menu takes the input before hopping forward lol
+maybe draw level names with level on highlight in level menu
+
+S tier levels:
+* examples
+ * icey nicey (# one)
+ * patience (could be a bit longer maybe)
+ * sequence 5
+* sequential ok
+* sequential building on each other breddy gud
+* is its own tutorial
+* satisfying e.g. line em up and knock em down
+* aesthetic, e.g. symmetrical
