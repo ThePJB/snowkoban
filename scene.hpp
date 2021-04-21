@@ -86,6 +86,8 @@ struct shared_data {
     // world stuff
     vla<world> worlds;
 
+    uint64_t start_time = get_us(); // just for nondeterministic hashes
+
     shared_data(int xres, int yres, const char *title) {
         gc = gef_init(title, xres, yres);
         gef_load_atlas(&gc, "assets/snowkoban.png");
@@ -168,4 +170,6 @@ struct scene {
     virtual void update(shared_data *app_d, double dt) = 0;
     virtual void on_focus(shared_data *app_d) = 0;
     virtual void handle_input(shared_data *app_d, SDL_Event e) = 0;
+
+    virtual void on_finish_transition(shared_data *app_d) {};
 };

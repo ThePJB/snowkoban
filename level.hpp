@@ -18,6 +18,8 @@ struct level {
     vla<entity> entities;
     bool player_faces_left = false;
 
+    const char *title;
+
     level(){};
     level(const level_prototype *lp);
 };

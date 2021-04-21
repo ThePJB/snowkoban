@@ -35,7 +35,7 @@ struct game : scene {
     void append_current_state_to_history(float time);
     bool undo(shared_data *shared_data);
     
-    enum game_state {GS_NORMAL, GS_ANIMATE, GS_REWIND, GS_CELEBRATE};
+    enum game_state {GS_NORMAL, GS_ANIMATE, GS_REWIND, GS_CELEBRATE, GS_VICTORY_FADEOUT};
     game_state state = GS_NORMAL;
     void set_state(game_state gs);
 
@@ -43,12 +43,12 @@ struct game : scene {
     title_state m_title_state = TS_NO_SHOW;
     void set_title_state(title_state ts);
     void title_sm_update(double dt);
+
+    void draw_victory_juice(shared_data *app_d, float t);
     
     void draw(shared_data *app_d, double dt);
     void update(shared_data *app_d, double dt);
     void on_focus(shared_data *app_d);
+    void on_finish_transition(shared_data *app_d);
     void handle_input(shared_data *app_d, SDL_Event e);
 };
-
-
-void game_load_level_from_str(game *g, const char *level_str, shared_data *shared_data);

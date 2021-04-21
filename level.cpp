@@ -8,6 +8,7 @@ level::level(const level_prototype *lp) {
     initialized = true;
     entities = lp->starting_entities.deep_copy();
     tiles = lp->tiles.deep_copy();
+    title = lp->title;
 }
 
 // t from 0 to 1

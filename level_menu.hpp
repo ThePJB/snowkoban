@@ -15,6 +15,8 @@ struct level_menu : scene {
 
     double target_y_offset = 0;
     double current_y_offset = 0;
+
+    float time_since_select = 1;
     
     int x_viewport_offset(int x, int xmax, int xres);
     int y_viewport_offset(int y, int ymax, int yres);

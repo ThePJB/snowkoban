@@ -24,10 +24,12 @@ void application::update(double dt) {
         }
         m_shared_data.trans_t_current += dt;
         if (m_shared_data.trans_t_current > m_shared_data.trans_t_max) {
+            scenes[m_shared_data.current_scene]->on_finish_transition(&m_shared_data);
             m_shared_data.current_scene = m_shared_data.next_scene;
             m_shared_data.next_scene = SCENE_NONE;
             m_shared_data.trans_t_current = 0;
             m_shared_data.trans_t_max = 0;
+
         }
     }
     m_shared_data.time += dt;

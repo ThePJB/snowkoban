@@ -59,6 +59,33 @@ void game_move_player(game *g, int dx, int dy, float time, audio *a) {
     level_step(&g->m_level);
 }
 
+void game::draw_victory_juice(shared_data *app_d, float t) {
+    const auto old_render_target = SDL_GetRenderTarget(app_d->gc.renderer);
+    const auto fs = gef_bmp_font_size(app_d->game_style.game_font, app_d->game_style.big, 6);
+    // render to texture, have it grow and spin, that sounds like fun
+    const auto winner_texture = SDL_CreateTexture(app_d->gc.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, fs.x, fs.y);
+    SDL_SetTextureBlendMode(winner_texture, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(app_d->gc.renderer, 0, 0, 0, 0);
+    SDL_SetRenderTarget(app_d->gc.renderer, winner_texture);
+    SDL_RenderClear(app_d->gc.renderer);
+    gef_draw_bmp_text(&app_d->gc, app_d->game_style.game_font, app_d->game_style.big, "winner", 0, 0);
+    SDL_SetRenderTarget(app_d->gc.renderer, old_render_target);
+    // dilate with t!
+    // deterministicc startx/y
+
+    const auto start_x = hash_floatn(victories + app_d->start_time, 0, app_d->gc.xres);
+    const auto start_y = hash_floatn(victories + app_d->start_time, 0, app_d->gc.yres);
+    const auto curr_x = cm_lerp(start_x, app_d->gc.xres/2, t);
+    const auto curr_y = cm_lerp(start_y, app_d->gc.yres/2, t);
+
+    const auto scale_coeff = 2;
+    
+    const auto dest_rect = rect::centered(curr_x, curr_y, fs.x * t * scale_coeff, fs.y * t * scale_coeff).sdl_rect();
+    const auto angle = t * 360 * 2;
+    SDL_RenderCopyEx(app_d->gc.renderer, winner_texture, NULL, &dest_rect, angle, NULL, SDL_FLIP_NONE);
+    SDL_DestroyTexture(winner_texture);
+}
+
 void game::draw(shared_data *app_d, double dt) {
     gef_context *gc = &app_d->gc;
 
@@ -105,6 +132,7 @@ void game::draw(shared_data *app_d, double dt) {
         level_draw(&m_level, gc, xo, yo, scale_factor, 1, app_d->time);
     }
 
+
     int64_t t_level = get_us();
     
     if (app_d->draw_snow) {
@@ -117,8 +145,9 @@ void game::draw(shared_data *app_d, double dt) {
         rewind_effect(gc, app_d->abs_time);
     }
 
-    char buf[256];
-    sprintf(buf, "%d-%d %s", app_d->world_idx+1, app_d->level_idx+1, app_d->current_level_proto()->title);
+    //char buf[256];
+    //sprintf(buf, "%d-%d %s", app_d->world_idx+1, app_d->level_idx+1, level->title);
+    const auto buf = m_level.title;
 
     int x = gc->xres / 2;
 
@@ -136,32 +165,10 @@ void game::draw(shared_data *app_d, double dt) {
     }
 
     if (state == GS_CELEBRATE) {
-
-        const auto fs = gef_bmp_font_size(app_d->game_style.game_font, app_d->game_style.big, 6);
-        // render to texture, have it grow and spin, that sounds like fun
-        const auto winner_texture = SDL_CreateTexture(app_d->gc.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, fs.x, fs.y);
-        SDL_SetTextureBlendMode(winner_texture, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(app_d->gc.renderer, 0, 0, 0, 0);
-        SDL_SetRenderTarget(app_d->gc.renderer, winner_texture);
-        SDL_RenderClear(app_d->gc.renderer);
         const auto normalized_time = state_t / celebrate_t_max;
-        gef_draw_bmp_text(gc, app_d->game_style.game_font, app_d->game_style.big, "winner", 0, 0);
-        SDL_SetRenderTarget(app_d->gc.renderer, NULL);
-        // dilate with t!
-        // deterministicc startx/y
-        const auto tss = cm_slow_stop2(normalized_time);
-
-        const auto start_x = hash_floatn(victories, 0, app_d->gc.xres);
-        const auto start_y = hash_floatn(victories, 0, app_d->gc.yres);
-        const auto curr_x = cm_lerp(start_x, gc->xres/2, tss);
-        const auto curr_y = cm_lerp(start_y, gc->yres/2, tss);
-
-        const auto scale_coeff = 2;
-        
-        const auto dest_rect = rect::centered(curr_x, curr_y, fs.x * tss * scale_coeff, fs.y * tss * scale_coeff).sdl_rect();
-        const auto angle = tss * 360 * 2;
-        SDL_RenderCopyEx(app_d->gc.renderer, winner_texture, NULL, &dest_rect, angle, NULL, SDL_FLIP_NONE);
-        SDL_DestroyTexture(winner_texture);
+        draw_victory_juice(app_d, cm_slow_stop2(normalized_time));
+    } else if (state == GS_VICTORY_FADEOUT) {
+        draw_victory_juice(app_d, 1.0);
     }
 
     int64_t t_text = get_us();
@@ -226,13 +233,8 @@ void game::update(shared_data *app_d, double dt) {
     } else if (state == GS_CELEBRATE) {
         // CELEBRATE -> YOU WIN BACK TO LEVEL MENU
         if (state_t > celebrate_t_max) {
-            // kick back to main menu (every level) // todo make it go to next level
-            // why level menu doesnt insta update? oh its the scrolly thing
-            if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
-                app_d->level_idx++;
-            }
+            set_state(GS_VICTORY_FADEOUT);
             app_d->set_scene(SCENE_LEVEL_MENU, TRANS_WIPE_LEFT, trans_wipe_time);
-            set_state(GS_NORMAL); // maybe make a GS victory with fireworks etc
         }
     }
 }
@@ -244,6 +246,15 @@ void game::on_focus(shared_data *app_d) {
     m_level = level(app_d->current_level_proto());
     set_state(GS_NORMAL);
     set_title_state(TS_FADE_IN);
+}
+
+// hopefully it will do a noticeable scroll in level menu and not be a confusing
+void game::on_finish_transition(shared_data *app_d) {
+    if (state == GS_VICTORY_FADEOUT) {
+        if (app_d->level_idx < app_d->current_world()->lps.length - 1) {
+            app_d->level_idx++;
+        }
+    }
 }
 
 void game::handle_input(shared_data *app_d, SDL_Event e) {

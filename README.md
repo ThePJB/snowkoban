@@ -209,3 +209,24 @@ what now?
  * probably should have it fade out by the end of CELEBRATE
 
  Do like a victory screen roundup lol
+
+ victory screen: something about deferred rendering not allowing me to change how I draw in the transition period
+
+-----------
+
+worth doing a reflection on how I do scene mgmt. global scene i make once and mutate instead of tearing them down and recreating
+better to have less mutability maybe
+
+functions and expressions should be your bread and butter
+decoupling things in time is like necessarily disgusting lol or is it? probs. I usually just write the algorithm to do it instead
+of relying on somem flaky sketchy async shit
+
+CHANGE THE RENDER TARGET BACK
+this is why they use a stack lol
+is it time to finally abstract this shit properly lol. dont do it lmao. with that being said rect abstraction is good.
+well this time i can work around it with SDL_GetRenderTarget
+
+level menu juicing: can it please move after u on_enter it
+it would just be updating it in game. maybe like an on_finish_exiting hook for scene. cant really think of a better way
+can you provide a default method in cpp?
+call overridden function from parent class requires virtual though right?
