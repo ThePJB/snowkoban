@@ -16,6 +16,7 @@ audio audio_init() {
 
     a.playlist.push(Mix_LoadMUS("assets/Tune_4.ogg"));
     a.playlist.push(Mix_LoadMUS("assets/Tune_5.ogg"));
+    a.playlist.push(Mix_LoadMUS("assets/Tune_6.ogg"));
     a.sounds[CS_LOSE] = Mix_LoadWAV("assets/lose.ogg");
     a.sounds[CS_SLIP] = Mix_LoadWAV("assets/slide.wav");
     a.sounds[CS_SNOW_FOOTSTEP] = Mix_LoadWAV("assets/snow-footstep-01.wav");

@@ -596,11 +596,11 @@ R"(sequence 3
     const char *multiplayer_levels[] = {
         "multiplayer 1\n"
         "###############\n"
-        "##w   pbpt   w#\n"
+        "#w    pbpt   w#\n"
         "###############\n"
-        "#     p       #\n"
         "#             #\n"
         "#             #\n"
+        "#      p      #\n"
         "#tb    #    bt#\n"
         "###############\n",
 

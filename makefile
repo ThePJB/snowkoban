@@ -43,6 +43,9 @@ $(ODIR)/%.owin: %.cpp
 windist: win
 	zip windist.zip *.dll assets/* snowkoban.exe
 
+lindist: snowkoban
+	zip lindist.zip assets/* snowkoban
+
 win: $(XOBJ)
 	$(XCC) -o snowkoban.exe $^ $(XLDFLAGS)
 

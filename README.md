@@ -237,6 +237,9 @@ draw titles above selected level
 level menu takes the input before hopping forward lol
 maybe draw level names with level on highlight in level menu
 
+maybe i should tone down the fireworks a bit its like dopamine city overload lol. or make them proportional to level difficulty
+clunk sound for sliding into wall
+
 S tier levels:
 * examples
  * icey nicey (# one)
@@ -247,3 +250,9 @@ S tier levels:
 * is its own tutorial
 * satisfying e.g. line em up and knock em down
 * aesthetic, e.g. symmetrical
+
+---------------------------
+missing a vorbis DLL or something so no music lmao
+yer idk i added dlls but no help
+memory leak in load function?
+new tune thanks james
