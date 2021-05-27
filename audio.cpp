@@ -13,8 +13,11 @@ audio audio_init() {
         printf("failed to open audio\n");
         exit(1);
     }
-
-    a.playlist.push(Mix_LoadMUS("assets/Tune_4.ogg"));
+    const auto tune4 = Mix_LoadMUS("assets/Tune_4.ogg");
+    if (tune4 == NULL) {
+        printf("error loading music");
+    }
+    a.playlist.push(tune4);
     a.playlist.push(Mix_LoadMUS("assets/Tune_5.ogg"));
     a.playlist.push(Mix_LoadMUS("assets/Tune_6.ogg"));
     a.sounds[CS_LOSE] = Mix_LoadWAV("assets/lose.ogg");
