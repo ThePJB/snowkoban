@@ -342,11 +342,16 @@ void game::handle_input(shared_data *app_d, SDL_Event e) {
                 game_move_player(this, dx, dy, app_d->time, &app_d->a);
             }
 
-        } else if (reset) {
-            audio_play(&app_d->a, CS_LOSE);
-            set_state(GS_REWIND);
-            undos_per_second = undos_per_second_initial;
+        } else if (reset && !e.key.repeat) {
+            if (undo(app_d)) {
+                set_state(GS_REWIND);
+                audio_play(&app_d->a, CS_LOSE);
+                undos_per_second = undos_per_second_initial;
+            }
         }
+    }
+    if (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_r) {
+        set_state(GS_NORMAL);
     }
 }
 

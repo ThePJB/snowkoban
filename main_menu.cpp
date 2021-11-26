@@ -40,7 +40,7 @@ void main_menu::handle_input(shared_data *app_d, SDL_Event e) {
             audio_play(&app_d->a, CS_MENU_SELECT);
             btn_callbacks[selection](app_d);
         }
-    } else if (e.type == SDL_MOUSEMOTION) {
+    }/* else if (e.type == SDL_MOUSEMOTION) {
         for (int i = 0; i < num_buttons; i++) {
             const auto pane_rect = rect::centered(app_d->gc.xres/2, app_d->gc.yres/2, 0.8 * app_d->gc.xres, 0.8 * app_d->gc.yres);
             const auto r = rect::centered_layout(pane_rect, 0.8*pane_rect.w, 0.2*pane_rect.h, 1,  num_buttons, 0, i);
@@ -61,7 +61,7 @@ void main_menu::handle_input(shared_data *app_d, SDL_Event e) {
                 audio_play(&app_d->a, CS_MENU_SELECT);
             }
         }
-    }
+    }*/
 }
 
 void main_menu::draw(shared_data *app_d, double dt) {

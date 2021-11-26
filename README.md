@@ -49,7 +49,7 @@
    - write to disk
    - res - text input (also depend scene stack)
    - slider
-   - full screen
+   - full screenshared_data
 
 double play of present dopamine sound is really annoying to fix
 be good if the sounds played off each other well and double play was good
